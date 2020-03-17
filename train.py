@@ -69,7 +69,7 @@ flags.DEFINE_integer('print_interval', 0, 'Interval for printing the loss and sa
 flags.DEFINE_string('exp_name', "debug", 'Name of the experiment')
 flags.DEFINE_string('basedir', "models", 'Directory where the models should be stored')
 flags.DEFINE_string('data_dir', "", 'Directory from where the data should be read in')
-flags.DEFINE_enum('data_type', 'hmnist', ['hmnist', 'physionet', 'sprites'], 'Type of data to be trained on')
+flags.DEFINE_enum('data_type', 'hmnist', ['hmnist', 'physionet', 'sprites', 'dsprites'], 'Type of data to be trained on')
 flags.DEFINE_integer('seed', 1337, 'Seed for the random number generator')
 flags.DEFINE_enum('model_type', 'gp-vae', ['vae', 'hi-vae', 'gp-vae'], 'Type of model to be trained')
 flags.DEFINE_integer('cnn_kernel_size', 3, 'Kernel size for the CNN preprocessor')
@@ -137,8 +137,16 @@ def main(argv):
         decoder = GaussianDecoder
         img_shape = (64, 64, 3)
         val_split = 8000
+    elif FLAGS.data_type == "dsprites":
+        if FLAGS.data_dir == "":
+            FLAGS.data_dir = "data/dsprites/dsprites_5000.npz"
+        data_dim = 4096
+        time_length = 10
+        decoder = GaussianDecoder
+        img_shape = (64, 64, 1)
+        val_split = 4000
     else:
-        raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites']")
+        raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites', 'dsprites']")
 
 
     #############
@@ -165,7 +173,7 @@ def main(argv):
             m_val_miss = data['m_train_miss']
             y_val = data['y_train']
             m_val_artificial = data["m_train_artificial"]
-    elif FLAGS.data_type in ['hmnist', 'sprites']:
+    elif FLAGS.data_type in ['hmnist', 'sprites', 'dsprites']:
         x_val_full = x_train_full[val_split:]
         x_val_miss = x_train_miss[val_split:]
         m_val_miss = m_train_miss[val_split:]
@@ -182,7 +190,7 @@ def main(argv):
         m_val_artificial = data["m_val_artificial"]
         y_val = data["y_val"]
     else:
-        raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites']")
+        raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites', 'dsprites']")
 
     tf_x_train_miss = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))\
                                      .shuffle(len(x_train_miss)).batch(FLAGS.batch_size).repeat()
@@ -190,13 +198,13 @@ def main(argv):
     tf_x_val_miss = tf.compat.v1.data.make_one_shot_iterator(tf_x_val_miss)
 
     # Build Conv2D preprocessor for image data
-    if FLAGS.data_type in ['hmnist', 'sprites']:
+    if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites']:
         print("Using CNN preprocessor")
         image_preprocessor = ImagePreprocessor(img_shape, FLAGS.cnn_sizes, FLAGS.cnn_kernel_size)
     elif FLAGS.data_type == 'physionet':
         image_preprocessor = None
     else:
-        raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites']")
+        raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites', 'dsprites']")
 
 
     ###############
@@ -306,7 +314,7 @@ def main(argv):
                     tf.contrib.summary.scalar("kl_val", val_kl)
                     tf.contrib.summary.scalar("nll_val", val_nll)
 
-                    if FLAGS.data_type in ["hmnist", "sprites"]:
+                    if FLAGS.data_type in ["hmnist", "sprites", "dsprites"]:
                         # Draw reconstructed images
                         x_hat = model.decode(model.encode(x_seq).sample()).mean()
                         tf.contrib.summary.image("input_train", tf.reshape(x_seq, [-1]+list(img_shape)))
@@ -396,7 +404,7 @@ def main(argv):
         print("AUROC: {:.4f}".format(auroc))
         print("AUPRC: {:.4f}".format(auprc))
 
-    elif FLAGS.data_type == "sprites":
+    elif FLAGS.data_type in ["sprites", "dsprites"]:
         auroc, auprc = 0, 0
 
     elif FLAGS.data_type == "physionet":
