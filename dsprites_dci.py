@@ -15,7 +15,7 @@ def main(argv):
     FLAGS = flags.FLAGS
 
     flags.DEFINE_string('data_dir', "", 'Directory from where the data should be read in')
-    flags.DEFINE_boolean('save', False, 'Save scores')
+    flags.DEFINE_boolean('save_score', False, 'Save scores')
 
     if FLAGS.data_dir == "":
         FLAGS.data_dir = "data/z_c_5000.npz"
@@ -40,8 +40,9 @@ def main(argv):
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
     scores = dci._compute_dci(c_train.transpose(), z_train.transpose(), c_test.transpose(), z_test.transpose())
-
-    if FLAGS.save:
+    
+    save_score = True
+    if save_score:
         np.savez('data/dci_scores/dci_{}_{}_{}.npz'.format(z_shape[1], c_shape[1], z_shape[0]),
                  informativeness_train=scores['informativeness_train'],
                  informativeness_test=scores['informativeness_test'],
