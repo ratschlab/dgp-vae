@@ -5,14 +5,21 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import numpy as np
+from absl import flags, app
 from sklearn.model_selection import train_test_split
 from disentanglement_lib.evaluation.metrics import dci
 
+def main(argv):
+    del argv # Unused
 
-def main():
-    # Hardcoded for now
-    data_path = '/Users/Simon/Documents/Uni/FS20/Semester Project/GP-VAE/data/z_c_5000.npz'
-    data = np.load(data_path)
+    FLAGS = flags.FLAGS
+
+    flags.DEFINE_string('data_dir', "", 'Directory from where the data should be read in')
+    flags.DEFINE_boolean('save', False, 'Save scores')
+
+    if FLAGS.data_dir == "":
+        FLAGS.data_dir = "data/z_c_5000.npz"
+    data = np.load(FLAGS.data_dir)
 
     z = data['z']
     c = data['c']
@@ -32,9 +39,14 @@ def main():
     z_reshape = z_reshape[:,mask]
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
-
     scores = dci._compute_dci(c_train.transpose(), z_train.transpose(), c_test.transpose(), z_test.transpose())
 
+    if FLAGS.save:
+        np.savez('data/dci_scores/dci_{}_{}_{}.npz'.format(z_shape[1], c_shape[1], z_shape[0]),
+                 informativeness_train=scores['informativeness_train'],
+                 informativeness_test=scores['informativeness_test'],
+                 disentanglement=scores['disentanglement'],
+                 completeness=scores['completeness'])
 
 if __name__ == '__main__':
-    main()
+    app.run(main)
