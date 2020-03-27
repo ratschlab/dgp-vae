@@ -139,7 +139,7 @@ def main(argv):
         val_split = 8000
     elif FLAGS.data_type == "dsprites":
         if FLAGS.data_dir == "":
-            FLAGS.data_dir = "data/dsprites/dsprites_5000.npz"
+            FLAGS.data_dir = "data/dsprites/dsprites_10000.npz"
         data_dim = 4096
         time_length = 10
         decoder = GaussianDecoder
@@ -179,10 +179,10 @@ def main(argv):
         m_val_miss = m_train_miss[val_split:]
         if FLAGS.data_type == 'hmnist':
             y_val = y_train[val_split:]
+            y_train = y_train[:val_split]
         x_train_full = x_train_full[:val_split]
         x_train_miss = x_train_miss[:val_split]
         m_train_miss = m_train_miss[:val_split]
-        y_train = y_train[:val_split]
     elif FLAGS.data_type == 'physionet':
         x_val_full = data["x_val_full"]  # full for artificial missings
         x_val_miss = data["x_val_miss"]
@@ -191,6 +191,8 @@ def main(argv):
         y_val = data["y_val"]
     else:
         raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites', 'dsprites']")
+
+    print('Data Loaded')
 
     tf_x_train_miss = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))\
                                      .shuffle(len(x_train_miss)).batch(FLAGS.batch_size).repeat()
