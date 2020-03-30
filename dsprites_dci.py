@@ -64,7 +64,7 @@ def main(argv):
 
     save_score = True
     if save_score:
-        np.savez('data/dci_scores/dci_{}_{}_{}'.format(z_shape[1], c_shape[1], z_shape[0]),
+        np.savez('data/dsprites/dci_scores/dci_{}_{}_{}'.format(z_shape[1], c_shape[1], z_shape[0]),
                  informativeness_train=scores['informativeness_train'],
                  informativeness_test=scores['informativeness_test'],
                  disentanglement=scores['disentanglement'],
