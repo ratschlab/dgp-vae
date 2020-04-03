@@ -23,11 +23,15 @@ import tensorflow as tf
 import gin.tf
 from absl import app, flags
 
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string('output_dir', 'test_output', 'Directory to save results in')
+
 def main(argv):
     del argv # Unused
 
     # Save all results in subdirectories of following path
-    base_path = 'test_output'
+    base_path = FLAGS.output_dir
 
     # Overwrite output or not (for rerunning script)
     overwrite = True

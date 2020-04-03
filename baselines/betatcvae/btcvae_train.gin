@@ -1,12 +1,12 @@
-dataset.name = "dsprites_full"
+dataset.name = "dsprites_custom"
 model.batch_size = 64
-model.model = @vae()
+model.model = @beta_tc_vae()
 model.random_seed = 0
-vae.beta = 4
+beta_tc_vae.beta = 4
 encoder.num_latent = 10
 vae_optimizer.optimizer_fn = @AdamOptimizer
 # We train for only 5 steps, in practice we train for 300000 steps.
-model.training_steps = 5
+model.training_steps = 1562
 model.random_seed=0
 AdamOptimizer.beta1 = 0.9
 AdamOptimizer.beta2 = 0.999
