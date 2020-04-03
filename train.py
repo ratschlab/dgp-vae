@@ -241,7 +241,7 @@ def main(argv):
     ########################
     # Training preparation #
     ########################
-
+    print("TF Version: ", tf.__version__)
     print("GPU support: ", tf.test.is_gpu_available())
 
     print("Training...")
