@@ -33,10 +33,10 @@ def main(argv):
     overwrite = True
 
     # Results directory of BetaTCVAE
-    path_btcvae = os.path.join(base_path,'vae')
+    path_btcvae = os.path.join(base_path,'betatcvae')
 
     # Train model. Training is configured with a gin config
-    train.train_with_gin(os.path.join(path_btcvae, 'model'), overwrite, ['btcvae_test.gin'])
+    train.train_with_gin(os.path.join(path_btcvae, 'model'), overwrite, ['btcvae_train.gin'])
 
     # Extract mean representation of latent space
     representation_path = os.path.join(path_btcvae, "representation")
