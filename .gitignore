@@ -106,3 +106,9 @@ data/*
 models/*
 lsf.*
 *.npz
+*.json
+*.pb
+*.index
+
+# Baseline output files
+baselines/betatcvae/test_output/*
