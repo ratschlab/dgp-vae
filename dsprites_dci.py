@@ -26,7 +26,7 @@ def load_z_c(z_path, c_path):
 
 def main(argv):
     del argv # Unused
-
+    
     if FLAGS.z_name == '':
         z_path = 'data/dsprites/factors_5000.npy'
     else:
@@ -62,7 +62,7 @@ def main(argv):
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
     scores = dci._compute_dci(c_train.transpose(), z_train.transpose(), c_test.transpose(), z_test.transpose())
 
-    save_score = True
+    save_score = False
     if save_score:
         np.savez('data/dsprites/dci_scores/dci_{}_{}_{}'.format(z_shape[1], c_shape[1], z_shape[0]),
                  informativeness_train=scores['informativeness_train'],
