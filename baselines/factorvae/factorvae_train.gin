@@ -1,0 +1,21 @@
+dataset.name = "dsprites_custom"
+model.batch_size = 64
+model.model = @factor_vae()
+model.random_seed = 0
+factor_vae.gamma = 10
+encoder.num_latent = 10
+vae_optimizer.optimizer_fn = @AdamOptimizer
+# We train for only 5 steps, in practice we train for 300000 steps.
+model.training_steps = 5
+model.random_seed=0
+discriminator.discriminator_fn = @fc_discriminator
+AdamOptimizer.beta1 = 0.9
+AdamOptimizer.beta2 = 0.999
+AdamOptimizer.epsilon = 1e-08
+AdamOptimizer.learning_rate = 0.0001
+AdamOptimizer.name = 'Adam'
+AdamOptimizer.use_locking = False
+discriminator_optimizer.optimizer_fn = @AdamOptimizer
+encoder.encoder_fn = @conv_encoder
+decoder.decoder_fn = @deconv_decoder
+reconstruction_loss.loss_fn = @bernoulli_loss

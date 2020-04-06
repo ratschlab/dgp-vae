@@ -112,3 +112,4 @@ lsf.*
 
 # Baseline output files
 baselines/betatcvae/test_output/*
+baselines/factorvae/test_output/*
