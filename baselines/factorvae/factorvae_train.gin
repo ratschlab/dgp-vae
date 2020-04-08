@@ -6,7 +6,7 @@ factor_vae.gamma = 10
 encoder.num_latent = 10
 vae_optimizer.optimizer_fn = @AdamOptimizer
 # We train for only 5 steps, in practice we train for 300000 steps.
-model.training_steps = 5
+model.training_steps = 100000
 model.random_seed=0
 discriminator.discriminator_fn = @fc_discriminator
 AdamOptimizer.beta1 = 0.9
