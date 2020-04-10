@@ -203,25 +203,25 @@ def main(argv):
         for k in range(len(x_val_miss)):
             yield x_val_miss[k,:,:], m_val_miss[k,:,:]
 
-    data_gen = tf.data.Dataset.from_generator(gen_train, (tf.float32, tf.float32), (tf.TensorShape(x_train_miss.shape[1:]), tf.TensorShape(m_train_miss.shape[1:])))
-    slice_gen = data_gen.take(1)
+    # data_gen = tf.data.Dataset.from_generator(gen_train, (tf.float32, tf.float32), (tf.TensorShape(x_train_miss.shape[1:]), tf.TensorShape(m_train_miss.shape[1:])))
+    # slice_gen = data_gen.take(1)
+    #
+    # data_slice = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))
+    # slice_sample = data_slice.take(1)
+    # print('=====================================================')
+    # print('TRAIN SHAPE: ',x_val_miss.shape)
+    # print('MISS SHAPE:', m_val_miss.shape)
+    # print(slice_sample)
+    # print('=====================================================')
+    # print(slice_gen)
+    # print('=====================================================')
+    #
+    # tf_x_train_miss = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))\
+    #                                  .shuffle(len(x_train_miss)).batch(FLAGS.batch_size).repeat()
+    # tf_x_val_miss = tf.data.Dataset.from_tensor_slices((x_val_miss, m_val_miss)).batch(FLAGS.batch_size).repeat()
 
-    data_slice = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))
-    slice_sample = data_slice.take(1)
-    print('=====================================================')
-    print('TRAIN SHAPE: ',x_val_miss.shape)
-    print('MISS SHAPE:', m_val_miss.shape)
-    print(slice_sample)
-    print('=====================================================')
-    print(slice_gen)
-    print('=====================================================')
-
-    tf_x_train_miss = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))\
-                                     .shuffle(len(x_train_miss)).batch(FLAGS.batch_size).repeat()
-    tf_x_val_miss = tf.data.Dataset.from_tensor_slices((x_val_miss, m_val_miss)).batch(FLAGS.batch_size).repeat()
-
-    # tf_x_train_miss = tf.data.Dataset.from_generator(gen_train, (tf.float32, tf.float32), (tf.TensorShape(x_train_miss.shape[1:]), tf.TensorShape(m_train_miss.shape[1:]))).shuffle(len(x_train_miss)).batch(FLAGS.batch_size).repeat()
-    # tf_x_val_miss = tf.data.Dataset.from_generator(gen_val, (tf.float32, tf.float32), (tf.TensorShape(x_val_miss.shape[1:]), tf.TensorShape(m_val_miss.shape[1:])))
+    tf_x_train_miss = tf.data.Dataset.from_generator(gen_train, (tf.float32, tf.float32), (tf.TensorShape(x_train_miss.shape[1:]), tf.TensorShape(m_train_miss.shape[1:]))).shuffle(len(x_train_miss)).batch(FLAGS.batch_size).repeat()
+    tf_x_val_miss = tf.data.Dataset.from_generator(gen_val, (tf.float32, tf.float32), (tf.TensorShape(x_val_miss.shape[1:]), tf.TensorShape(m_val_miss.shape[1:]))).batch(FLAGS.batch_size).repeat()
 
     tf_x_val_miss = tf.compat.v1.data.make_one_shot_iterator(tf_x_val_miss)
 
