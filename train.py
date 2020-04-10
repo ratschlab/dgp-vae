@@ -198,6 +198,8 @@ def main(argv):
     data_slice = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))
     slice_sample = data_slice.take(1)
     print('=====================================================')
+    print('TRAIN SHAPE: ',x_train_miss.shape)
+    print('MISS SHAPE:', m_train_miss.shape)
     print(slice_sample)
     print('=====================================================')
 
