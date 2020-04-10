@@ -194,6 +194,13 @@ def main(argv):
 
     print('Data Loaded')
 
+    # DEBUGGING
+    data_slice = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))
+    slice_sample = data_slice.take(1)
+    print('=====================================================')
+    print(slice_sample)
+    print('=====================================================')
+
     tf_x_train_miss = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))\
                                      .shuffle(len(x_train_miss)).batch(FLAGS.batch_size).repeat()
     tf_x_val_miss = tf.data.Dataset.from_tensor_slices((x_val_miss, m_val_miss)).batch(FLAGS.batch_size).repeat()
