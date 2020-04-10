@@ -199,7 +199,7 @@ def main(argv):
         for k in range(len(x_train_miss)):
             yield x_train_miss[k,:,:], m_train_miss[k,:,:]
 
-    data_gen = tf.data.Dataset.from_generator(gen_train, (tf.float32, tf.float32), (tf.TensorShape([10,4096]), tf.TensorShape([10,4096])))
+    data_gen = tf.data.Dataset.from_generator(gen_train, (tf.float32, tf.float32), (tf.TensorShape(x_train_miss.shape[1:]), tf.TensorShape(m_train_miss.shape[1:])))
     slice_gen = data_gen.take(1)
 
     data_slice = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))
