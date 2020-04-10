@@ -194,13 +194,22 @@ def main(argv):
 
     print('Data Loaded')
 
-    # DEBUGGING
+    # DEBUGGING GENERATOR
+    def gen_train():
+        for k in range(len(x_train_miss)):
+            yield x_train_miss[k,:,:], m_train_miss[k,:,:]
+
+    data_gen = tf.data.Dataset.from_generator(gen_train, (tf.float32, tf.float32), (tf.TensorShape([10,4096]), tf.TensorShape([10,4096])))
+    slice_gen = data_gen.take(1)
+
     data_slice = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))
     slice_sample = data_slice.take(1)
     print('=====================================================')
     print('TRAIN SHAPE: ',x_train_miss.shape)
     print('MISS SHAPE:', m_train_miss.shape)
     print(slice_sample)
+    print('=====================================================')
+    print(slice_gen)
     print('=====================================================')
 
     tf_x_train_miss = tf.data.Dataset.from_tensor_slices((x_train_miss, m_train_miss))\
