@@ -15,6 +15,9 @@ from matplotlib import pyplot as plt
 import tensorflow as tf
 
 tf.compat.v1.enable_eager_execution()
+# config = tf.compat.v1.ConfigProto()
+# config.gpu_options.allow_growth = True
+# tf.compat.v1.enable_eager_execution(config=config)
 
 from sklearn.metrics import average_precision_score, roc_auc_score
 from sklearn.linear_model import LogisticRegression
