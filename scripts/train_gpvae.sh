@@ -5,7 +5,7 @@
 #   mkdir -p models/dsprites_dim_$dim
 # done
 
-for n in {3..10}; do
+for n in {7..10}; do
   SEED=$RANDOM
   for dim in 8 16 32 64 128; do
 
