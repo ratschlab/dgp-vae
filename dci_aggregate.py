@@ -28,10 +28,10 @@ def aggregate(N, latent_dims, base_dir='dsprites_dim_'):
         n = 0
         for _, dirs, _ in os.walk(os.path.join("models", dim_dir)):
             for dir in dirs:
-                print(dir)
-                dci_file = glob(os.path.join(dir,'dci*'))
-                print(dci_file)
-                for _, _, files in os.walk(os.path.abspath(dir)):
+                print(os.path.abspath(dir))
+                # dci_file = glob(os.path.join(dir,'dci*'))
+                # print(dci_file)
+                for _, _, files in os.walk(os.path.dir)):
                     print('FILES: ',files)
                     for filename in files:
                         print(filename)
