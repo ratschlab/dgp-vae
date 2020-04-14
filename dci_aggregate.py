@@ -23,7 +23,7 @@ def aggregate(N, latent_dims, base_dir='dsprites_dim_'):
     """
     dci_scores = np.zeros((3,N,len(latent_dims)), dtype=np.float32)
 
-    for dim, m in latent_dims:
+    for dim, m in enumerate(latent_dims):
         dim_dir = base_dir+"{}".format(dim)
         n = 0
         for _, dirs, _ in os.walk(os.path.join("models", dim_dir)):
