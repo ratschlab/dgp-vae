@@ -26,6 +26,7 @@ from absl import app, flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('output_dir', 'test_output', 'Directory to save results in')
+flags.DEFINE_integer('seed', 42, 'Seed for the random number generator')
 
 def main(argv):
     del argv # Unused
@@ -37,21 +38,25 @@ def main(argv):
     overwrite = True
 
     # Results directory of Factor VAE
-    path_btcvae = os.path.join(base_path,'factorvae')
+    path_factorvae = os.path.join(base_path,'factorvae')
 
+    gin_bindings = [
+        "model.random_seed = {}".format(FLAGS.seed)
+    ]
     # Train model. Training is configured with a gin config
-    train.train_with_gin(os.path.join(path_btcvae, 'model'), overwrite, ['factorvae_train.gin'])
+    train.train_with_gin(os.path.join(path_factorvae, 'model'), overwrite,
+                         ['factorvae_train.gin'], gin_bindings)
 
     # Extract mean representation of latent space
-    representation_path = os.path.join(path_btcvae, "representation")
-    model_path = os.path.join(path_btcvae, "model")
+    representation_path = os.path.join(path_factorvae, "representation")
+    model_path = os.path.join(path_factorvae, "model")
     postprocess_gin = ["factorvae_postprocess.gin"]  # This contains the settings.
     postprocess.postprocess_with_gin(model_path, representation_path, overwrite,
                                      postprocess_gin)
 
     # Compute DCI metric
-    result_path = os.path.join(path_btcvae, "metrics", "dci")
-    representation_path = os.path.join(path_btcvae, "representation")
+    result_path = os.path.join(path_factorvae, "metrics", "dci")
+    representation_path = os.path.join(path_factorvae, "representation")
     evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['factorvae_dci.gin'])
 
 if __name__ == '__main__':

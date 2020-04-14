@@ -1,5 +1,5 @@
 """
-BetaTCVAE training script for dsprites dataset, using disentanglement_lib.
+DIP VAE I training script for dsprites dataset, using disentanglement_lib.
 Also evaluates DCI metric and saves outputs.
 
 Simon Bing
@@ -37,27 +37,27 @@ def main(argv):
     # Overwrite output or not (for rerunning script)
     overwrite = True
 
-    # Results directory of BetaTCVAE
-    path_btcvae = os.path.join(base_path,'betatcvae')
+    # Results directory of Factor VAE
+    path_dipvae = os.path.join(base_path,'dipvae_I')
 
     gin_bindings = [
         "model.random_seed = {}".format(FLAGS.seed)
     ]
     # Train model. Training is configured with a gin config
-    train.train_with_gin(os.path.join(path_btcvae, 'model'), overwrite,
-                         ['btcvae_train.gin'], gin_bindings)
+    train.train_with_gin(os.path.join(path_dipvae, 'model'), overwrite,
+                         ['dipvae_I_train.gin'], gin_bindings)
 
     # Extract mean representation of latent space
-    representation_path = os.path.join(path_btcvae, "representation")
-    model_path = os.path.join(path_btcvae, "model")
-    postprocess_gin = ["btcvae_postprocess.gin"]  # This contains the settings.
+    representation_path = os.path.join(path_dipvae, "representation")
+    model_path = os.path.join(path_dipvae, "model")
+    postprocess_gin = ["dipvae_I_postprocess.gin"]  # This contains the settings.
     postprocess.postprocess_with_gin(model_path, representation_path, overwrite,
                                      postprocess_gin)
 
     # Compute DCI metric
-    result_path = os.path.join(path_btcvae, "metrics", "dci")
-    representation_path = os.path.join(path_btcvae, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['btcvae_dci.gin'])
+    result_path = os.path.join(path_dipvae, "metrics", "dci")
+    representation_path = os.path.join(path_dipvae, "representation")
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['dipvae_I_dci.gin'])
 
 if __name__ == '__main__':
     app.run(main)

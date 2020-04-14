@@ -25,24 +25,20 @@ def aggregate(N, latent_dims, base_dir='dsprites_dim_'):
 
     for m, dim in enumerate(latent_dims):
         dim_dir = base_dir+"{}".format(dim)
-        n = 0
+        # n = 0
         models_path = os.path.join('models', dim_dir)
         for _, dirs, _ in os.walk(models_path):
             for n, dir in enumerate(dirs):
-                # print(os.path.abspath(dir))
-                # dci_file = glob(os.path.join(dir,'dci*'))
-                # print(dci_file)
                 for _, _, files in os.walk(os.path.join(models_path,dir)):
-                    # print('FILES: ',files)
                     for filename in files:
-                        # print(filename)
                         if filename.startswith('dci'):
-                            print(filename)
-                            dci = np.load(filename)
-                        # dci_file = glob(os.path.join(dir,'dci*')) # This should find the file that begin with dci so full name doesnt have to be specified MUST STILL BE TESTED
-                        # print(dci_file)
-                        # dci = np.load(dci_file)
-                        # dci_scores[0,n,m]
+                            # print(n, filename)
+                            dci = np.load(filename) # Might need abspath here
+                            dci_scores[0,n,m] = dci['disentanglement']
+                            dci_scores[1,n,m] = dci['completeness']
+                            dci_scores[2,n,m] = dci['informativeness']
+
+    return dci_scores
 
 def main(argv):
     del argv # Unused
