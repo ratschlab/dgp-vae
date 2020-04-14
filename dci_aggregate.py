@@ -30,6 +30,7 @@ def aggregate(N, latent_dims, base_dir='dsprites_dim_'):
             for dir in dirs:
                 print(dir)
                 for _, _, files in os.walk(dir):
+                    print(files)
                     for filename in files:
                         print(filename)
                         if filename.startswith('dci'):
