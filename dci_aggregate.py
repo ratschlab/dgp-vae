@@ -10,7 +10,11 @@ import os
 from glob import glob
 from absl import flags, app
 
-def aggregate(N, latent_dims, base_dir='dsprites_dim_'):
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string('model', 'gpvae', 'Model for dci scores should be evaluated')
+
+def aggregate_gpvae(N, latent_dims, base_dir='dsprites_dim_'):
     """
     Collects all dci scores and aggregates into single array.
     Args:
@@ -44,9 +48,14 @@ def main(argv):
     del argv # Unused
 
     n_experiments = 10
-    latent_dims = [8, 16, 32, 64, 128]
 
-    dci_scores = aggregate(n_experiments, latent_dims)
+    if FLAGS.model == 'gpvae':
+        latent_dims = [8, 16, 32, 64, 128]
+        dci_scores = aggregate_gpvae(n_experiments, latent_dims)
+    elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
+        blabla
+    else:
+        raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
 if __name__ == '__main__':
     app.run(main)

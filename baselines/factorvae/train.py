@@ -32,13 +32,13 @@ def main(argv):
     del argv # Unused
 
     # Save all results in subdirectories of following path
-    base_path = FLAGS.output_dir
+    base_path = 'dim_64'
 
     # Overwrite output or not (for rerunning script)
     overwrite = True
 
     # Results directory of Factor VAE
-    path_factorvae = os.path.join(base_path,'factorvae')
+    path_factorvae = os.path.join(base_path,FLAGS.output_dir)
 
     gin_bindings = [
         "model.random_seed = {}".format(FLAGS.seed)

@@ -32,32 +32,32 @@ def main(argv):
     del argv # Unused
 
     # Save all results in subdirectories of following path
-    base_path = FLAGS.output_dir
+    base_path = 'dim_64'
 
     # Overwrite output or not (for rerunning script)
     overwrite = True
 
     # Results directory of Factor VAE
-    path_dipvae = os.path.join(base_path,'dipvae_I')
+    path_dipvae = os.path.join(base_path,FLAGS.output_dir)
 
     gin_bindings = [
         "model.random_seed = {}".format(FLAGS.seed)
     ]
     # Train model. Training is configured with a gin config
     train.train_with_gin(os.path.join(path_dipvae, 'model'), overwrite,
-                         ['dipvae_I_train.gin'], gin_bindings)
+                         ['dipvae_i_train.gin'], gin_bindings)
 
     # Extract mean representation of latent space
     representation_path = os.path.join(path_dipvae, "representation")
     model_path = os.path.join(path_dipvae, "model")
-    postprocess_gin = ["dipvae_I_postprocess.gin"]  # This contains the settings.
+    postprocess_gin = ["dipvae_i_postprocess.gin"]  # This contains the settings.
     postprocess.postprocess_with_gin(model_path, representation_path, overwrite,
                                      postprocess_gin)
 
     # Compute DCI metric
     result_path = os.path.join(path_dipvae, "metrics", "dci")
     representation_path = os.path.join(path_dipvae, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['dipvae_I_dci.gin'])
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['dipvae_i_dci.gin'])
 
 if __name__ == '__main__':
     app.run(main)
