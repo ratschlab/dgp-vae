@@ -30,7 +30,7 @@ def aggregate(N, latent_dims, base_dir='dsprites_dim_'):
             for dir in dirs:
                 dci_file = glob(os.path.join(dir,'dci*')) # This should find the file that begin with dci so full name doesnt have to be specified MUST STILL BE TESTED
                 print(dci_file)
-                dci = np.load(dci_file)
+                # dci = np.load(dci_file)
                 # dci_scores[0,n,m]
 
 def main(argv):
