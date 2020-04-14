@@ -62,7 +62,7 @@ def main(argv):
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
     scores = dci._compute_dci(c_train.transpose(), z_train.transpose(), c_test.transpose(), z_test.transpose())
 
-    save_score = False
+    save_score = True
     if save_score:
         np.savez('{}/dci_{}_{}_{}'.format(FLAGS.model_name, z_shape[1], c_shape[1], z_shape[0]),
                  informativeness_train=scores['informativeness_train'],
