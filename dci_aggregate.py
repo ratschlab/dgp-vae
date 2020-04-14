@@ -30,6 +30,7 @@ def aggregate(N, latent_dims, base_dir='dsprites_dim_'):
             for dir in dirs:
                 for _, _, files in os.walk(dir):
                     for filename in files:
+                        print(filename)
                         if filename.startswith('dci'):
                             print(filename)
                         # dci_file = glob(os.path.join(dir,'dci*')) # This should find the file that begin with dci so full name doesnt have to be specified MUST STILL BE TESTED
