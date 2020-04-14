@@ -28,10 +28,14 @@ def aggregate(N, latent_dims, base_dir='dsprites_dim_'):
         n = 0
         for _, dirs, _ in os.walk(os.path.join("models", dim_dir)):
             for dir in dirs:
-                dci_file = glob(os.path.join(dir,'dci*')) # This should find the file that begin with dci so full name doesnt have to be specified MUST STILL BE TESTED
-                print(dci_file)
-                # dci = np.load(dci_file)
-                # dci_scores[0,n,m]
+                for _, _, files in os.walk(dir):
+                    for filename in files:
+                        if filename.startswith('dci'):
+                            print(filename)
+                        # dci_file = glob(os.path.join(dir,'dci*')) # This should find the file that begin with dci so full name doesnt have to be specified MUST STILL BE TESTED
+                        # print(dci_file)
+                        # dci = np.load(dci_file)
+                        # dci_scores[0,n,m]
 
 def main(argv):
     del argv # Unused
