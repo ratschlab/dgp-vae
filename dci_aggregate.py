@@ -14,6 +14,7 @@ from absl import flags, app
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('model', 'gpvae', 'Model for dci scores should be evaluated')
+flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
 def aggregate_gpvae(N, latent_dims, base_dir='dsprites_dim_'):
     """
@@ -81,6 +82,9 @@ def main(argv):
         dci_scores = aggregate_baseline(n_experiments)
     else:
         raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
+
+    if FLAGS.save:
+        np.save('gpvae_dci_aggr.npy', dci_scores)
 
 if __name__ == '__main__':
     app.run(main)
