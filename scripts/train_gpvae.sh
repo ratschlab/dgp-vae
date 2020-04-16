@@ -1,11 +1,11 @@
 #!/bin/bash
 
-Create directory for each tested latent dimension
+# Create directory for each tested latent dimension
 for dim in 8 16 32 64 128 256; do
   mkdir -p models/dsprites_dim_"$dim"_tensor
 done
 
-for n in {1..10}; do
+for n in {7..10}; do
   SEED=$RANDOM
   for dim in 8 16 32 64 128; do
 
