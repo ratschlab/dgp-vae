@@ -7,7 +7,7 @@ done
 
 for n in 1; do
   SEED=4731
-  for dim in 8 16; do
+  for dim in 8 16 32 64 128; do
 
   bsub -o models/dsprites_dim_"$dim"_debug2/lfs_log_$dim -g /gpvae_disent -R "rusage[mem=16000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]"\
   python train.py --model_type gp-vae --data_type dsprites --exp_name dsprites_"$dim"_debug_n$n \
