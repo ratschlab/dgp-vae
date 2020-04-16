@@ -330,7 +330,8 @@ def main(argv):
                     loss, nll, kl = model.compute_loss(x_seq, m_mask=m_seq, return_parts=True)
                     print("Train loss = {:.3f} | NLL = {:.3f} | KL = {:.3f}".format(loss, nll, kl))
 
-                    saver.save(checkpoint_prefix)
+                    # Dont save checkpoints for now to save disk space.
+                    # saver.save(checkpoint_prefix)
                     tf.contrib.summary.scalar("loss_train", loss)
                     tf.contrib.summary.scalar("kl_train", kl)
                     tf.contrib.summary.scalar("nll_train", nll)
@@ -413,11 +414,11 @@ def main(argv):
     z_mean = [model.encode(x_batch).mean().numpy() for x_batch in x_val_miss_batches]
     np.save(os.path.join(outdir, "z_mean"), np.vstack(z_mean))
     x_val_imputed = np.vstack([model.decode(z_batch).mean().numpy() for z_batch in z_mean])
-    np.save(os.path.join(outdir, "imputed_no_gt"), x_val_imputed)
+    # np.save(os.path.join(outdir, "imputed_no_gt"), x_val_imputed)
 
     # impute gt observed values
     x_val_imputed[m_val_miss == 0] = x_val_miss[m_val_miss == 0]
-    np.save(os.path.join(outdir, "imputed"), x_val_imputed)
+    # np.save(os.path.join(outdir, "imputed"), x_val_imputed)
 
     if FLAGS.data_type == "hmnist":
         # AUROC evaluation using Logistic Regression
