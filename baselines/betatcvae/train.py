@@ -32,7 +32,7 @@ def main(argv):
     del argv # Unused
 
     # Save all results in subdirectories of following path
-    base_path = 'dim_64'
+    base_path = '/baselines/betatcvae/dim_64'
 
     # Overwrite output or not (for rerunning script)
     overwrite = True
