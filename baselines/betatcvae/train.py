@@ -45,7 +45,7 @@ def main(argv):
     ]
     # Train model. Training is configured with a gin config
     train.train_with_gin(os.path.join(path_btcvae, 'model'), overwrite,
-                         [os.path.realpath('btcvae_train.gin')], gin_bindings)
+                         [os.path.realpath('baselines/betatcvae/btcvae_train.gin')], gin_bindings)
 
     # Extract mean representation of latent space
     representation_path = os.path.join(path_btcvae, "representation")
