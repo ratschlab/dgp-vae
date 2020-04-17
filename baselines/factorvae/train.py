@@ -57,7 +57,7 @@ def main(argv):
     # Compute DCI metric
     result_path = os.path.join(path_factorvae, "metrics", "dci")
     representation_path = os.path.join(path_factorvae, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.realpath('baselines/factorvae/factorvae_dci.gin')]
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.realpath('baselines/factorvae/factorvae_dci.gin')])
 
 if __name__ == '__main__':
     app.run(main)
