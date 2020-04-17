@@ -30,7 +30,7 @@ def aggregate_gpvae(N, latent_dims, base_dir='dsprites_dim_'):
     dci_scores = np.zeros((3,N,len(latent_dims)), dtype=np.float32)
 
     for m, dim in enumerate(latent_dims):
-        dim_dir = base_dir+"{}_tensor".format(dim)
+        dim_dir = base_dir+"{}_tensor2".format(dim)
         # n = 0
         models_path = os.path.join('models', dim_dir)
         for _, dirs, _ in os.walk(models_path):
@@ -73,7 +73,7 @@ def aggregate_baseline(N, base_dir='dim_64'):
 def main(argv):
     del argv # Unused
 
-    n_experiments = 5
+    n_experiments = 10
 
     if FLAGS.model == 'gpvae':
         latent_dims = [8, 16, 32, 64, 128]
