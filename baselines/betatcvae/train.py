@@ -50,14 +50,14 @@ def main(argv):
     # Extract mean representation of latent space
     representation_path = os.path.join(path_btcvae, "representation")
     model_path = os.path.join(path_btcvae, "model")
-    postprocess_gin = ["btcvae_postprocess.gin"]  # This contains the settings.
+    postprocess_gin = [os.path.realpath('baselines/betatcvae/btcvae_postprocess.gin')]  # This contains the settings.
     postprocess.postprocess_with_gin(model_path, representation_path, overwrite,
                                      postprocess_gin)
 
     # Compute DCI metric
     result_path = os.path.join(path_btcvae, "metrics", "dci")
     representation_path = os.path.join(path_btcvae, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['btcvae_dci.gin'])
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.realpath('baselines/betatcvae/btcvae_dci.gin')])
 
 if __name__ == '__main__':
     app.run(main)

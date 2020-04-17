@@ -45,19 +45,19 @@ def main(argv):
     ]
     # Train model. Training is configured with a gin config
     train.train_with_gin(os.path.join(path_factorvae, 'model'), overwrite,
-                         ['factorvae_train.gin'], gin_bindings)
+                         [os.path.realpath('baselines/factorvae/factorvae_train.gin')], gin_bindings)
 
     # Extract mean representation of latent space
     representation_path = os.path.join(path_factorvae, "representation")
     model_path = os.path.join(path_factorvae, "model")
-    postprocess_gin = ["factorvae_postprocess.gin"]  # This contains the settings.
+    postprocess_gin = [os.path.realpath('baselines/factorvae/factorvae_postprocess.gin')]  # This contains the settings.
     postprocess.postprocess_with_gin(model_path, representation_path, overwrite,
                                      postprocess_gin)
 
     # Compute DCI metric
     result_path = os.path.join(path_factorvae, "metrics", "dci")
     representation_path = os.path.join(path_factorvae, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['factorvae_dci.gin'])
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.realpath('baselines/factorvae/factorvae_dci.gin'))
 
 if __name__ == '__main__':
     app.run(main)
