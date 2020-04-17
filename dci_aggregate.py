@@ -84,7 +84,7 @@ def main(argv):
         raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
     if FLAGS.save:
-        np.save('gpvae_tensor_dci_aggr.npy', dci_scores)
+        np.save('gpvae_tensor2_dci_aggr.npy', dci_scores)
 
 if __name__ == '__main__':
     app.run(main)
