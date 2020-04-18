@@ -16,7 +16,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('model', 'gpvae', 'Model for dci scores should be evaluated')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
-def walklevel(some_dir, level=1):
+def walklevel(some_dir, level=0):
     some_dir = some_dir.rstrip(os.path.sep)
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
