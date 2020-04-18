@@ -16,6 +16,16 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('model', 'gpvae', 'Model for dci scores should be evaluated')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
+def walklevel(some_dir, level=1):
+    some_dir = some_dir.rstrip(os.path.sep)
+    assert os.path.isdir(some_dir)
+    num_sep = some_dir.count(os.path.sep)
+    for root, dirs, files in os.walk(some_dir):
+        yield root, dirs, files
+        num_sep_this = root.count(os.path.sep)
+        if num_sep + level <= num_sep_this:
+            del dirs[:]
+
 def aggregate_gpvae(N, latent_dims, base_dir='dsprites_dim_'):
     """
     Collects all dci scores and aggregates into single array.
@@ -60,7 +70,7 @@ def aggregate_baseline(N, base_dir='dim_64'):
 
     base_path = os.path.join('baselines', FLAGS.model, base_dir)
 
-    for _, dirs, _ in os.walk(base_path):
+    for _, dirs, _ in walklevel(base_path):
         for n, dir in enumerate(dirs):
             print(n, dir)
             json_path = os.path.join(base_path, dir, 'metrics', 'dci', 'results', 'aggregate', 'evaluation.json')
