@@ -79,12 +79,12 @@ def main(argv):
         latent_dims = [8, 16, 32, 64, 128]
         dci_scores = aggregate_gpvae(n_experiments, latent_dims)
     elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
-        dci_scores = aggregate_baseline(n_experiments)
+        dci_scores = aggregate_baseline(n_experiments, base_dir='dim_64')
     else:
         raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
     if FLAGS.save:
-        np.save('gpvae_tensor2_dci_aggr.npy', dci_scores)
+        np.save('{}_64_dci_aggr.npy'.format(FLAGS.model), dci_scores)
 
 if __name__ == '__main__':
     app.run(main)
