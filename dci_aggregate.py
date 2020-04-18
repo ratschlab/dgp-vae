@@ -62,11 +62,12 @@ def aggregate_baseline(N, base_dir='dim_64'):
 
     for _, dirs, _ in os.walk(base_path):
         for n, dir in enumerate(dirs):
-            dci = json.load(os.path.join(base_path, dir, 'metrics', 'dci', 'results',
-                                      'aggregate', 'evaluation.json')) # PROPERLY PARSE JSON FILE
-            dci_scores[0,n] = dci['evaluation_results.disentanglement']
-            dci_scores[1,n] = dci['evaluation_results.completeness']
-            dci_scores[2,n] = dci['evaluation_results.informativeness_test']
+            json_path = os.path.join(base_path, dir, 'metrics', 'dci', 'results', 'aggregate', 'evaluation.json')
+            with open(json_path) as json_file:
+                dci = json.load(json_file) # PROPERLY PARSE JSON FILE
+                dci_scores[0,n] = dci['evaluation_results.disentanglement']
+                dci_scores[1,n] = dci['evaluation_results.completeness']
+                dci_scores[2,n] = dci['evaluation_results.informativeness_test']
 
     return dci_scores
 
