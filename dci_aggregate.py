@@ -62,6 +62,7 @@ def aggregate_baseline(N, base_dir='dim_64'):
 
     for _, dirs, _ in os.walk(base_path):
         for n, dir in enumerate(dirs):
+            print(n, dir)
             json_path = os.path.join(base_path, dir, 'metrics', 'dci', 'results', 'aggregate', 'evaluation.json')
             with open(json_path) as json_file:
                 dci = json.load(json_file) # PROPERLY PARSE JSON FILE
