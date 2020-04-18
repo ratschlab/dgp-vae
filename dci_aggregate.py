@@ -74,7 +74,7 @@ def aggregate_baseline(N, base_dir='dim_64'):
 def main(argv):
     del argv # Unused
 
-    n_experiments = 10
+    n_experiments = 9
 
     if FLAGS.model == 'gpvae':
         latent_dims = [8, 16, 32, 64, 128]
