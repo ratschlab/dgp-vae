@@ -97,7 +97,10 @@ def main(argv):
         raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
     if FLAGS.save:
-        np.save('{}_{}_dci_aggr.npy'.format(FLAGS.model, FLAGS.exp_name), dci_scores)
+        if FLAGS.exp_name == '':
+            np.save('{}_64_dci_aggr.npy'.format(FLAGS.model), dci_scores)
+        else:
+            np.save('{}_{}_dci_aggr.npy'.format(FLAGS.model, FLAGS.exp_name), dci_scores)
 
 if __name__ == '__main__':
     app.run(main)
