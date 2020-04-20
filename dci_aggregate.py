@@ -14,6 +14,7 @@ from absl import flags, app
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('model', 'gpvae', 'Model for dci scores should be evaluated')
+flags.DEFINE_string('exp_name', '', 'Experiment name')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
 def walklevel(some_dir, level=0):
@@ -40,8 +41,8 @@ def aggregate_gpvae(N, latent_dims, base_dir='dsprites_dim_'):
     dci_scores = np.zeros((3,N,len(latent_dims)), dtype=np.float32)
 
     for m, dim in enumerate(latent_dims):
-        dim_dir = base_dir+"{}_tensor2".format(dim)
-        # n = 0
+        dim_dir = base_dir+"{}_{}".format(dim, FLAGS.exp_name)
+
         models_path = os.path.join('models', dim_dir)
         for _, dirs, _ in os.walk(models_path):
             for n, dir in enumerate(dirs):
@@ -85,7 +86,7 @@ def aggregate_baseline(N, base_dir='dim_64'):
 def main(argv):
     del argv # Unused
 
-    n_experiments = 9
+    n_experiments = 10
 
     if FLAGS.model == 'gpvae':
         latent_dims = [8, 16, 32, 64, 128]
@@ -96,7 +97,7 @@ def main(argv):
         raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
     if FLAGS.save:
-        np.save('{}_64_dci_aggr.npy'.format(FLAGS.model), dci_scores)
+        np.save('{}_{}_dci_aggr.npy'.format(FLAGS.model, FLAGS.exp_name), dci_scores)
 
 if __name__ == '__main__':
     app.run(main)
