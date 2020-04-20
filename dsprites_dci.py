@@ -27,10 +27,11 @@ def load_z_c(z_path, c_path):
 def main(argv):
     del argv # Unused
 
-    if FLAGS.z_name == '':
-        z_path = 'data/dsprites/factors_5000.npy'
-    else:
-        z_path = 'data/dsprites/{}'.format(FLAGS.z_name)
+    # if FLAGS.z_name == '':
+    #     z_path = 'data/dsprites/factors_5000.npy'
+    # else:
+    #     z_path = 'data/dsprites/{}'.format(FLAGS.z_name)
+    z_path = 'data/dsprites/{}'.format(FLAGS.z_name)
     c_path = '{}/z_mean.npy'.format(FLAGS.model_name)
 
     z, c = load_z_c(z_path, c_path)
