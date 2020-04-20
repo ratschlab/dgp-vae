@@ -45,19 +45,19 @@ def main(argv):
     ]
     # Train model. Training is configured with a gin config
     train.train_with_gin(os.path.join(path_dipvae, 'model'), overwrite,
-                         [os.path.realpath('baselines/betatcvae/dipvae_i_train.gin')], gin_bindings)
+                         [os.path.realpath('baselines/dipvae_i/dipvae_i_train.gin')], gin_bindings)
 
     # Extract mean representation of latent space
     representation_path = os.path.join(path_dipvae, "representation")
     model_path = os.path.join(path_dipvae, "model")
-    postprocess_gin = [os.path.realpath('baselines/betatcvae/dipvae_i_postprocess.gin')]  # This contains the settings.
+    postprocess_gin = [os.path.realpath('baselines/dipvae_i/dipvae_i_postprocess.gin')]  # This contains the settings.
     postprocess.postprocess_with_gin(model_path, representation_path, overwrite,
                                      postprocess_gin)
 
     # Compute DCI metric
     result_path = os.path.join(path_dipvae, "metrics", "dci")
     representation_path = os.path.join(path_dipvae, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.realpath('baselines/betatcvae/dipvae_i_dci.gin')])
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.realpath('baselines/dipvae_i/dipvae_i_dci.gin')])
 
 if __name__ == '__main__':
     app.run(main)
