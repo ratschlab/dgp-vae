@@ -32,7 +32,7 @@ def main(argv):
     del argv # Unused
 
     # Save all results in subdirectories of following path
-    base_path = 'baselines/betatcvae/dim_8'
+    base_path = 'baselines/betatcvae/dim_16'
 
     # Overwrite output or not (for rerunning script)
     overwrite = True
