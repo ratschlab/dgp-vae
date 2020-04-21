@@ -92,13 +92,13 @@ def main(argv):
         latent_dims = [8, 16, 32, 64, 128]
         dci_scores = aggregate_gpvae(n_experiments, latent_dims)
     elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
-        dci_scores = aggregate_baseline(n_experiments, base_dir='dim_8')
+        dci_scores = aggregate_baseline(n_experiments, base_dir='dim_16')
     else:
         raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
     if FLAGS.save:
         if FLAGS.exp_name == '':
-            np.save('{}_8_dci_aggr.npy'.format(FLAGS.model), dci_scores)
+            np.save('{}_16_dci_aggr.npy'.format(FLAGS.model), dci_scores)
         else:
             np.save('{}_{}_dci_aggr.npy'.format(FLAGS.model, FLAGS.exp_name), dci_scores)
 
