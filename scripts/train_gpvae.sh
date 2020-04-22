@@ -2,7 +2,7 @@
 
 # Create directory for each tested latent dimension
 for dim in 8 16 32 64 128; do
-  mkdir -p models/dsprites_dim_"$dim"_gp_full1
+  mkdir -p models/dsprites_dim_"$dim"_sin_rand1
 done
 
 for n in {1..10}; do
