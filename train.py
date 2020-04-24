@@ -142,7 +142,7 @@ def main(argv):
         val_split = 8000
     elif FLAGS.data_type == "dsprites":
         if FLAGS.data_dir == "":
-            FLAGS.data_dir = "data/dsprites/dsprites_sin_rand_5000.npz"
+            FLAGS.data_dir = "data/dsprites/dsprites_sin_no_ss_5000.npz"
         data_dim = 4096
         time_length = 10
         decoder = GaussianDecoder
