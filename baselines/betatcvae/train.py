@@ -26,13 +26,15 @@ from absl import app, flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('output_dir', 'test_output', 'Directory to save results in')
+flags.DEFINE_integer('dim', 32, 'Latent dimension of encoder')
+flags.DEFINE_string('subset', "", 'Subset of factors of tested dataset')
 flags.DEFINE_integer('seed', 42, 'Seed for the random number generator')
 
 def main(argv):
     del argv # Unused
 
     # Save all results in subdirectories of following path
-    base_path = 'baselines/betatcvae/dim_32'
+    base_path = 'baselines/betatcvae/dim_{}_subset_{}'.format(FLAGS.dim, FLAGS.subset)
 
     # Overwrite output or not (for rerunning script)
     overwrite = True
@@ -41,7 +43,9 @@ def main(argv):
     path_btcvae = os.path.join(base_path,FLAGS.output_dir)
 
     gin_bindings = [
-        "model.random_seed = {}".format(FLAGS.seed)
+        "model.random_seed = {}".format(FLAGS.seed),
+        "subset.name = '{}'".format(FLAGS.subset),
+        "encoder.num_latent = {}".format(FLAGS.dim)
     ]
     # Train model. Training is configured with a gin config
     train.train_with_gin(os.path.join(path_btcvae, 'model'), overwrite,
