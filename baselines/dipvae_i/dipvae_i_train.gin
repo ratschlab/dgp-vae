@@ -1,4 +1,5 @@
-dataset.name = "dsprites_custom"
+dataset.name = "dsprites_full"
+subset.name = "sin_order_ss"
 model.batch_size = 64
 model.model = @dip_vae()
 model.random_seed = 0
