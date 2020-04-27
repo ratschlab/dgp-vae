@@ -31,8 +31,10 @@ def main(argv):
     #     z_path = 'data/dsprites/factors_5000.npy'
     # else:
     #     z_path = 'data/dsprites/{}'.format(FLAGS.z_name)
-    z_path = 'data/dsprites/{}'.format(FLAGS.z_name)
+    # z_path = 'data/dsprites/{}'.format(FLAGS.z_name)
     c_path = '{}/z_mean.npy'.format(FLAGS.model_name)
+    z_path = os.path.join(os.environ.get("DISENTANGLEMENT_LIB_DATA", "."),
+                          "dsprites", "factors", FLAGS.z_name)
 
     z, c = load_z_c(z_path, c_path)
 
