@@ -13,7 +13,7 @@ from absl import flags, app
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('model', 'gpvae', 'Model for dci scores should be evaluated')
+flags.DEFINE_string('model', 'gpvae', 'Model for which dci score should be calculated')
 flags.DEFINE_string('exp_name', '', 'Experiment name')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
