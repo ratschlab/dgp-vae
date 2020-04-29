@@ -109,9 +109,24 @@ lsf.*
 *.json
 *.pb
 *.index
+.DS_Store
 
-# Baseline output files
-baselines/betatcvae/test_output/*
-baselines/betatcvae/beta*
-baselines/factorvae/test_output/*
-baselines/factorvae/fvae*
+# Baselines
+baselines/betatcvae
+baselines/factorvae
+baselines/dipvae_i
+
+!/baselines/betatcvae/train.py
+!/baselines/betatcvae/btcvae_dci.gin
+!/baselines/betatcvae/btcvae_postprocess.gin
+!/baselines/betatcvae/btcvae_train.gin
+
+!/baselines/factorvae/train.py
+!/baselines/factorvae/factorvae_dci.gin
+!/baselines/factorvae/factorvae_postprocess.gin
+!/baselines/factorvae/factorvae_train.gin
+
+!/baselines/dipvae_i/train.py
+!/baselines/dipvae_i/dipvae_i_dci.gin
+!/baselines/dipvae_i/dipvae_i_postprocess.gin
+!/baselines/dipvae_i/dipvae_i_train.gin
