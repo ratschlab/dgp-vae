@@ -164,7 +164,7 @@ def main(argv):
         y_train = data['y_train']
 
     if FLAGS.testing:
-        if FLAGS.data_type in ['hmnist', 'sprites']:
+        if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites']:
             x_val_full = data['x_test_full']
             x_val_miss = data['x_test_miss']
             m_val_miss = data['m_test_miss']
