@@ -224,7 +224,7 @@ def main(argv):
     #                                  .shuffle(len(x_train_miss)).batch(FLAGS.batch_size).repeat()
     # tf_x_val_miss = tf.data.Dataset.from_tensor_slices((x_val_miss, m_val_miss)).batch(FLAGS.batch_size).repeat()
 
-    tf_x_train_miss = tf.data.Dataset.from_generator(gen_train, (tf.float32, tf.float32), (tf.TensorShape(x_train_miss.shape[1:]), tf.TensorShape(m_train_miss.shape[1:]))).batch(FLAGS.batch_size).repeat()
+    tf_x_train_miss = tf.data.Dataset.from_generator(gen_train, (tf.float32, tf.float32), (tf.TensorShape(x_train_miss.shape[1:]), tf.TensorShape(m_train_miss.shape[1:]))).shuffle(len(x_train_miss)).batch(FLAGS.batch_size).repeat()
     tf_x_val_miss = tf.data.Dataset.from_generator(gen_val, (tf.float32, tf.float32), (tf.TensorShape(x_val_miss.shape[1:]), tf.TensorShape(m_val_miss.shape[1:]))).batch(FLAGS.batch_size).repeat()
 
     tf_x_val_miss = tf.compat.v1.data.make_one_shot_iterator(tf_x_val_miss)
