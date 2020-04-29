@@ -70,6 +70,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb
 
 # pyenv
 .python-version
@@ -104,10 +105,10 @@ venv.bak/
 
 data/*
 models/*
+cluster_logs/*
 lsf.*
 *.npz
 *.npy
-*.ipynb
 *.json
 *.pb
 *.index
