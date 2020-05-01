@@ -28,26 +28,11 @@ def load_z_c(z_path, c_path):
 def main(argv):
     del argv # Unused
 
-    # if FLAGS.z_name == '':
-    #     z_path = 'data/dsprites/factors_5000.npy'
-    # else:
-    #     z_path = 'data/dsprites/{}'.format(FLAGS.z_name)
-    # z_path = 'data/dsprites/{}'.format(FLAGS.z_name)
     c_path = '{}/z_mean.npy'.format(FLAGS.model_name)
     z_path = os.path.join(os.environ.get("DISENTANGLEMENT_LIB_DATA", "."),
                           "dsprites", "factors", FLAGS.z_name)
 
     z, c = load_z_c(z_path, c_path)
-
-    # flags.DEFINE_string('data_dir', "", 'Directory from where the data should be read in')
-    # flags.DEFINE_boolean('save_score', False, 'Save scores')
-    #
-    # if FLAGS.data_dir == "":
-    #     FLAGS.data_dir = "data/z_c_5000.npz"
-    # data = np.load(FLAGS.data_dir)
-
-    # z = data['z']
-    # c = data['c']
 
     z_shape = z.shape
     c_shape = c.shape
@@ -64,7 +49,7 @@ def main(argv):
     z_reshape = z_reshape[:,mask]
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
-    scores = dci._compute_dci(c_train.transpose(), z_train.transpose(), c_test.transpose(), z_test.transpose())
+    scores = dci._compute_dci(c_train[:8000,:].transpose(), z_train[:8000,:].transpose(), c_test[:2000,:].transpose(), z_test[:2000,:].transpose())
 
     save_score = True
     if save_score:
