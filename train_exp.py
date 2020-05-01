@@ -394,7 +394,7 @@ def main(argv):
     print("Evaluation...")
 
     # Split data on batches
-    num_split = np.ceil(len(x_val_full) / batch_size)
+    num_split = np.ceil(len(x_val_full) / FLAGS.batch_size)
 
     x_val_miss_batches = np.array_split(x_val_miss, num_split, axis=0)
     x_val_full_batches = np.array_split(x_val_full, num_split, axis=0)
