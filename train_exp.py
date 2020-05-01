@@ -387,125 +387,127 @@ def main(argv):
                 break
 
 
-    ##############
-    # Evaluation #
-    ##############
+    #############
+    Evaluation #
+    #############
 
-    # print("Evaluation...")
-    #
-    # # Split data on batches
-    # x_val_miss_batches = np.array_split(x_val_miss, FLAGS.batch_size, axis=0)
-    # x_val_full_batches = np.array_split(x_val_full, FLAGS.batch_size, axis=0)
-    # if FLAGS.data_type == 'physionet':
-    #     m_val_batches = np.array_split(m_val_artificial, FLAGS.batch_size, axis=0)
-    # else:
-    #     m_val_batches = np.array_split(m_val_miss, FLAGS.batch_size, axis=0)
-    # get_val_batches = lambda: zip(x_val_miss_batches, x_val_full_batches, m_val_batches)
-    #
-    # # Compute NLL and MSE on missing values
-    # n_missings = m_val_artificial.sum() if FLAGS.data_type == 'physionet' else m_val_miss.sum()
-    # nll_miss = np.sum([model.compute_nll(x, y=y, m_mask=m).numpy()
-    #                    for x, y, m in get_val_batches()]) / n_missings
-    # mse_miss = np.sum([model.compute_mse(x, y=y, m_mask=m, binary=FLAGS.data_type=="hmnist").numpy()
-    #                    for x, y, m in get_val_batches()]) / n_missings
-    # print("NLL miss: {:.4f}".format(nll_miss))
-    # print("MSE miss: {:.4f}".format(mse_miss))
-    #
-    # # Save imputed values
-    # z_mean = [model.encode(x_batch).mean().numpy() for x_batch in x_val_miss_batches]
-    # np.save(os.path.join(outdir, "z_mean"), np.vstack(z_mean))
+    print("Evaluation...")
+
+    # Split data on batches
+    num_split = np.ceil(len(x_val_full) / batch_size)
+
+    x_val_miss_batches = np.array_split(x_val_miss, num_split, axis=0)
+    x_val_full_batches = np.array_split(x_val_full, num_split, axis=0)
+    if FLAGS.data_type == 'physionet':
+        m_val_batches = np.array_split(m_val_artificial, num_split, axis=0)
+    else:
+        m_val_batches = np.array_split(m_val_miss, num_split, axis=0)
+    get_val_batches = lambda: zip(x_val_miss_batches, x_val_full_batches, m_val_batches)
+
+    # Compute NLL and MSE on missing values
+    n_missings = m_val_artificial.sum() if FLAGS.data_type == 'physionet' else m_val_miss.sum()
+    nll_miss = np.sum([model.compute_nll(x, y=y, m_mask=m).numpy()
+                       for x, y, m in get_val_batches()]) / n_missings
+    mse_miss = np.sum([model.compute_mse(x, y=y, m_mask=m, binary=FLAGS.data_type=="hmnist").numpy()
+                       for x, y, m in get_val_batches()]) / n_missings
+    print("NLL miss: {:.4f}".format(nll_miss))
+    print("MSE miss: {:.4f}".format(mse_miss))
+
+    # Save imputed values
+    z_mean = [model.encode(x_batch).mean().numpy() for x_batch in x_val_miss_batches]
+    np.save(os.path.join(outdir, "z_mean"), np.vstack(z_mean))
     # x_val_imputed = np.vstack([model.decode(z_batch).mean().numpy() for z_batch in z_mean])
-    # # np.save(os.path.join(outdir, "imputed_no_gt"), x_val_imputed)
-    #
-    # # impute gt observed values
-    # x_val_imputed[m_val_miss == 0] = x_val_miss[m_val_miss == 0]
-    # # np.save(os.path.join(outdir, "imputed"), x_val_imputed)
-    #
-    # if FLAGS.data_type == "hmnist":
-    #     # AUROC evaluation using Logistic Regression
-    #     x_val_imputed = np.round(x_val_imputed)
-    #     x_val_imputed = x_val_imputed.reshape([-1, time_length * data_dim])
-    #
-    #     cls_model = LogisticRegression(solver='lbfgs', multi_class='multinomial', tol=1e-10, max_iter=10000)
-    #     val_split = len(x_val_imputed) // 2
-    #
-    #     cls_model.fit(x_val_imputed[:val_split], y_val[:val_split])
-    #     probs = cls_model.predict_proba(x_val_imputed[val_split:])
-    #
-    #     auprc = average_precision_score(np.eye(num_classes)[y_val[val_split:]], probs)
-    #     auroc = roc_auc_score(np.eye(num_classes)[y_val[val_split:]], probs)
-    #     print("AUROC: {:.4f}".format(auroc))
-    #     print("AUPRC: {:.4f}".format(auprc))
-    #
-    # elif FLAGS.data_type in ["sprites", "dsprites"]:
-    #     auroc, auprc = 0, 0
-    #
-    # elif FLAGS.data_type == "physionet":
-    #     # Uncomment to preserve some z_samples and their reconstructions
-    #     # for i in range(5):
-    #     #     z_sample = [model.encode(x_batch).sample().numpy() for x_batch in x_val_miss_batches]
-    #     #     np.save(os.path.join(outdir, "z_sample_{}".format(i)), np.vstack(z_sample))
-    #     #     x_val_imputed_sample = np.vstack([model.decode(z_batch).mean().numpy() for z_batch in z_sample])
-    #     #     np.save(os.path.join(outdir, "imputed_sample_{}_no_gt".format(i)), x_val_imputed_sample)
-    #     #     x_val_imputed_sample[m_val_miss == 0] = x_val_miss[m_val_miss == 0]
-    #     #     np.save(os.path.join(outdir, "imputed_sample_{}".format(i)), x_val_imputed_sample)
-    #
-    #     # AUROC evaluation using Logistic Regression
-    #     x_val_imputed = x_val_imputed.reshape([-1, time_length * data_dim])
-    #     val_split = len(x_val_imputed) // 2
-    #     cls_model = LogisticRegression(solver='liblinear', tol=1e-10, max_iter=10000)
-    #     cls_model.fit(x_val_imputed[:val_split], y_val[:val_split])
-    #     probs = cls_model.predict_proba(x_val_imputed[val_split:])[:, 1]
-    #     auprc = average_precision_score(y_val[val_split:], probs)
-    #     auroc = roc_auc_score(y_val[val_split:], probs)
-    #
-    #     print("AUROC: {:.4f}".format(auroc))
-    #     print("AUPRC: {:.4f}".format(auprc))
-    #
-    # # Visualize reconstructions
-    # if FLAGS.data_type in ["hmnist", "sprites"]:
-    #     img_index = 0
-    #     if FLAGS.data_type == "hmnist":
-    #         img_shape = (28, 28)
-    #         cmap = "gray"
-    #     elif FLAGS.data_type == "sprites":
-    #         img_shape = (64, 64, 3)
-    #         cmap = None
-    #
-    #     fig, axes = plt.subplots(nrows=3, ncols=x_val_miss.shape[1], figsize=(2*x_val_miss.shape[1], 6))
-    #
-    #     x_hat = model.decode(model.encode(x_val_miss[img_index: img_index+1]).mean()).mean().numpy()
-    #     seqs = [x_val_miss[img_index:img_index+1], x_hat, x_val_full[img_index:img_index+1]]
-    #
-    #     for axs, seq in zip(axes, seqs):
-    #         for ax, img in zip(axs, seq[0]):
-    #             ax.imshow(img.reshape(img_shape), cmap=cmap)
-    #             ax.axis('off')
-    #
-    #     suptitle = FLAGS.model_type + f" reconstruction, NLL missing = {mse_miss}"
-    #     fig.suptitle(suptitle, size=18)
-    #     fig.savefig(os.path.join(outdir, FLAGS.data_type + "_reconstruction.pdf"))
-    #
-    # results_all = [FLAGS.seed, FLAGS.model_type, FLAGS.data_type, FLAGS.kernel, FLAGS.beta, FLAGS.latent_dim,
-    #                FLAGS.num_epochs, FLAGS.batch_size, FLAGS.learning_rate, FLAGS.window_size,
-    #                FLAGS.kernel_scales, FLAGS.sigma, FLAGS.length_scale,
-    #                len(FLAGS.encoder_sizes), FLAGS.encoder_sizes[0] if len(FLAGS.encoder_sizes) > 0 else 0,
-    #                len(FLAGS.decoder_sizes), FLAGS.decoder_sizes[0] if len(FLAGS.decoder_sizes) > 0 else 0,
-    #                FLAGS.cnn_kernel_size, FLAGS.cnn_sizes,
-    #                nll_miss, mse_miss, losses_train[-1], losses_val[-1], auprc, auroc, FLAGS.testing, FLAGS.data_dir]
-    #
-    # with open(os.path.join(outdir, "results.tsv"), "w") as outfile:
-    #     outfile.write("seed\tmodel\tdata\tkernel\tbeta\tz_size\tnum_epochs"
-    #                   "\tbatch_size\tlearning_rate\twindow_size\tkernel_scales\t"
-    #                   "sigma\tlength_scale\tencoder_depth\tencoder_width\t"
-    #                   "decoder_depth\tdecoder_width\tcnn_kernel_size\t"
-    #                   "cnn_sizes\tNLL\tMSE\tlast_train_loss\tlast_val_loss\tAUPRC\tAUROC\ttesting\tdata_dir\n")
-    #     outfile.write("\t".join(map(str, results_all)))
-    #
-    # with open(os.path.join(outdir, "training_curve.tsv"), "w") as outfile:
-    #     outfile.write("\t".join(map(str, losses_train)))
-    #     outfile.write("\n")
-    #     outfile.write("\t".join(map(str, losses_val)))
+    # np.save(os.path.join(outdir, "imputed_no_gt"), x_val_imputed)
+
+    # impute gt observed values
+    x_val_imputed[m_val_miss == 0] = x_val_miss[m_val_miss == 0]
+    # np.save(os.path.join(outdir, "imputed"), x_val_imputed)
+
+    if FLAGS.data_type == "hmnist":
+        # AUROC evaluation using Logistic Regression
+        x_val_imputed = np.round(x_val_imputed)
+        x_val_imputed = x_val_imputed.reshape([-1, time_length * data_dim])
+
+        cls_model = LogisticRegression(solver='lbfgs', multi_class='multinomial', tol=1e-10, max_iter=10000)
+        val_split = len(x_val_imputed) // 2
+
+        cls_model.fit(x_val_imputed[:val_split], y_val[:val_split])
+        probs = cls_model.predict_proba(x_val_imputed[val_split:])
+
+        auprc = average_precision_score(np.eye(num_classes)[y_val[val_split:]], probs)
+        auroc = roc_auc_score(np.eye(num_classes)[y_val[val_split:]], probs)
+        print("AUROC: {:.4f}".format(auroc))
+        print("AUPRC: {:.4f}".format(auprc))
+
+    elif FLAGS.data_type in ["sprites", "dsprites"]:
+        auroc, auprc = 0, 0
+
+    elif FLAGS.data_type == "physionet":
+        # Uncomment to preserve some z_samples and their reconstructions
+        # for i in range(5):
+        #     z_sample = [model.encode(x_batch).sample().numpy() for x_batch in x_val_miss_batches]
+        #     np.save(os.path.join(outdir, "z_sample_{}".format(i)), np.vstack(z_sample))
+        #     x_val_imputed_sample = np.vstack([model.decode(z_batch).mean().numpy() for z_batch in z_sample])
+        #     np.save(os.path.join(outdir, "imputed_sample_{}_no_gt".format(i)), x_val_imputed_sample)
+        #     x_val_imputed_sample[m_val_miss == 0] = x_val_miss[m_val_miss == 0]
+        #     np.save(os.path.join(outdir, "imputed_sample_{}".format(i)), x_val_imputed_sample)
+
+        # AUROC evaluation using Logistic Regression
+        x_val_imputed = x_val_imputed.reshape([-1, time_length * data_dim])
+        val_split = len(x_val_imputed) // 2
+        cls_model = LogisticRegression(solver='liblinear', tol=1e-10, max_iter=10000)
+        cls_model.fit(x_val_imputed[:val_split], y_val[:val_split])
+        probs = cls_model.predict_proba(x_val_imputed[val_split:])[:, 1]
+        auprc = average_precision_score(y_val[val_split:], probs)
+        auroc = roc_auc_score(y_val[val_split:], probs)
+
+        print("AUROC: {:.4f}".format(auroc))
+        print("AUPRC: {:.4f}".format(auprc))
+
+    # Visualize reconstructions
+    if FLAGS.data_type in ["hmnist", "sprites"]:
+        img_index = 0
+        if FLAGS.data_type == "hmnist":
+            img_shape = (28, 28)
+            cmap = "gray"
+        elif FLAGS.data_type == "sprites":
+            img_shape = (64, 64, 3)
+            cmap = None
+
+        fig, axes = plt.subplots(nrows=3, ncols=x_val_miss.shape[1], figsize=(2*x_val_miss.shape[1], 6))
+
+        x_hat = model.decode(model.encode(x_val_miss[img_index: img_index+1]).mean()).mean().numpy()
+        seqs = [x_val_miss[img_index:img_index+1], x_hat, x_val_full[img_index:img_index+1]]
+
+        for axs, seq in zip(axes, seqs):
+            for ax, img in zip(axs, seq[0]):
+                ax.imshow(img.reshape(img_shape), cmap=cmap)
+                ax.axis('off')
+
+        suptitle = FLAGS.model_type + f" reconstruction, NLL missing = {mse_miss}"
+        fig.suptitle(suptitle, size=18)
+        fig.savefig(os.path.join(outdir, FLAGS.data_type + "_reconstruction.pdf"))
+
+    results_all = [FLAGS.seed, FLAGS.model_type, FLAGS.data_type, FLAGS.kernel, FLAGS.beta, FLAGS.latent_dim,
+                   FLAGS.num_epochs, FLAGS.batch_size, FLAGS.learning_rate, FLAGS.window_size,
+                   FLAGS.kernel_scales, FLAGS.sigma, FLAGS.length_scale,
+                   len(FLAGS.encoder_sizes), FLAGS.encoder_sizes[0] if len(FLAGS.encoder_sizes) > 0 else 0,
+                   len(FLAGS.decoder_sizes), FLAGS.decoder_sizes[0] if len(FLAGS.decoder_sizes) > 0 else 0,
+                   FLAGS.cnn_kernel_size, FLAGS.cnn_sizes,
+                   nll_miss, mse_miss, losses_train[-1], losses_val[-1], auprc, auroc, FLAGS.testing, FLAGS.data_dir]
+
+    with open(os.path.join(outdir, "results.tsv"), "w") as outfile:
+        outfile.write("seed\tmodel\tdata\tkernel\tbeta\tz_size\tnum_epochs"
+                      "\tbatch_size\tlearning_rate\twindow_size\tkernel_scales\t"
+                      "sigma\tlength_scale\tencoder_depth\tencoder_width\t"
+                      "decoder_depth\tdecoder_width\tcnn_kernel_size\t"
+                      "cnn_sizes\tNLL\tMSE\tlast_train_loss\tlast_val_loss\tAUPRC\tAUROC\ttesting\tdata_dir\n")
+        outfile.write("\t".join(map(str, results_all)))
+
+    with open(os.path.join(outdir, "training_curve.tsv"), "w") as outfile:
+        outfile.write("\t".join(map(str, losses_train)))
+        outfile.write("\n")
+        outfile.write("\t".join(map(str, losses_val)))
 
     print("Training finished.")
 
