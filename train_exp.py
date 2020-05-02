@@ -420,7 +420,7 @@ def main(argv):
     # np.save(os.path.join(outdir, "imputed_no_gt"), x_val_imputed)
 
     # impute gt observed values
-    x_val_imputed[m_val_miss == 0] = x_val_miss[m_val_miss == 0]
+    # x_val_imputed[m_val_miss == 0] = x_val_miss[m_val_miss == 0]
     # np.save(os.path.join(outdir, "imputed"), x_val_imputed)
 
     if FLAGS.data_type == "hmnist":
