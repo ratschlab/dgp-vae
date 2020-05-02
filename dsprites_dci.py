@@ -29,8 +29,10 @@ def main(argv):
     del argv # Unused
 
     c_path = '{}/z_mean.npy'.format(FLAGS.model_name)
-    z_path = os.path.join(os.environ.get("DISENTANGLEMENT_LIB_DATA", "."),
-                          "dsprites", "factors", FLAGS.z_name)
+    # z_path = os.path.join(os.environ.get("DISENTANGLEMENT_LIB_DATA", "."),
+    #                       "dsprites", "factors", FLAGS.z_name)
+    project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites'
+    z_path = os.path.join(project_path, FLAGS.z_name)
 
     z, c = load_z_c(z_path, c_path)
 
