@@ -98,7 +98,7 @@ def main(argv):
 
     if FLAGS.save:
         if FLAGS.exp_name == '':
-            np.save('{}_64_sin_dci_aggr.npy'.format(FLAGS.model), dci_scores)
+            np.save('{}_64_sin_rand_dci_aggr.npy'.format(FLAGS.model), dci_scores)
         else:
             np.save('{}_{}_dci_aggr.npy'.format(FLAGS.model, FLAGS.exp_name), dci_scores)
 
