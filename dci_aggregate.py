@@ -92,7 +92,7 @@ def main(argv):
         latent_dims = [8, 16, 32, 64, 128]
         dci_scores = aggregate_gpvae(n_experiments, latent_dims)
     elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
-        dci_scores = aggregate_baseline(n_experiments, base_dir='dim_64_subset_sin')
+        dci_scores = aggregate_baseline(n_experiments, base_dir='dim_64_subset_sin_rand')
     else:
         raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
