@@ -2,6 +2,10 @@
 Simon Bing ETHZ, 2020
 """
 import warnings
+from typing import Union, Iterable
+
+from numpy.core._multiarray_umath import ndarray
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import numpy as np
