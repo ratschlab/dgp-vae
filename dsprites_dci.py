@@ -20,10 +20,8 @@ flags.DEFINE_string('z_name', '', 'Filename for underlying factors z')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
 
 def load_z_c(z_path, c_path):
-    z_full = np.load(z_path)
+    z_full = np.load(z_path)['test']
     c = np.load(c_path)
-    print(z_full.shape)
-    print(c.shape)
 
     # Check length of c and only take same amount of z values. Corresponds to z_test.
     z = z_full[:c.shape[0],:,:]
