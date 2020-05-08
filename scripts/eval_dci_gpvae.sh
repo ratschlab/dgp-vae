@@ -4,9 +4,7 @@
 
 for len in 1e-1 5e-1 1 2 4 8; do
   for base_dir in models/len/dsprites_len_"$len"_sin1/*; do
-#    bsub -g /gpvae_norm -R "rusage[mem=16000]" python dsprites_dci.py --z_name factors_100k_5k.npz \
-#    --model_name "$base_dir"
-     echo AHHHHHHHHHHHH
-     echo $base_dir
+    bsub -g /gpvae_norm -R "rusage[mem=16000]" python dsprites_dci.py --z_name factors_100k_5k.npz \
+    --model_name "$base_dir"
   done
 done
