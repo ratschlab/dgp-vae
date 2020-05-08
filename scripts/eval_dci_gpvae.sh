@@ -7,6 +7,6 @@ for len in 1e-1 5e-1 1 2 4 8; do
 #    bsub -g /gpvae_norm -R "rusage[mem=16000]" python dsprites_dci.py --z_name factors_100k_5k.npz \
 #    --model_name "$base_dir"
      echo AHHHHHHHHHHHH
-     echo $"base_dir"
+     echo $base_dir
   done
 done
