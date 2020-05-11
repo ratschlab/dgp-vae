@@ -25,6 +25,7 @@ from absl import app, flags
 
 FLAGS = flags.FLAGS
 
+flags.DEFINE_string('base_dir', 'base', 'Base directory')
 flags.DEFINE_string('output_dir', 'test_output', 'Directory to save results in')
 flags.DEFINE_integer('dim', 32, 'Latent dimension of encoder')
 flags.DEFINE_string('subset', "", 'Subset of factors of tested dataset')
@@ -34,7 +35,7 @@ def main(argv):
     del argv # Unused
 
     # Save all results in subdirectories of following path
-    base_path = os.path.relpath('dim_{}_subset_{}'.format(FLAGS.dim, FLAGS.subset))
+    base_path = os.path.relpath(FLAGS.base_dir, __file__)
 
     # Overwrite output or not (for rerunning script)
     overwrite = True
