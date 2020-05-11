@@ -2,8 +2,8 @@
 
 # Evaluate DCI metric for gpvae models
 
-for dim in 8; do
-  for base_dir in models/dim/dsprites_dimsweep_"$dim"_0/*; do
+for len in 1e-1 5e-1 1 2 4 8; do
+  for base_dir in models/len/dsprites_len_"$len"_sin2/*; do
     bsub -g /gpvae_norm -R "rusage[mem=16000]" python dsprites_dci.py --z_name factors_100k_5k.npz \
     --model_name "$base_dir"
   done
