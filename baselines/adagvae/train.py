@@ -35,7 +35,7 @@ def main(argv):
     del argv # Unused
 
     # Save all results in subdirectories of following path
-    base_path = os.path.relpath(FLAGS.base_dir, __file__)
+    base_path = os.path.relpath(FLAGS.base_dir, os.path.abspath(__file__))
 
     # Overwrite output or not (for rerunning script)
     overwrite = True
