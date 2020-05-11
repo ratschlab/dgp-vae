@@ -89,7 +89,7 @@ def main(argv):
     n_experiments = 10
 
     if FLAGS.model == 'gpvae':
-        latent_dims = [8, 16, 32, 64, 128]
+        latent_dims = [64]
         dci_scores = aggregate_gpvae(n_experiments, latent_dims)
     elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
         dci_scores = aggregate_baseline(n_experiments, base_dir='dim_64_subset_sin_rand')
