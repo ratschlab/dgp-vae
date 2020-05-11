@@ -14,6 +14,7 @@ from absl import flags, app
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('model', 'gpvae', 'Model for which dci score should be calculated')
+flags.DEFINE_string('base_dir', '', 'base directory of models')
 flags.DEFINE_string('exp_name', '', 'Experiment name')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
@@ -27,7 +28,7 @@ def walklevel(some_dir, level=0):
         if num_sep + level <= num_sep_this:
             del dirs[:]
 
-def aggregate_gpvae(N, latent_dims, base_dir='dsprites_dim_'):
+def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
     """
     Collects all dci scores and aggregates into single array.
     Args:
@@ -38,12 +39,12 @@ def aggregate_gpvae(N, latent_dims, base_dir='dsprites_dim_'):
     Returns:
         dci_scores, [3xNxM] np array
     """
-    dci_scores = np.zeros((3,N,len(latent_dims)), dtype=np.float32)
+    dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
 
-    for m, dim in enumerate(latent_dims):
-        dim_dir = base_dir+"{}_{}".format(dim, FLAGS.exp_name)
+    for m, param in enumerate(params):
+        param_dir = base_dir+"{}_{}".format(param, FLAGS.exp_name)
 
-        models_path = os.path.join('models', dim_dir)
+        models_path = os.path.join('models', param_dir)
         for _, dirs, _ in os.walk(models_path):
             for n, dir in enumerate(dirs):
                 for _, _, files in os.walk(os.path.join(models_path, dir)):
@@ -89,8 +90,8 @@ def main(argv):
     n_experiments = 10
 
     if FLAGS.model == 'gpvae':
-        latent_dims = [64]
-        dci_scores = aggregate_gpvae(n_experiments, latent_dims)
+        params = [64]
+        dci_scores = aggregate_gpvae(n_experiments, params, FLAGS.base_dir)
     elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
         dci_scores = aggregate_baseline(n_experiments, base_dir='dim_64_subset_sin_rand')
     else:
