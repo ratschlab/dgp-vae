@@ -51,7 +51,7 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
                 for _, _, files in os.walk(os.path.join(models_path, dir)):
                     for filename in files:
                         if filename.startswith('dci'):
-                            # print(n, filename)
+                            print(n, filename)
                             dci = np.load(os.path.join(models_path, dir, filename)) # Might need abspath here
                             dci_scores[0,n,m] = dci['disentanglement']
                             dci_scores[1,n,m] = dci['completeness']
