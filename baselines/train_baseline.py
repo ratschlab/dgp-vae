@@ -48,7 +48,8 @@ def main(argv):
     ]
     # Train model. Training is configured with a gin config
     train.train_with_gin(os.path.join(output_path, 'model'), overwrite,
-                         [os.path.join(baseline_path, '{}_train.gin'.format(FLAGS.model))], gin_bindings)
+                         [os.path.join(baseline_path, '{}_train.gin'.format(FLAGS.model))],
+                         gin_bindings)
 
     # Extract mean representation of latent space
     representation_path = os.path.join(output_path, "representation")
@@ -60,7 +61,8 @@ def main(argv):
     # Compute DCI metric
     result_path = os.path.join(output_path, "metrics", "dci")
     representation_path = os.path.join(output_path, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.join(baseline_path, '{}_dci.gin'.format(FLAGS.model))])
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite,
+                               [os.path.join(baseline_path, '{}_dci.gin'.format(FLAGS.model))])
 
 if __name__ == '__main__':
     app.run(main)
