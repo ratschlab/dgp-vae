@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Create directory for each tested latent dimension
-for dim in 6 16 32 64 128; do
+for dim in 8; do
   mkdir -p models/dim/dsprites_dimsweep_"$dim"_0
 done
 
 for n in {1..10}; do
   SEED=$RANDOM
-  for dim in 6 16 32 64 128; do
+  for dim in 8; do
 
   bsub -o models/dim/dsprites_dimsweep_"$dim"_0/log_"$dim"_$n -g /gpvae_disent \
   -R "rusage[mem=120000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]"\
