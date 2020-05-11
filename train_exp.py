@@ -309,6 +309,7 @@ def main(argv):
     losses_train = []
     losses_val = []
 
+    t0_global = time.time()
     t0 = time.time()
     with summary_writer.as_default(), tf.contrib.summary.always_record_summaries():
         for i, (x_seq, m_seq) in enumerate(tf_x_train_miss.take(num_steps)):
@@ -385,6 +386,8 @@ def main(argv):
                     import ipdb
                     ipdb.set_trace()
                 break
+
+    t_train_total = time.time() - t0_global
 
 
     #############
@@ -494,14 +497,15 @@ def main(argv):
                    len(FLAGS.encoder_sizes), FLAGS.encoder_sizes[0] if len(FLAGS.encoder_sizes) > 0 else 0,
                    len(FLAGS.decoder_sizes), FLAGS.decoder_sizes[0] if len(FLAGS.decoder_sizes) > 0 else 0,
                    FLAGS.cnn_kernel_size, FLAGS.cnn_sizes,
-                   nll_miss, mse_miss, losses_train[-1], losses_val[-1], auprc, auroc, FLAGS.testing, FLAGS.data_dir]
+                   nll_miss, mse_miss, losses_train[-1], losses_val[-1], auprc, auroc, FLAGS.testing, FLAGS.data_dir,
+                   t_train_total]
 
     with open(os.path.join(outdir, "results.tsv"), "w") as outfile:
         outfile.write("seed\tmodel\tdata\tkernel\tbeta\tz_size\tnum_epochs"
                       "\tbatch_size\tlearning_rate\twindow_size\tkernel_scales\t"
                       "sigma\tlength_scale\tencoder_depth\tencoder_width\t"
                       "decoder_depth\tdecoder_width\tcnn_kernel_size\t"
-                      "cnn_sizes\tNLL\tMSE\tlast_train_loss\tlast_val_loss\tAUPRC\tAUROC\ttesting\tdata_dir\n")
+                      "cnn_sizes\tNLL\tMSE\tlast_train_loss\tlast_val_loss\tAUPRC\tAUROC\ttesting\tdata_dir\ttime_train\n")
         outfile.write("\t".join(map(str, results_all)))
 
     with open(os.path.join(outdir, "training_curve.tsv"), "w") as outfile:
