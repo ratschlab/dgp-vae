@@ -15,6 +15,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string('model', 'gpvae', 'Model for which dci score should be calculated')
 flags.DEFINE_string('base_dir', '', 'base directory of models')
+flags.DEFINE_list('params', [64], 'Parameters tested in experiment')
 flags.DEFINE_string('exp_name', '', 'Experiment name')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
@@ -90,8 +91,8 @@ def main(argv):
     n_experiments = 10
 
     if FLAGS.model == 'gpvae':
-        params = [64]
-        dci_scores = aggregate_gpvae(n_experiments, params, FLAGS.base_dir)
+        # params = [64]
+        dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
     elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
         dci_scores = aggregate_baseline(n_experiments, base_dir='dim_64_subset_sin_rand')
     else:
