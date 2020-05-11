@@ -49,19 +49,19 @@ def main(argv):
     ]
     # Train model. Training is configured with a gin config
     train.train_with_gin(os.path.join(path_adagvae, 'model'), overwrite,
-                         ['adagvae_train.gin'], gin_bindings)
+                         ['baselines/adagvae/adagvae_train.gin'], gin_bindings)
 
     # Extract mean representation of latent space
     representation_path = os.path.join(path_adagvae, "representation")
     model_path = os.path.join(path_adagvae, "model")
-    postprocess_gin = ['adagvae_postprocess.gin']  # This contains the settings.
+    postprocess_gin = ['baselines/adagvae/adagvae_postprocess.gin']  # This contains the settings.
     postprocess.postprocess_with_gin(model_path, representation_path, overwrite,
                                      postprocess_gin)
 
     # Compute DCI metric
     result_path = os.path.join(path_adagvae, "metrics", "dci")
     representation_path = os.path.join(path_adagvae, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['adagvae_dci.gin'])
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['baselines/adagvae/adagvae_dci.gin'])
 
 if __name__ == '__main__':
     app.run(main)
