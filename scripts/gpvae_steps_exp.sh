@@ -4,7 +4,7 @@ for epochs in 1 4 6 8 10; do
   mkdir -p models/epoch/dsprites_epochs_"$epochs"_sweep0
 done
 
-for n in {1..10}: do
+for n in {1..10}; do
   seed=$RANDOM
   for epochs in 1 4 6 8 10; do
     bsub -o models/epoch/dsprites_epochs_"$epochs"_sweep0/log_"$epochs"_"$n" -g /gpvae_disent \
