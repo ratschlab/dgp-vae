@@ -113,6 +113,7 @@ lsf.*
 *.pb
 *.index
 .DS_Store
+!*.gin
 
 # Baselines
 baselines/betatcvae
