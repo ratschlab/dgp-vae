@@ -29,17 +29,17 @@ flags.DEFINE_integer('seed', 42, 'Seed for the random number generator')
 def main(argv):
     del argv # Unused
 
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    baseline_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                              FLAGS.model)
 
     # Save all results in subdirectories of following path
-    base_path = os.path.join(file_path, FLAGS.base_dir)
+    base_path = os.path.join(baseline_path, FLAGS.base_dir)
 
     # Overwrite output or not (for rerunning script)
     overwrite = True
 
     # Results directory of BetaTCVAE
-    path_baseline = os.path.join(base_path, FLAGS.output_dir)
+    output_path = os.path.join(base_path, FLAGS.output_dir)
 
     gin_bindings = [
         "model.random_seed = {}".format(FLAGS.seed),
@@ -47,20 +47,20 @@ def main(argv):
         "encoder.num_latent = {}".format(FLAGS.dim)
     ]
     # Train model. Training is configured with a gin config
-    train.train_with_gin(os.path.join(path_baseline, 'model'), overwrite,
-                         [os.path.join(file_path, '{}_train.gin'.format(FLAGS.model))], gin_bindings)
+    train.train_with_gin(os.path.join(output_path, 'model'), overwrite,
+                         [os.path.join(baseline_path, '{}_train.gin'.format(FLAGS.model))], gin_bindings)
 
     # Extract mean representation of latent space
-    representation_path = os.path.join(path_baseline, "representation")
-    model_path = os.path.join(path_baseline, "model")
-    postprocess_gin = [os.path.join(file_path, '{}_postprocess.gin'.format(FLAGS.model))]
+    representation_path = os.path.join(output_path, "representation")
+    model_path = os.path.join(output_path, "model")
+    postprocess_gin = [os.path.join(baseline_path, '{}_postprocess.gin'.format(FLAGS.model))]
     postprocess.postprocess_with_gin(model_path, representation_path, overwrite,
                                      postprocess_gin)
 
     # Compute DCI metric
-    result_path = os.path.join(path_baseline, "metrics", "dci")
-    representation_path = os.path.join(path_baseline, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.join(file_path, '{}_dci.gin'.format(FLAGS.model))])
+    result_path = os.path.join(output_path, "metrics", "dci")
+    representation_path = os.path.join(output_path, "representation")
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.join(baseline_path, '{}_dci.gin'.format(FLAGS.model))])
 
 if __name__ == '__main__':
     app.run(main)
