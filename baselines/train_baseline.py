@@ -22,9 +22,10 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('model', 'betatcvae', 'Baseline to train')
 flags.DEFINE_string('base_dir', 'base', 'Base directory')
 flags.DEFINE_string('output_dir', 'test_output', 'Directory to save results in')
-flags.DEFINE_integer('dim', 32, 'Latent dimension of encoder')
+flags.DEFINE_integer('dim', 64, 'Latent dimension of encoder')
 flags.DEFINE_string('subset', "", 'Subset of factors of tested dataset')
 flags.DEFINE_integer('seed', 42, 'Seed for the random number generator')
+flags.DEFINE_integer('steps', 15620, 'Training steps')
 
 def main(argv):
     del argv # Unused
@@ -44,7 +45,8 @@ def main(argv):
     gin_bindings = [
         "model.random_seed = {}".format(FLAGS.seed),
         "subset.name = '{}'".format(FLAGS.subset),
-        "encoder.num_latent = {}".format(FLAGS.dim)
+        "encoder.num_latent = {}".format(FLAGS.dim),
+        "model.training_steps = {}".format(FLAGS.steps)
     ]
     # Train model. Training is configured with a gin config
     train.train_with_gin(os.path.join(output_path, 'model'), overwrite,
