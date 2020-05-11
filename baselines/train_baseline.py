@@ -39,7 +39,7 @@ def main(argv):
     overwrite = True
 
     # Results directory of BetaTCVAE
-    path_baseline = os.path.join(base_path,FLAGS.output_dir)
+    path_baseline = os.path.join(base_path, FLAGS.output_dir)
 
     gin_bindings = [
         "model.random_seed = {}".format(FLAGS.seed),
@@ -48,19 +48,19 @@ def main(argv):
     ]
     # Train model. Training is configured with a gin config
     train.train_with_gin(os.path.join(path_baseline, 'model'), overwrite,
-                         ['baselines/adagvae/adagvae_train.gin'], gin_bindings)
+                         [os.path.join(file_path, '{}_train.gin'.format(FLAGS.model))], gin_bindings)
 
     # Extract mean representation of latent space
     representation_path = os.path.join(path_baseline, "representation")
     model_path = os.path.join(path_baseline, "model")
-    postprocess_gin = ['baselines/adagvae/adagvae_postprocess.gin']  # This contains the settings.
+    postprocess_gin = [os.path.join(file_path, '{}_postprocess.gin'.format(FLAGS.model))]
     postprocess.postprocess_with_gin(model_path, representation_path, overwrite,
                                      postprocess_gin)
 
     # Compute DCI metric
     result_path = os.path.join(path_baseline, "metrics", "dci")
     representation_path = os.path.join(path_baseline, "representation")
-    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, ['baselines/adagvae/adagvae_dci.gin'])
+    evaluate.evaluate_with_gin(representation_path, result_path, overwrite, [os.path.join(file_path, '{}_dci.gin'.format(FLAGS.model))])
 
 if __name__ == '__main__':
     app.run(main)
