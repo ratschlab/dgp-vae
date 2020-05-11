@@ -119,10 +119,10 @@ lsf.*
 baselines/factorvae
 baselines/dipvae_i
 
-!/baselines/betatcvae/train.py
-!/baselines/betatcvae/betatcvae_dci.gin
-!/baselines/betatcvae/betatcvae_postprocess.gin
-!/baselines/betatcvae/betatcvae_train.gin
+#!/baselines/betatcvae/train.py
+#!/baselines/betatcvae/betatcvae_dci.gin
+#!/baselines/betatcvae/betatcvae_postprocess.gin
+#!/baselines/betatcvae/betatcvae_train.gin
 
 !/baselines/factorvae/train.py
 !/baselines/factorvae/factorvae_dci.gin
