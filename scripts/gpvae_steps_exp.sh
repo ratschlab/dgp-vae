@@ -1,14 +1,14 @@
 #!/bin/bash
 
-for epochs in 1 4 6 8 10; do
+for epochs in 6 8 10; do
   mkdir -p models/epoch/dsprites_epochs_"$epochs"_sweep0
 done
 
 for n in {1..10}; do
   seed=$RANDOM
-  for epochs in 1 4 6 8 10; do
+  for epochs in 6 8 10; do
     bsub -o models/epoch/dsprites_epochs_"$epochs"_sweep0/log_"$epochs"_"$n" -g /gpvae_disent \
-    -R "rusage[mem=120000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]"\
+    -R "rusage[mem=200000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]"\
     python train_exp.py --model_type gp-vae --data_type dsprites --testing\
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/dsprites_100k_5k.npz \
     --exp_name dsprites_"$epochs"_n"$n" --basedir models/epoch/dsprites_epochs_"$epochs"_sweep0 \
