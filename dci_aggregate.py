@@ -59,7 +59,7 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
 
     return dci_scores
 
-def aggregate_baseline(N, base_dir=FLAGS.base_dir, exp_name=FLAGS.exp_name):
+def aggregate_baseline(N, base_dir='dim', exp_name='test_out'):
     """
     Collects all dci scores and aggregates into single array.
     Args:
