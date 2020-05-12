@@ -21,7 +21,6 @@ flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
 def walklevel(some_dir, level=0):
     some_dir = some_dir.rstrip(os.path.sep)
-    print(some_dir)
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
     for root, dirs, files in os.walk(some_dir):
@@ -95,7 +94,7 @@ def main(argv):
         # params = [64]
         dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
     elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
-        dci_scores = aggregate_baseline(n_experiments, FLAGS.base_dir)
+        dci_scores = aggregate_baseline(n_experiments, FLAGS.base_dir, FLAGS.exp_name)
     else:
         raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
