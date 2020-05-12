@@ -21,6 +21,7 @@ flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
 def walklevel(some_dir, level=0):
     some_dir = some_dir.rstrip(os.path.sep)
+    print(some_dir)
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
     for root, dirs, files in os.walk(some_dir):
