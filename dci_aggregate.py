@@ -59,7 +59,7 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
 
     return dci_scores
 
-def aggregate_baseline(N, base_dir='dim_64'):
+def aggregate_baseline(N, base_dir=FLAGS.base_dir, exp_name=FLAGS.exp_name):
     """
     Collects all dci scores and aggregates into single array.
     Args:
@@ -71,7 +71,7 @@ def aggregate_baseline(N, base_dir='dim_64'):
     """
     dci_scores = np.zeros((3,N), dtype=np.float32)
 
-    base_path = os.path.join('baselines', FLAGS.model, base_dir)
+    base_path = os.path.join('baselines', FLAGS.model, base_dir, exp_name)
 
     for _, dirs, _ in walklevel(base_path):
         for n, dir in enumerate(dirs):
@@ -94,15 +94,20 @@ def main(argv):
         # params = [64]
         dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
     elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
-        dci_scores = aggregate_baseline(n_experiments, base_dir='dim_64_subset_sin_rand')
+        dci_scores = aggregate_baseline(n_experiments, FLAGS.base_dir)
     else:
         raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
     if FLAGS.save:
-        if FLAGS.exp_name == '':
-            np.save('{}_64_sin_rand_dci_aggr.npy'.format(FLAGS.model), dci_scores)
+        if FLAGS.model == 'gpvae':
+            np.save('dci_scores/{}_64_sin_rand_dci_aggr.npy'.format(FLAGS.model), dci_scores)
+        elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
+            np.save(os.path.join('baselines', FLAGS.model, FLAGS.base_dir,
+                                 FLAGS.exp_name, '{}_dci_aggr.npy'.format(FLAGS.model))
+                    , dci_scores)
         else:
-            np.save('{}_{}_dci_aggr.npy'.format(FLAGS.model, FLAGS.exp_name), dci_scores)
+            raise ValueError(
+                "Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
 
 if __name__ == '__main__':
     app.run(main)
