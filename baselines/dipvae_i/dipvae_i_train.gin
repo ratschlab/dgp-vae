@@ -1,12 +1,12 @@
 dataset.name = "dsprites_full"
-subset.name = "sin_order_ss"
+subset.name = "sin_rand"
 model.batch_size = 64
 model.model = @dip_vae()
 model.random_seed = 0
 dip_vae.lambda_od = 5
 dip_vae.lambda_d_factor = 10
 dip_vae.dip_type = 'i'
-encoder.num_latent = 128
+encoder.num_latent = 64
 vae_optimizer.optimizer_fn = @AdamOptimizer
 model.training_steps = 15620
 AdamOptimizer.beta1 = 0.9
