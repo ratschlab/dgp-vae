@@ -3,7 +3,6 @@ subset.name = "sin_rand"
 model.batch_size = 64
 model.model = @annealed_vae()
 model.random_seed = 0
-annealed_vae.beta = 1
 annealed_vae.iteration_threshold = 100000
 annealed_vae.gamma = 100
 annealed_vae.c_max = 25
