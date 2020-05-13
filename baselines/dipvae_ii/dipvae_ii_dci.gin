@@ -1,0 +1,5 @@
+evaluation.evaluation_fn = @dci
+dataset.name="auto"
+evaluation.random_seed = 0
+dci.num_train=8
+dci.num_test=2
