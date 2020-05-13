@@ -1,10 +1,10 @@
 dataset.name = "dsprites_full"
-subset.name = "sin_order_ss"
+subset.name = "sin_rand"
 model.batch_size = 64
 model.model = @factor_vae()
 model.random_seed = 0
-factor_vae.gamma = 10
-encoder.num_latent = 32
+factor_vae.gamma = 30
+encoder.num_latent = 64
 vae_optimizer.optimizer_fn = @vae/AdamOptimizer
 model.training_steps = 15620
 discriminator.discriminator_fn = @fc_discriminator
