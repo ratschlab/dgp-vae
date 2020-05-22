@@ -325,6 +325,37 @@ class VAE(tf.keras.Model):
                           tf.zeros(shape=(1, self.time_length, self.data_dim), dtype=tf.float32))
         return self.trainable_variables
 
+    def mutual_info(self, x):
+        """Approximate the mutual information between x and z
+        I(x, z) = E_xE_{q(z|x)}log(q(z|x)) - E_xE_{q(z|x)}log(q(z))"""
+        z_distr = self.encode(x)
+        z_mean = z_distr.mean().numpy()
+        z_var = z_distr.variance().numpy()
+        z_mean = z_mean.reshape((z_mean.shape[0]*z_mean.shape[2], -1))
+        z_var = z_var.reshape((z_var.shape[0]*z_var.shape[2], -1))
+
+        num_samples, z_dim = z_mean.shape
+
+        # E_xE_{q(z|x)}log(q(z|x))
+        neg_entropy = (-0.5 * z_dim * np.log(2*np.pi) - 0.5 * (1+np.log(z_var)).sum(-1)).mean()
+
+        # Sample from latent distribution
+        z_samples = z_distr.sample().numpy()
+        z_samples = z_samples.reshape((z_samples.shape[0]*z_samples.shape[2], -1))
+        z_samples = np.expand_dims(z_samples, 1)
+
+        z_mean, z_var = np.expand_dims(z_mean, 0), np.expand_dims(z_var, 0)
+
+        dev = z_samples - z_mean
+        log_density = -0.5 * ((dev ** 2) / z_var).sum(-1) - 0.5 * (z_dim * np.log(2*np.pi) + np.log(z_var).sum(-1))
+
+        m = np.amax(log_density, axis=1, keepdims=True)
+        log_density_clip = log_density - m
+        m = m.squeeze(1)
+        log_qz = m + np.log(np.sum(np.exp(log_density_clip), axis=1, keepdims=False)) - np.log(num_samples)
+
+        return neg_entropy - log_qz.mean(-1)
+
 
 class HI_VAE(VAE):
     """ HI-VAE model, where the reconstruction term in ELBO is summed only over observed components """
