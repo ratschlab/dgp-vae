@@ -463,7 +463,7 @@ class AdaGPVAE(GP_VAE):
         # Compute dimension-wise KL divergence
         kl_dim_wise = qz_x_1.kl_divergence(qz_x_2)
         # Bin KL. This is done to automatically select the latent factors which
-        # should be shared.
+        # should be shared. TODO: is this the best way to find shared factors? seems like a lot are seen as shared...
         def f(sample):
             return tf.histogram_fixed_width_bins(
                 sample, [tf.reduce_min(sample), tf.reduce_max(sample)], nbins=2)
