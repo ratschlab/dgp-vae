@@ -93,21 +93,21 @@ def main(argv):
     if FLAGS.model == 'gpvae':
         # params = [64]
         dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
-    elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
+    elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
         dci_scores = aggregate_baseline(n_experiments, FLAGS.base_dir, FLAGS.exp_name)
     else:
-        raise ValueError("Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
+        raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
             np.save('dci_scores/{}_64_sin_rand_dci_aggr.npy'.format(FLAGS.model), dci_scores)
-        elif FLAGS.model in ['betatcvae', 'factorvae', 'dipvae_i']:
+        elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
             np.save(os.path.join('baselines', FLAGS.model, FLAGS.base_dir,
                                  FLAGS.exp_name, '{}_dci_aggr.npy'.format(FLAGS.model))
                     , dci_scores)
         else:
             raise ValueError(
-                "Model must be one of: ['gpvae', 'betatcvae', 'factorvae', 'dipvae_i']")
+                "Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
 if __name__ == '__main__':
     app.run(main)
