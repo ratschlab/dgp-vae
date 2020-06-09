@@ -467,3 +467,120 @@ class GP_VAE(HI_VAE):
                       squared_frobenius_norm(b_inv_a) + squared_frobenius_norm(
                       b.scale.solve((b.mean() - a.mean())[..., tf.newaxis]))))
         return kl_div
+
+class AdaGPVAE(GP_VAE):
+    """
+    Class that implements pairwise loss, as described in Eq. 6 of
+    "Weakly-Supervised Disentanglement Without Compromises"
+    (https://arxiv.org/abs/2002.02886).
+    """
+    def _compute_loss(self, x, m_mask=None, return_parts=False):
+        assert len(x.shape) == 3, "Input should have shape: [batch_size, time_length, data_dim]"
+        x = tf.identity(x)  # in case x is not a Tensor already...
+        x = tf.tile(x, [self.M * self.K, 1, 1])  # shape=(M*K*BS, TL, D)
+
+        # TODO: pass pairs directly instead of splitting batch like this.
+        # TODO: pairing that makes more sense than just arbitrarily like this
+        assert x.shape[0] % 2
+        n_split = x.shape[0] // 2
+        x_1 = x[:n_split,...]
+        x_2 = x[n_split:, ...]
+
+        # Encode both pairs with variable reuse
+        with tf.variable_scope(tf.get_variable_scope(), reuse=tf.AUTO_REUSE):
+            qz_x_1 = self.encode(x_1)
+            qz_x_2 = self.encode(x_2)
+
+        # Compute dimension-wise KL divergence
+        kl_dim_wise = qz_x_1.kl_divergence(qz_x_2)
+        # Bin KL. This is done to automatically select the latent factors which
+        # should be shared. TODO: is this the best way to find shared factors? seems like a lot are seen as shared...
+        def f(sample):
+            return tf.histogram_fixed_width_bins(
+                sample, [tf.reduce_min(sample), tf.reduce_max(sample)], nbins=2)
+        binned_kl = tf.map_fn(f, kl_dim_wise, dtype=tf.dtypes.int32)
+        dim_mask = tf.equal(binned_kl, 1)
+        # Extend mask to all timesteps
+        dim_mask_mean = tf.tile(tf.expand_dims(dim_mask, 2), [1, 1, x.get_shape().as_list()[1]])
+        dim_mask_cov = tf.tile(tf.expand_dims(dim_mask_mean, 3), [1, 1, 1, x.get_shape().as_list()[1]])
+        # Compute averaged mean and covariance
+        new_z_mean = 0.5 * (qz_x_1.mean() + qz_x_2.mean())
+        new_z_cov = 0.5 * (qz_x_1.covariance() + qz_x_2.covariance())
+        # Share distribution at common latent factors
+        new_z_mean_1 = tf.where(dim_mask_mean, qz_x_1.mean(), new_z_mean)
+        new_z_mean_2 = tf.where(dim_mask_mean, qz_x_2.mean(), new_z_mean)
+        new_z_cov_1 = tf.linalg.cholesky(tf.where(dim_mask_cov, qz_x_1.covariance(), new_z_cov))
+        new_z_cov_2 = tf.linalg.cholesky(tf.where(dim_mask_cov, qz_x_2.covariance(), new_z_cov))
+        # Create new distributions q(z|x)
+        qz_x_1_new = tfd.MultivariateNormalTriL(loc=new_z_mean_1,
+                                                scale_tril=new_z_cov_1)
+        qz_x_2_new = tfd.MultivariateNormalTriL(loc=new_z_mean_2,
+                                                scale_tril=new_z_cov_2)
+
+        if m_mask is not None:
+            m_mask = tf.identity(m_mask)  # in case m_mask is not a Tensor already...
+            m_mask = tf.tile(m_mask, [self.M * self.K, 1, 1])  # shape=(M*K*BS, TL, D)
+            m_mask = tf.cast(m_mask, tf.bool)
+
+        pz = self._get_prior()
+
+        z_1 = qz_x_1_new.sample()
+        z_2 = qz_x_2_new.sample()
+        px_z_1 = self.decode(z_1)
+        px_z_2 = self.decode(z_2)
+
+        nll_1 = -px_z_1.log_prob(x_1)
+        nll_1 = tf.where(tf.math.is_finite(nll_1), nll_1, tf.zeros_like(nll_1))
+        nll_2 = -px_z_2.log_prob(x_2)
+        nll_2 = tf.where(tf.math.is_finite(nll_2), nll_2, tf.zeros_like(nll_2))
+
+        if m_mask is not None:
+            nll_1 = tf.where(m_mask[:n_split,...], tf.zeros_like(nll_1), nll_1)
+            nll_2 = tf.where(m_mask[n_split:,...], tf.zeros_like(nll_2), nll_2)
+        nll_1 = tf.reduce_sum(nll_1, [1, 2])
+        nll_2 = tf.reduce_sum(nll_2, [1, 2])
+        nll = tf.concat([nll_1, nll_2], 0)
+
+        if self.K > 1:
+            kl = qz_x.log_prob(z) - pz.log_prob(z)  # shape=(M*K*BS, TL or d)
+            kl = tf.where(tf.is_finite(kl), kl, tf.zeros_like(kl))
+            kl = tf.reduce_sum(kl, 1)  # shape=(M*K*BS)
+
+            kl_1 = qz_x_1_new.log_prob(z_1) - pz.log_prob(z_1)
+            kl_1 = tf.where(tf.is_finite(kl_1), kl_1, tf.zeros_like(kl_1))
+            kl_1 = tf.reduce_sum(kl_1, 1)
+            kl_2 = qz_x_1_new.log_prob(z_2) - pz.log_prob(z_2)
+            kl_2 = tf.where(tf.is_finite(kl_2), kl_2, tf.zeros_like(kl_2))
+            kl_2 = tf.reduce_sum(kl_2, 1)
+            kl = tf.concat([kl_1, kl_2], 0)
+
+            weights = -nll - kl  # shape=(M*K*BS)
+            weights = tf.reshape(weights, [self.M, self.K, -1])  # shape=(M, K, BS)
+
+            elbo = reduce_logmeanexp(weights, axis=1)  # shape=(M, 1, BS)
+            elbo = tf.reduce_mean(elbo)  # scalar
+
+        else:
+            # if K==1, compute KL analytically
+            kl_1 = self.kl_divergence(qz_x_1_new, pz)
+            kl_1 = tf.where(tf.math.is_finite(kl_1), kl_1, tf.zeros_like(kl_1))
+            kl_1 = tf.reduce_sum(kl_1, 1)
+            kl_2 = self.kl_divergence(qz_x_2_new, pz)
+            kl_2 = tf.where(tf.math.is_finite(kl_2), kl_2, tf.zeros_like(kl_2))
+            kl_2 = tf.reduce_sum(kl_2, 1)
+            kl = tf.concat([kl_1, kl_2], 0)
+
+            elbo = -nll - self.beta * kl
+            elbo = tf.reduce_mean(elbo)  # scalar
+
+        if return_parts:
+            nll = tf.reduce_mean(nll)  # scalar
+            kl = tf.reduce_mean(kl)  # scalar
+            return -elbo, nll, kl
+        else:
+            return -elbo
+
+    def get_trainable_vars(self):
+        self.compute_loss(tf.random.normal(shape=(2, self.time_length, self.data_dim), dtype=tf.float32),
+                          tf.zeros(shape=(2, self.time_length, self.data_dim), dtype=tf.float32))
+        return self.trainable_variables

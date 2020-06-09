@@ -75,7 +75,7 @@ flags.DEFINE_string('basedir', "models", 'Directory where the models should be s
 flags.DEFINE_string('data_dir', "", 'Directory from where the data should be read in')
 flags.DEFINE_enum('data_type', 'hmnist', ['hmnist', 'physionet', 'sprites', 'dsprites'], 'Type of data to be trained on')
 flags.DEFINE_integer('seed', 1337, 'Seed for the random number generator')
-flags.DEFINE_enum('model_type', 'gp-vae', ['vae', 'hi-vae', 'gp-vae'], 'Type of model to be trained')
+flags.DEFINE_enum('model_type', 'gp-vae', ['vae', 'hi-vae', 'gp-vae', 'ada-gp-vae'], 'Type of model to be trained')
 flags.DEFINE_integer('cnn_kernel_size', 3, 'Kernel size for the CNN preprocessor')
 flags.DEFINE_list('cnn_sizes', [256], 'Number of filters for the layers of the CNN preprocessor')
 flags.DEFINE_boolean('testing', False, 'Use the actual test set for testing')
@@ -268,8 +268,21 @@ def main(argv):
                        length_scale=FLAGS.length_scale, kernel_scales = FLAGS.kernel_scales,
                        image_preprocessor=image_preprocessor, window_size=FLAGS.window_size,
                        beta=FLAGS.beta, M=FLAGS.M, K=FLAGS.K, data_type=FLAGS.data_type)
+    elif FLAGS.model_type == "ada-gp-vae":
+        encoder = BandedJointEncoder if FLAGS.banded_covar else JointEncoder
+        model = AdaGPVAE(latent_dim=FLAGS.latent_dim, data_dim=data_dim,
+                       time_length=time_length,
+                       encoder_sizes=FLAGS.encoder_sizes, encoder=encoder,
+                       decoder_sizes=FLAGS.decoder_sizes, decoder=decoder,
+                       kernel=FLAGS.kernel, sigma=FLAGS.sigma,
+                       length_scale=FLAGS.length_scale,
+                       kernel_scales=FLAGS.kernel_scales,
+                       image_preprocessor=image_preprocessor,
+                       window_size=FLAGS.window_size,
+                       beta=FLAGS.beta, M=FLAGS.M, K=FLAGS.K,
+                       data_type=FLAGS.data_type)
     else:
-        raise ValueError("Model type must be one of ['vae', 'hi-vae', 'gp-vae']")
+        raise ValueError("Model type must be one of ['vae', 'hi-vae', 'gp-vae', 'ada-gp-vae']")
 
 
     ########################
