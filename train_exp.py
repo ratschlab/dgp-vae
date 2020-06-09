@@ -83,7 +83,7 @@ flags.DEFINE_boolean('banded_covar', False, 'Use a banded covariance matrix inst
 flags.DEFINE_integer('batch_size', 64, 'Batch size for training')
 
 flags.DEFINE_bool('lagging_inference', False, 'Apply aggressive encoder training to prevent posterior collapse')
-flags.DEFINE_float('encoder_eps', 10.0, 'Convergence epsilon for to check convergence of aggressive encoder training') # TODO: find proper tuning
+flags.DEFINE_float('encoder_epsilon', 10.0, 'Convergence epsilon for to check convergence of aggressive encoder training') # TODO: find proper tuning
 
 flags.DEFINE_integer('M', 1, 'Number of samples for ELBO estimation')
 flags.DEFINE_integer('K', 1, 'Number of importance sampling weights')
@@ -328,7 +328,7 @@ def main(argv):
     else:
         aggressive = False
 
-    max_aggressive_steps = 3
+    max_aggressive_steps = 20
 
     with summary_writer.as_default(), tf.contrib.summary.always_record_summaries():
         for i, (x_seq, m_seq) in enumerate(tf_x_train_miss.take(num_steps)):
@@ -354,16 +354,17 @@ def main(argv):
                             zip(enc_grads, encoder_trainable_vars),
                             global_step=tf.compat.v1.train.get_or_create_global_step())
 
-                        if not j:  # Skip on first iteration
+                        if not j == 0:  # Skip on first iteration
                             # SINGLE ITERATION CONVERGENCE CHECK
-                            if abs(loss - prev_loss) < FLAGS.encoder_epsilon: break
+                            # if abs(prev_loss - loss) > FLAGS.encoder_epsilon: break
 
                             # 10 ITERATION CONVERGENCE CHECK
-                            # if (loss - prev_loss) <= 0:
-                            #     convergence_counter += 1
-                            #     if convergence_counter >= 10: break
+                            if (loss - prev_loss) <= 0:
+                                convergence_counter += 1
+                                if convergence_counter >= 10: break
 
                         prev_loss = loss
+                        print('In inner loop, at step {}. Loss currently: {}'.format(j, loss))
 
                     # Decoder and preprocessor training
                     with tf.GradientTape() as dec_tape:
@@ -418,11 +419,14 @@ def main(argv):
                     tf.contrib.summary.scalar("nll_val", val_nll)
 
                     # Update aggressive flag
+                    print('AGGRESSIVE CHECK: {}'.format(aggressive))
                     if aggressive:  # Only go from aggressive to normal, not back
                         # Mutual information on validation batch
                         mi = model.mutual_info(x_val_batch)
+                        print('MI: {}'.format(mi))
                         mi_list.append(mi)
-                        if mi_list[-1] - mi_list[-2] <= 0: aggressive = False  # TODO: 0 might be too tight, check behaviour in practice
+                        if len(mi_list) == 1: pass  # skip check if first MI calculation
+                        elif mi_list[-1] - mi_list[-2] <= 0: aggressive = False  # TODO: 0 might be too tight, check behaviour in practice
 
                     if FLAGS.data_type in ["hmnist", "sprites", "dsprites"]:
                         # Draw reconstructed images
