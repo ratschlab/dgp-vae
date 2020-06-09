@@ -82,6 +82,9 @@ flags.DEFINE_boolean('testing', False, 'Use the actual test set for testing')
 flags.DEFINE_boolean('banded_covar', False, 'Use a banded covariance matrix instead of a diagonal one for the output of the inference network: Ignored if model_type is not gp-vae')
 flags.DEFINE_integer('batch_size', 64, 'Batch size for training')
 
+flags.DEFINE_bool('lagging_inference', False, 'Apply aggressive encoder training to prevent posterior collapse')
+flags.DEFINE_float('encoder_epsilon', 10.0, 'Convergence epsilon for to check convergence of aggressive encoder training') # TODO: find proper tuning
+
 flags.DEFINE_integer('M', 1, 'Number of samples for ELBO estimation')
 flags.DEFINE_integer('K', 1, 'Number of importance sampling weights')
 
@@ -108,6 +111,7 @@ def main(argv):
     timestamp = datetime.now().strftime("%y%m%d")
     full_exp_name = "{}_{}".format(timestamp, FLAGS.exp_name)
     outdir = os.path.join(FLAGS.basedir, full_exp_name)
+
     if not os.path.exists(outdir): os.mkdir(outdir)
     checkpoint_prefix = os.path.join(outdir, "ckpt")
     print("Full exp name: ", full_exp_name)
@@ -277,6 +281,11 @@ def main(argv):
     print("Training...")
     _ = tf.compat.v1.train.get_or_create_global_step()
     trainable_vars = model.get_trainable_vars()
+    # encoder_trainable_vars = model.encoder.layers[0].trainable_variables
+    encoder_trainable_vars = model.encoder.trainable_variables
+    decoder_trainable_vars = model.decoder.trainable_variables
+    preprocessor_trainable_vars = model.preprocessor.trainable_variables
+    decoder_preprocessor_trainable_vars = decoder_trainable_vars + preprocessor_trainable_vars
     optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)
 
     print("Encoder: ", model.encoder.net.summary())
@@ -309,20 +318,81 @@ def main(argv):
     losses_train = []
     losses_val = []
 
+    mi_list = []
+
     t0_global = time.time()
     t0 = time.time()
+
+    if FLAGS.lagging_inference:
+        aggressive = True
+    else:
+        aggressive = False
+
+    max_aggressive_steps = 20
+
     with summary_writer.as_default(), tf.contrib.summary.always_record_summaries():
         for i, (x_seq, m_seq) in enumerate(tf_x_train_miss.take(num_steps)):
             try:
-                with tf.GradientTape() as tape:
-                    tape.watch(trainable_vars)
-                    loss = model.compute_loss(x_seq, m_mask=m_seq)
-                    losses_train.append(loss.numpy())
-                grads = tape.gradient(loss, trainable_vars)
-                grads = [np.nan_to_num(grad) for grad in grads]
-                grads, global_norm = tf.clip_by_global_norm(grads, FLAGS.gradient_clip)
-                optimizer.apply_gradients(zip(grads, trainable_vars),
-                                          global_step=tf.compat.v1.train.get_or_create_global_step())
+                # Aggressive encoder training
+                if aggressive:
+                    # Inner loop for encoder training
+                    convergence_counter = 0
+                    for j, (x_seq_enc, m_seq_enc) in enumerate(
+                            tf_x_train_miss.take(max_aggressive_steps)):
+                        with tf.GradientTape() as enc_tape:
+                            enc_tape.watch(encoder_trainable_vars)
+                            loss = model.compute_loss(x_seq_enc,
+                                                      m_mask=m_seq_enc)
+                            # losses_train.append(loss.numpy())
+                        enc_grads = enc_tape.gradient(loss,
+                                                      encoder_trainable_vars)
+                        enc_grads = [np.nan_to_num(enc_grad) for enc_grad in
+                                     enc_grads]
+                        enc_grads, enc_global_norm = tf.clip_by_global_norm(
+                            enc_grads, FLAGS.gradient_clip)
+                        optimizer.apply_gradients(
+                            zip(enc_grads, encoder_trainable_vars),
+                            global_step=tf.compat.v1.train.get_or_create_global_step())
+
+                        if not j == 0:  # Skip on first iteration
+                            # SINGLE ITERATION CONVERGENCE CHECK
+                            # if abs(prev_loss - loss) > FLAGS.encoder_epsilon: break
+
+                            # 10 ITERATION CONVERGENCE CHECK
+                            if (loss - prev_loss) <= 0:
+                                convergence_counter += 1
+                                if convergence_counter >= 10: break
+
+                        prev_loss = loss
+                        print('In inner loop, at step {}. Loss currently: {}'.format(j, loss))
+
+                    # Decoder and preprocessor training
+                    with tf.GradientTape() as dec_tape:
+                        dec_tape.watch(decoder_preprocessor_trainable_vars)
+                        loss = model.compute_loss(x_seq, m_mask=m_seq)
+                        losses_train.append(loss.numpy())
+                    dec_grads = dec_tape.gradient(loss,
+                                                  decoder_preprocessor_trainable_vars)
+                    dec_grads = [np.nan_to_num(dec_grad) for dec_grad in
+                                 dec_grads]
+                    dec_grads, global_norm = tf.clip_by_global_norm(dec_grads,
+                                                                    FLAGS.gradient_clip)
+                    optimizer.apply_gradients(
+                        zip(dec_grads, decoder_preprocessor_trainable_vars),
+                        global_step=tf.compat.v1.train.get_or_create_global_step())
+
+                # Normal training
+                else:
+                    with tf.GradientTape() as tape:
+                        tape.watch(trainable_vars)
+                        loss = model.compute_loss(x_seq, m_mask=m_seq)
+                        losses_train.append(loss.numpy())
+                    grads = tape.gradient(loss, trainable_vars)
+                    grads = [np.nan_to_num(grad) for grad in grads]
+                    grads, global_norm = tf.clip_by_global_norm(grads,
+                                                                FLAGS.gradient_clip)
+                    optimizer.apply_gradients(zip(grads, trainable_vars),
+                                              global_step=tf.compat.v1.train.get_or_create_global_step())
 
                 # Print intermediate results
                 if i % FLAGS.print_interval == 0:
@@ -347,6 +417,16 @@ def main(argv):
                     tf.contrib.summary.scalar("loss_val", val_loss)
                     tf.contrib.summary.scalar("kl_val", val_kl)
                     tf.contrib.summary.scalar("nll_val", val_nll)
+
+                    # Update aggressive flag
+                    print('AGGRESSIVE CHECK: {}'.format(aggressive))
+                    if aggressive:  # Only go from aggressive to normal, not back
+                        # Mutual information on validation batch
+                        mi = model.mutual_info(x_val_batch)
+                        print('MI: {}'.format(mi))
+                        mi_list.append(mi)
+                        if len(mi_list) == 1: pass  # skip check if first MI calculation
+                        elif mi_list[-1] - mi_list[-2] <= 0: aggressive = False  # TODO: 0 might be too tight, check behaviour in practice
 
                     if FLAGS.data_type in ["hmnist", "sprites", "dsprites"]:
                         # Draw reconstructed images
