@@ -112,7 +112,7 @@ def main(argv):
     full_exp_name = "{}_{}".format(timestamp, FLAGS.exp_name)
     outdir = os.path.join(FLAGS.basedir, full_exp_name)
 
-    if not os.path.exists(outdir): os.mkdir(outdir)
+    if not os.path.exists(outdir): os.makedirs(outdir)
     checkpoint_prefix = os.path.join(outdir, "ckpt")
     print("Full exp name: ", full_exp_name)
 
@@ -498,6 +498,12 @@ def main(argv):
         m_val_batches = np.array_split(m_val_artificial, num_split, axis=0)
     else:
         m_val_batches = np.array_split(m_val_miss, num_split, axis=0)
+    ######################## DEBUGGING ONLY ################################
+    # TODO delete before final commit
+    x_val_miss_batches = x_val_miss_batches[:2]
+    x_val_full_batches = x_val_full_batches[:2]
+    m_val_batches = m_val_batches[:2]
+    ########################################################################
     get_val_batches = lambda: zip(x_val_miss_batches, x_val_full_batches, m_val_batches)
 
     # Compute NLL and MSE on missing values
@@ -607,6 +613,8 @@ def main(argv):
         outfile.write("\t".join(map(str, losses_val)))
 
     print("Training finished.")
+
+    return outdir
 
 
 if __name__ == '__main__':

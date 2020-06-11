@@ -18,9 +18,11 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string('z_name', '', 'Filename for underlying factors z')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
+flags.DEFINE_bool('save_score', False, 'Whether or not to save calculated score')
 
 def load_z_c(z_path, c_path):
-    z_full = np.load(z_path)['factors_test']
+    # z_full = np.load(z_path)['factors_test']
+    z_full = np.load(z_path)  # TODO
     c = np.load(c_path)
 
     # Check length of c and only take same amount of z values. Corresponds to z_test.
@@ -29,13 +31,18 @@ def load_z_c(z_path, c_path):
 
     return z, c
 
-def main(argv):
+def main(argv, model_dir=None):
     del argv # Unused
 
-    c_path = '{}/z_mean.npy'.format(FLAGS.model_name)
-    # z_path = os.path.join(os.environ.get("DISENTANGLEMENT_LIB_DATA", "."),
-    #                       "dsprites", "factors", FLAGS.z_name)
-    project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites'
+    if model_dir is None:
+        out_dir = FLAGS.model_name
+    else:
+        out_dir = model_dir
+        print("ARGUMENT PASSED CORRECTLY")  # TODO
+
+    c_path = '{}/z_mean.npy'.format(out_dir)
+    # project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites'
+    project_path = '/Users/Simon/git/disentanglement_lib/disentanglement_lib/data/ground_truth'  # TODO
     z_path = os.path.join(project_path, FLAGS.z_name)
 
     z, c = load_z_c(z_path, c_path)
@@ -55,15 +62,19 @@ def main(argv):
     z_reshape = z_reshape[:,mask]
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
-    scores = dci._compute_dci(c_train[:8000,:].transpose(), z_train[:8000,:].transpose(), c_test[:2000,:].transpose(), z_test[:2000,:].transpose())
+    # scores = dci._compute_dci(c_train[:8000,:].transpose(), z_train[:8000,:].transpose(), c_test[:2000,:].transpose(), z_test[:2000,:].transpose())
+    scores = dci._compute_dci(c_train[:80,:].transpose(), z_train[:80,:].transpose(), c_test[:20,:].transpose(), z_test[:20,:].transpose())  # TODO
 
-    save_score = True
-    if save_score:
-        np.savez('{}/dci_{}_{}_{}'.format(FLAGS.model_name, z_shape[1], c_shape[1], z_shape[0]),
+    print("Evaluation finished")
+
+    if FLAGS.save_score:
+        np.savez('{}/dci_{}_{}_{}'.format(out_dir, z_shape[1], c_shape[1], z_shape[0]),
                  informativeness_train=scores['informativeness_train'],
                  informativeness_test=scores['informativeness_test'],
                  disentanglement=scores['disentanglement'],
                  completeness=scores['completeness'])
+        print("Score saved")
+
 
 if __name__ == '__main__':
     app.run(main)
