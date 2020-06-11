@@ -81,7 +81,7 @@ def aggregate_baseline(N, params, base_dir='dim'):
 
         for _, dirs, _ in walklevel(model_path):
             for n, dir in enumerate(dirs):
-                print(n, dir)
+                # print(n, dir)
                 json_path = os.path.join(model_path, dir, 'metrics', 'dci',
                                          'results', 'aggregate',
                                          'evaluation.json')
@@ -90,18 +90,6 @@ def aggregate_baseline(N, params, base_dir='dim'):
                     dci_scores[0, n, m] = dci['evaluation_results.disentanglement']
                     dci_scores[1, n, m] = dci['evaluation_results.completeness']
                     dci_scores[2, n, m] = dci['evaluation_results.informativeness_test']
-
-    # base_path = os.path.join('baselines', FLAGS.model, base_dir, FLAGS.exp_name)
-    #
-    # for _, dirs, _ in walklevel(base_path):
-    #     for n, dir in enumerate(dirs):
-    #         # print(n, dir)
-    #         json_path = os.path.join(base_path, dir, 'metrics', 'dci', 'results', 'aggregate', 'evaluation.json')
-    #         with open(json_path) as json_file:
-    #             dci = json.load(json_file) # PROPERLY PARSE JSON FILE
-    #             dci_scores[0,n] = dci['evaluation_results.disentanglement']
-    #             dci_scores[1,n] = dci['evaluation_results.completeness']
-    #             dci_scores[2,n] = dci['evaluation_results.informativeness_test']
 
     return dci_scores
 
@@ -123,9 +111,7 @@ def main(argv):
         if FLAGS.model == 'gpvae':
             np.save(os.path.join('models', FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
         elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
-            np.save(os.path.join('baselines', FLAGS.model, FLAGS.base_dir,
-                                 FLAGS.exp_name, '{}_dci_aggr.npy'.format(FLAGS.model))
-                    , dci_scores)
+            np.save(os.path.join('baselines', FLAGS.model, FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
         else:
             raise ValueError(
                 "Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
