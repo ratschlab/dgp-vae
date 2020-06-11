@@ -99,6 +99,8 @@ def main(argv):
     else:
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
+    print(dci_scores.shape)
+
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
             np.save('dci_scores/{}_64_sin_rand_dci_aggr.npy'.format(FLAGS.model), dci_scores)
