@@ -45,6 +45,7 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
     for m, param in enumerate(params):
         # param_dir = base_dir+"_{}_{}".format(param, FLAGS.exp_name)
         param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
+        print(param_dir)
 
         models_path = os.path.join('models', param_dir)
         for _, dirs, _ in os.walk(models_path):
