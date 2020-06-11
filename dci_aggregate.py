@@ -103,7 +103,7 @@ def main(argv):
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
-            np.save(os.path.join('models, FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
+            np.save(os.path.join('models', FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
         elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
             np.save(os.path.join('baselines', FLAGS.model, FLAGS.base_dir,
                                  FLAGS.exp_name, '{}_dci_aggr.npy'.format(FLAGS.model))
