@@ -45,10 +45,10 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
     for m, param in enumerate(params):
         # param_dir = base_dir+"_{}_{}".format(param, FLAGS.exp_name)
         param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
-        print(param_dir)
 
         models_path = os.path.join('models', param_dir)
         for _, dirs, _ in os.walk(models_path):
+            print(dirs)
             for n, dir in enumerate(dirs):
                 for _, _, files in os.walk(os.path.join(models_path, dir)):
                     for filename in files:
@@ -93,7 +93,6 @@ def main(argv):
     n_experiments = 10
 
     if FLAGS.model == 'gpvae':
-        # params = [64]
         dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
     elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
         dci_scores = aggregate_baseline(n_experiments, FLAGS.base_dir, FLAGS.exp_name)
