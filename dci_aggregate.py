@@ -34,7 +34,7 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
     Collects all dci scores and aggregates into single array.
     Args:
         N, int:             Number of random seeds
-        latent_dims, list:  Latent dims tested
+        params, list:       params tested
         base_dir, string:   Base directory naming scheme
 
     Returns:
@@ -43,7 +43,6 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
     dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
 
     for m, param in enumerate(params):
-        # param_dir = base_dir+"_{}_{}".format(param, FLAGS.exp_name)
         param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
 
         models_path = os.path.join('models', param_dir)
@@ -61,29 +60,46 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
 
     return dci_scores
 
-def aggregate_baseline(N, base_dir='dim', exp_name='test_out'):
+def aggregate_baseline(N, params, base_dir='dim'):
     """
     Collects all dci scores and aggregates into single array.
     Args:
         N, int:             Number of random seeds
+        params, list:       params tested
         base_dir, string:   Base directory naming scheme
 
     Returns:
-        dci_scores, [3xN] np array
+        dci_scores, [3xNxM] np array
     """
-    dci_scores = np.zeros((3,N), dtype=np.float32)
+    dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
 
-    base_path = os.path.join('baselines', FLAGS.model, base_dir, exp_name)
+    for m, param in enumerate(params):
+        param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
+        model_path = os.path.join('baselines', FLAGS.model, param_dir)
 
-    for _, dirs, _ in walklevel(base_path):
-        for n, dir in enumerate(dirs):
-            # print(n, dir)
-            json_path = os.path.join(base_path, dir, 'metrics', 'dci', 'results', 'aggregate', 'evaluation.json')
-            with open(json_path) as json_file:
-                dci = json.load(json_file) # PROPERLY PARSE JSON FILE
-                dci_scores[0,n] = dci['evaluation_results.disentanglement']
-                dci_scores[1,n] = dci['evaluation_results.completeness']
-                dci_scores[2,n] = dci['evaluation_results.informativeness_test']
+        for _, dirs, _ in walklevel(model_path):
+            for n, dir in enumerate(dirs):
+                # print(n, dir)
+                json_path = os.path.join(model_path, dir, 'metrics', 'dci',
+                                         'results', 'aggregate',
+                                         'evaluation.json')
+                with open(json_path) as json_file:
+                    dci = json.load(json_file)  # PROPERLY PARSE JSON FILE
+                    dci_scores[0, n] = dci['evaluation_results.disentanglement']
+                    dci_scores[1, n] = dci['evaluation_results.completeness']
+                    dci_scores[2, n] = dci['evaluation_results.informativeness_test']
+
+    # base_path = os.path.join('baselines', FLAGS.model, base_dir, FLAGS.exp_name)
+    #
+    # for _, dirs, _ in walklevel(base_path):
+    #     for n, dir in enumerate(dirs):
+    #         # print(n, dir)
+    #         json_path = os.path.join(base_path, dir, 'metrics', 'dci', 'results', 'aggregate', 'evaluation.json')
+    #         with open(json_path) as json_file:
+    #             dci = json.load(json_file) # PROPERLY PARSE JSON FILE
+    #             dci_scores[0,n] = dci['evaluation_results.disentanglement']
+    #             dci_scores[1,n] = dci['evaluation_results.completeness']
+    #             dci_scores[2,n] = dci['evaluation_results.informativeness_test']
 
     return dci_scores
 
