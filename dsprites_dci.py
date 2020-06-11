@@ -61,6 +61,9 @@ def main(argv, model_dir=None):
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
     scores = dci._compute_dci(c_train[:8000,:].transpose(), z_train[:8000,:].transpose(), c_test[:2000,:].transpose(), z_test[:2000,:].transpose())
 
+    print('D: {}'.format(scores['disentanglement']))
+    print('C: {}'.format(scores['completeness']))
+    print('I: {}'.format(scores['informativeness_test']))
     print("Evaluation finished")
 
     if FLAGS.save_score:
