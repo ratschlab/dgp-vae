@@ -74,7 +74,7 @@ def aggregate_baseline(N, params, base_dir='dim'):
     dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
 
     for m, param in enumerate(params):
-        param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
+        param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, params))
         print(param_dir)
         model_path = os.path.join('baselines', FLAGS.model, param_dir)
         print(model_path)
