@@ -74,7 +74,7 @@ def aggregate_baseline(N, params, base_dir='dim'):
     dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
 
     for m, param in enumerate(params):
-        param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, params))
+        param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
         print(param_dir)
         model_path = os.path.join('baselines', FLAGS.model, param_dir)
         print(model_path)
@@ -87,9 +87,9 @@ def aggregate_baseline(N, params, base_dir='dim'):
                                          'evaluation.json')
                 with open(json_path) as json_file:
                     dci = json.load(json_file)  # PROPERLY PARSE JSON FILE
-                    dci_scores[0, n] = dci['evaluation_results.disentanglement']
-                    dci_scores[1, n] = dci['evaluation_results.completeness']
-                    dci_scores[2, n] = dci['evaluation_results.informativeness_test']
+                    dci_scores[0, n, m] = dci['evaluation_results.disentanglement']
+                    dci_scores[1, n, m] = dci['evaluation_results.completeness']
+                    dci_scores[2, n, m] = dci['evaluation_results.informativeness_test']
 
     # base_path = os.path.join('baselines', FLAGS.model, base_dir, FLAGS.exp_name)
     #
