@@ -21,8 +21,7 @@ flags.DEFINE_string('model_name', '', 'Name of model directory to get learned la
 flags.DEFINE_bool('save_score', False, 'Whether or not to save calculated score')
 
 def load_z_c(z_path, c_path):
-    # z_full = np.load(z_path)['factors_test']
-    z_full = np.load(z_path)  # TODO
+    z_full = np.load(z_path)['factors_test']
     c = np.load(c_path)
 
     # Check length of c and only take same amount of z values. Corresponds to z_test.
@@ -38,11 +37,9 @@ def main(argv, model_dir=None):
         out_dir = FLAGS.model_name
     else:
         out_dir = model_dir
-        print("ARGUMENT PASSED CORRECTLY")  # TODO
 
     c_path = '{}/z_mean.npy'.format(out_dir)
-    # project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites'
-    project_path = '/Users/Simon/git/disentanglement_lib/disentanglement_lib/data/ground_truth'  # TODO
+    project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites'
     z_path = os.path.join(project_path, FLAGS.z_name)
 
     z, c = load_z_c(z_path, c_path)
@@ -62,8 +59,7 @@ def main(argv, model_dir=None):
     z_reshape = z_reshape[:,mask]
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
-    # scores = dci._compute_dci(c_train[:8000,:].transpose(), z_train[:8000,:].transpose(), c_test[:2000,:].transpose(), z_test[:2000,:].transpose())
-    scores = dci._compute_dci(c_train[:80,:].transpose(), z_train[:80,:].transpose(), c_test[:20,:].transpose(), z_test[:20,:].transpose())  # TODO
+    scores = dci._compute_dci(c_train[:8000,:].transpose(), z_train[:8000,:].transpose(), c_test[:2000,:].transpose(), z_test[:2000,:].transpose())
 
     print("Evaluation finished")
 

@@ -377,7 +377,7 @@ def main(argv):
                                 if convergence_counter >= 10: break
 
                         prev_loss = loss
-                        print('In inner loop, at step {}. Loss currently: {}'.format(j, loss))
+                        # print('In inner loop, at step {}. Loss currently: {}'.format(j, loss))
 
                     # Decoder and preprocessor training
                     with tf.GradientTape() as dec_tape:
@@ -498,12 +498,6 @@ def main(argv):
         m_val_batches = np.array_split(m_val_artificial, num_split, axis=0)
     else:
         m_val_batches = np.array_split(m_val_miss, num_split, axis=0)
-    ######################## DEBUGGING ONLY ################################
-    # TODO delete before final commit
-    x_val_miss_batches = x_val_miss_batches[:2]
-    x_val_full_batches = x_val_full_batches[:2]
-    m_val_batches = m_val_batches[:2]
-    ########################################################################
     get_val_batches = lambda: zip(x_val_miss_batches, x_val_full_batches, m_val_batches)
 
     # Compute NLL and MSE on missing values
