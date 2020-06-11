@@ -16,7 +16,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('model', 'gpvae', 'Model for which dci score should be calculated')
 flags.DEFINE_string('base_dir', '', 'base directory of models')
 flags.DEFINE_list('params', [64], 'Parameters tested in experiment')
-flags.DEFINE_string('exp_name', '', 'Experiment name')
+flags.DEFINE_string('exp_name', '', 'Experiment naming scheme')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
 def walklevel(some_dir, level=0):
@@ -103,7 +103,7 @@ def main(argv):
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
-            np.save('dci_scores/{}_64_sin_rand_dci_aggr.npy'.format(FLAGS.model), dci_scores)
+            np.save(os.path.join(FLAGS.base_dir, 'dci_aggr.npy'))
         elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
             np.save(os.path.join('baselines', FLAGS.model, FLAGS.base_dir,
                                  FLAGS.exp_name, '{}_dci_aggr.npy'.format(FLAGS.model))
