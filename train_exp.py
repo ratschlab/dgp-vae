@@ -502,10 +502,13 @@ def main(argv):
 
     # Compute NLL and MSE on missing values
     n_missings = m_val_artificial.sum() if FLAGS.data_type == 'physionet' else m_val_miss.sum()
-    nll_miss = np.sum([model.compute_nll(x, y=y, m_mask=m).numpy()
-                       for x, y, m in get_val_batches()]) / n_missings
-    mse_miss = np.sum([model.compute_mse(x, y=y, m_mask=m, binary=FLAGS.data_type=="hmnist").numpy()
-                       for x, y, m in get_val_batches()]) / n_missings
+    # nll_miss = np.sum([model.compute_nll(x, y=y, m_mask=m).numpy()
+    #                    for x, y, m in get_val_batches()]) / n_missings
+    # mse_miss = np.sum([model.compute_mse(x, y=y, m_mask=m, binary=FLAGS.data_type=="hmnist").numpy()
+    #                    for x, y, m in get_val_batches()]) / n_missings
+
+    nll_miss = np.nan
+    mse_miss = np.nan
     print("NLL miss: {:.4f}".format(nll_miss))
     print("MSE miss: {:.4f}".format(mse_miss))
 
