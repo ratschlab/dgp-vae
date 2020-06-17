@@ -97,6 +97,7 @@ def main(argv):
     n_experiments = 10
 
     if FLAGS.model == 'gpvae':
+        print(FLAGS.base_dir)
         dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
     elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
         dci_scores = aggregate_baseline(n_experiments, FLAGS.params, FLAGS.base_dir)
@@ -108,6 +109,7 @@ def main(argv):
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
             np.save(os.path.join('models', FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
+            print(FLAGS.base_dir)
             print(F"Saved scores at :{os.path.join('models', FLAGS.base_dir, 'dci_aggr.npy')}")
         elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
             np.save(os.path.join('baselines', FLAGS.model, FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
