@@ -108,10 +108,10 @@ def main(argv):
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
             np.save(os.path.join('models', FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
-            print(F"Saved scores at :{os.path.join('models', FLAGS.base_dir, 'dci_aggr.npy')}}")
+            print(F"Saved scores at :{os.path.join('models', FLAGS.base_dir, 'dci_aggr.npy')}")
         elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
             np.save(os.path.join('baselines', FLAGS.model, FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
-            print(F"Saved scores at :{os.path.join('baselines', FLAGS.model, FLAGS.base_dir, 'dci_aggr.npy')}}")
+            print(F"Saved scores at :{os.path.join('baselines', FLAGS.model, FLAGS.base_dir, 'dci_aggr.npy')}")
         else:
             raise ValueError(
                 "Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
