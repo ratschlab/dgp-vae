@@ -374,7 +374,7 @@ class GP_VAE(HI_VAE):
         super(GP_VAE, self).__init__(*args, **kwargs)
         self.kernel = kernel
         self.sigma = sigma
-        self.length_scale = length_scale
+        self.length_scale = tf.Variable(length_scale, trainable=True, name='len_scale')
         self.kernel_scales = kernel_scales
 
         if isinstance(self.encoder, JointEncoder):
@@ -383,7 +383,7 @@ class GP_VAE(HI_VAE):
         # Precomputed KL components for efficiency
         self.pz_scale_inv = None
         self.pz_scale_log_abs_determinant = None
-        self.prior = None
+        # self.prior = None
 
     def decode(self, z):
         num_dim = len(z.shape)
@@ -392,36 +392,37 @@ class GP_VAE(HI_VAE):
         return self.decoder(tf.transpose(z, perm=perm))
 
     def _get_prior(self):
-        if self.prior is None:
-            # Compute kernel matrices for each latent dimension
-            kernel_matrices = []
-            for i in range(self.kernel_scales):
-                if self.kernel == "rbf":
-                    kernel_matrices.append(rbf_kernel(self.time_length, self.length_scale / 2**i))
-                elif self.kernel == "diffusion":
-                    kernel_matrices.append(diffusion_kernel(self.time_length, self.length_scale / 2**i))
-                elif self.kernel == "matern":
-                    kernel_matrices.append(matern_kernel(self.time_length, self.length_scale / 2**i))
-                elif self.kernel == "cauchy":
-                    kernel_matrices.append(cauchy_kernel(self.time_length, self.sigma, self.length_scale / 2**i))
+        # Compute kernel matrices for each latent dimension
+        kernel_matrices = []
+        for i in range(self.kernel_scales):
+            if self.kernel == "rbf":
+                kernel_matrices.append(rbf_kernel(self.time_length, self.length_scale / 2**i))
+            elif self.kernel == "diffusion":
+                kernel_matrices.append(diffusion_kernel(self.time_length, self.length_scale / 2**i))
+            elif self.kernel == "matern":
+                kernel_matrices.append(matern_kernel(self.time_length, self.length_scale / 2**i))
+            elif self.kernel == "cauchy":
+                kernel_matrices.append(cauchy_kernel(self.time_length, self.sigma, self.length_scale / 2**i))
 
-            # Combine kernel matrices for each latent dimension
-            tiled_matrices = []
-            total = 0
-            for i in range(self.kernel_scales):
-                if i == self.kernel_scales-1:
-                    multiplier = self.latent_dim - total
-                else:
-                    multiplier = int(np.ceil(self.latent_dim / self.kernel_scales))
-                    total += multiplier
-                tiled_matrices.append(tf.tile(tf.expand_dims(kernel_matrices[i], 0), [multiplier, 1, 1]))
-            kernel_matrix_tiled = np.concatenate(tiled_matrices)
-            assert len(kernel_matrix_tiled) == self.latent_dim
+        # Combine kernel matrices for each latent dimension
+        tiled_matrices = []
+        total = 0
+        for i in range(self.kernel_scales):
+            if i == self.kernel_scales-1:
+                multiplier = self.latent_dim - total
+            else:
+                multiplier = int(np.ceil(self.latent_dim / self.kernel_scales))
+                total += multiplier
+            tiled_matrices.append(tf.tile(tf.expand_dims(kernel_matrices[i], 0), [multiplier, 1, 1]))
+        kernel_matrix_tiled = np.concatenate(tiled_matrices)
+        assert len(kernel_matrix_tiled) == self.latent_dim
+        # Distribution needs tensor for backprop to work
+        kernel_tensor_tiled = tiled_matrices[0]
 
-            self.prior = tfd.MultivariateNormalFullCovariance(
-                loc=tf.zeros([self.latent_dim, self.time_length], dtype=tf.float32),
-                covariance_matrix=kernel_matrix_tiled)
-        return self.prior
+        prior = tfd.MultivariateNormalFullCovariance(
+            loc=tf.zeros([self.latent_dim, self.time_length], dtype=tf.float32),
+            covariance_matrix=kernel_tensor_tiled)
+        return prior
 
     def kl_divergence(self, a, b):
         """ Batched KL divergence `KL(a || b)` for multivariate Normals.
