@@ -364,7 +364,8 @@ class HI_VAE(VAE):
 
 
 class GP_VAE(HI_VAE):
-    def __init__(self, *args, kernel="cauchy", sigma=1., length_scale=1.0, kernel_scales=1, **kwargs):
+    def __init__(self, *args, kernel="cauchy", sigma=1., length_scale=1.0,
+                 kernel_scales=1, **kwargs):
         """ Proposed GP-VAE model with Gaussian Process prior
             :param kernel: Gaussial Process kernel ["cauchy", "diffusion", "rbf", "matern"]
             :param sigma: scale parameter for a kernel function
@@ -374,8 +375,19 @@ class GP_VAE(HI_VAE):
         super(GP_VAE, self).__init__(*args, **kwargs)
         self.kernel = kernel
         self.sigma = sigma
-        self.length_scale = tf.Variable(length_scale, trainable=True, name='len_scale')
         self.kernel_scales = kernel_scales
+        if kernel_scales >= 1:
+            length_scales = []
+            # Constant initialization
+            # for i in range(self.kernel_scales):
+            #     length_scales.append(length_scale)
+            # Varying initialization
+            for i in range(self.kernel_scales):
+                length_scales.append(length_scale / 2**i)
+            self.length_scale = tf.Variable(length_scales, trainable=True, name='len_scale')
+        else:
+            raise ValueError("kernel_scales must be at least 1!")
+
 
         if isinstance(self.encoder, JointEncoder):
             self.encoder.transpose = True
@@ -394,15 +406,25 @@ class GP_VAE(HI_VAE):
     def _get_prior(self):
         # Compute kernel matrices for each latent dimension
         kernel_matrices = []
+        # for i in range(self.kernel_scales):
+        #     if self.kernel == "rbf":
+        #         kernel_matrices.append(rbf_kernel(self.time_length, self.length_scale / 2**i))
+        #     elif self.kernel == "diffusion":
+        #         kernel_matrices.append(diffusion_kernel(self.time_length, self.length_scale / 2**i))
+        #     elif self.kernel == "matern":
+        #         kernel_matrices.append(matern_kernel(self.time_length, self.length_scale / 2**i))
+        #     elif self.kernel == "cauchy":
+        #         kernel_matrices.append(cauchy_kernel(self.time_length, self.sigma, self.length_scale / 2**i))
+
         for i in range(self.kernel_scales):
             if self.kernel == "rbf":
-                kernel_matrices.append(rbf_kernel(self.time_length, self.length_scale / 2**i))
+                kernel_matrices.append(rbf_kernel(self.time_length, self.length_scale[i]))
             elif self.kernel == "diffusion":
-                kernel_matrices.append(diffusion_kernel(self.time_length, self.length_scale / 2**i))
+                kernel_matrices.append(diffusion_kernel(self.time_length, self.length_scale[i]))
             elif self.kernel == "matern":
-                kernel_matrices.append(matern_kernel(self.time_length, self.length_scale / 2**i))
+                kernel_matrices.append(matern_kernel(self.time_length, self.length_scale[i]))
             elif self.kernel == "cauchy":
-                kernel_matrices.append(cauchy_kernel(self.time_length, self.sigma, self.length_scale / 2**i))
+                kernel_matrices.append(cauchy_kernel(self.time_length, self.sigma, self.length_scale[i]))
 
         # Combine kernel matrices for each latent dimension
         tiled_matrices = []
@@ -417,7 +439,7 @@ class GP_VAE(HI_VAE):
         kernel_matrix_tiled = np.concatenate(tiled_matrices)
         assert len(kernel_matrix_tiled) == self.latent_dim
         # Distribution needs tensor for backprop to work
-        kernel_tensor_tiled = tiled_matrices[0]
+        kernel_tensor_tiled = tf.concat(tiled_matrices, axis=0)
 
         prior = tfd.MultivariateNormalFullCovariance(
             loc=tf.zeros([self.latent_dim, self.time_length], dtype=tf.float32),
