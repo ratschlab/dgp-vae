@@ -87,6 +87,8 @@ def get_time_baseline(N, params, base_dir='dim'):
                     train_meta = json.load(json_file)  # PROPERLY PARSE JSON FILE
                     train_times[n, m] = train_meta['train_results.elapsed_time']
 
+        print(F'Avg time {param}: {np.mean(train_times[:,m])} ')
+
     print(F'Train times shape: {train_times.shape}')
 
 
