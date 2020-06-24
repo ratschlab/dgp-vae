@@ -401,10 +401,10 @@ def main(argv):
                 else:
                     with tf.GradientTape() as tape:
                         tape.watch(trainable_vars)
-                        loss = model.compute_loss(x_seq, m_mask=m_seq)
+                        loss, nll, kl = model.compute_loss(x_seq, m_mask=m_seq, return_parts=True)
                         losses_train.append(loss.numpy())
                     grads = tape.gradient(loss, trainable_vars)
-                    grads = [np.nan_to_num(grad) for grad in grads]
+                    grads = [np.nan_to_num(grad, posinf=1e4, neginf=-1e4) for grad in grads]
                     grads, global_norm = tf.clip_by_global_norm(grads,
                                                                 FLAGS.gradient_clip)
                     optimizer.apply_gradients(zip(grads, trainable_vars),
@@ -415,6 +415,8 @@ def main(argv):
                     print("================================================")
                     print("Learning rate: {} | Global gradient norm: {:.2f}".format(optimizer._lr, global_norm))
                     print("Step {}) Time = {:2f}".format(i, time.time() - t0))
+                    # kl = 0
+                    # nll = 0
                     loss, nll, kl = model.compute_loss(x_seq, m_mask=m_seq, return_parts=True)
                     print("Train loss = {:.3f} | NLL = {:.3f} | KL = {:.3f}".format(loss, nll, kl))
 
@@ -446,9 +448,10 @@ def main(argv):
 
                     if FLAGS.data_type in ["hmnist", "sprites", "dsprites"]:
                         # Draw reconstructed images
-                        x_hat = model.decode(model.encode(x_seq).sample()).mean()
-                        tf.contrib.summary.image("input_train", tf.reshape(x_seq, [-1]+list(img_shape)))
-                        tf.contrib.summary.image("reconstruction_train", tf.reshape(x_hat, [-1]+list(img_shape)))
+                        # x_hat = model.decode(model.encode(x_seq).sample()).mean()
+                        # tf.contrib.summary.image("input_train", tf.reshape(x_seq, [-1]+list(img_shape)))
+                        # tf.contrib.summary.image("reconstruction_train", tf.reshape(x_hat, [-1]+list(img_shape)))
+                        pass
                     elif FLAGS.data_type == 'physionet':
                         # Eval MSE and AUROC on entire val set
                         x_val_miss_batches = np.array_split(x_val_miss, FLAGS.batch_size, axis=0)
@@ -494,6 +497,9 @@ def main(argv):
 
     if FLAGS.model_type == 'ada-gp-vae':
         print(F'Average shared dimensions: {model.running_avg_shared_dims} of {FLAGS.latent_dim}')
+
+    if FLAGS.learn_len:
+        print(F'Learned length scale: {model.length_scale.numpy()}')
 
     # Split data on batches
     num_split = np.ceil(len(x_val_full) / FLAGS.batch_size)

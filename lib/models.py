@@ -427,7 +427,7 @@ class GP_VAE(HI_VAE):
             if i == self.kernel_scales-1:
                 multiplier = self.latent_dim - total
             else:
-                multiplier = int(np.ceil(self.latent_dim / self.kernel_scales))
+                multiplier = int(np.rint(self.latent_dim / self.kernel_scales))
                 total += multiplier
             tiled_matrices.append(tf.tile(tf.expand_dims(kernel_matrices[i], 0), [multiplier, 1, 1]))
         kernel_matrix_tiled = np.concatenate(tiled_matrices)
