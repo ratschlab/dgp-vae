@@ -365,7 +365,7 @@ class HI_VAE(VAE):
 
 class GP_VAE(HI_VAE):
     def __init__(self, *args, kernel="cauchy", sigma=1., length_scale=1.0,
-                 kernel_scales=1, learnable_len_scale=False, **kwargs):
+                 kernel_scales=1, learnable_len_scale=False, len_init='scaled', **kwargs):
         """ Proposed GP-VAE model with Gaussian Process prior
             :param kernel: Gaussial Process kernel ["cauchy", "diffusion", "rbf", "matern"]
             :param sigma: scale parameter for a kernel function
@@ -379,11 +379,16 @@ class GP_VAE(HI_VAE):
         if kernel_scales >= 1:
             length_scales = []
             # Constant initialization
-            # for i in range(self.kernel_scales):
-            #     length_scales.append(length_scale)
-            # Varying initialization
             for i in range(self.kernel_scales):
-                length_scales.append(length_scale / 2**i)
+                if len_init=='same':
+                    length_scales.append(length_scale)
+                elif len_init=='scaled':
+                    length_scales.append(length_scale / 2 ** i)
+                else:
+                    raise ValueError("len_scale must be same or scaled")
+            # Varying initialization
+            # for i in range(self.kernel_scales):
+            #     length_scales.append(length_scale / 2**i)
             if learnable_len_scale:
                 self.length_scale = tf.Variable(length_scales, trainable=True, name='len_scale')
             else:

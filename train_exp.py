@@ -91,6 +91,7 @@ flags.DEFINE_integer('K', 1, 'Number of importance sampling weights')
 flags.DEFINE_enum('kernel', 'cauchy', ['rbf', 'diffusion', 'matern', 'cauchy'], 'Kernel to be used for the GP prior: Ignored if model_type is not (m)gp-vae')
 flags.DEFINE_integer('kernel_scales', 1, 'Number of different length scales sigma for the GP prior: Ignored if model_type is not gp-vae')
 flags.DEFINE_bool('learn_len', False, 'Whether to make length scales learnable or not.')
+flags.DEFINE_enum('len_init', 'same', ['same', 'scaled'], 'initalization of multiple length scales')
 
 
 def main(argv):
@@ -266,7 +267,7 @@ def main(argv):
                        encoder_sizes=FLAGS.encoder_sizes, encoder=encoder,
                        decoder_sizes=FLAGS.decoder_sizes, decoder=decoder,
                        kernel=FLAGS.kernel, sigma=FLAGS.sigma,
-                       length_scale=FLAGS.length_scale, kernel_scales = FLAGS.kernel_scales,
+                       length_scale=FLAGS.length_scale, kernel_scales = FLAGS.kernel_scales, len_init=FLAGS.len_init,
                        learnable_len_scale=FLAGS.learn_len, image_preprocessor=image_preprocessor,
                        window_size=FLAGS.window_size, beta=FLAGS.beta, M=FLAGS.M,
                        K=FLAGS.K, data_type=FLAGS.data_type)
@@ -278,6 +279,7 @@ def main(argv):
                        decoder_sizes=FLAGS.decoder_sizes, decoder=decoder,
                        kernel=FLAGS.kernel, sigma=FLAGS.sigma,
                        length_scale=FLAGS.length_scale,
+                       len_init=FLAGS.len_init,
                        kernel_scales=FLAGS.kernel_scales,
                        learnable_len_scale=FLAGS.learn_len,
                        image_preprocessor=image_preprocessor,
