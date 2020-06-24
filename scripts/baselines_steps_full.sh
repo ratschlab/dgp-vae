@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for n in {1..10}; do
+for n in {5..10}; do
   seed=$RANDOM
   for steps in 15620 50000 100000 200000 300000; do
     for model in adagvae annealedvae betavae betatcvae factorvae dipvae_i dipvae_ii; do
