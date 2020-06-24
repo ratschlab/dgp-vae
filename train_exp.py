@@ -417,8 +417,6 @@ def main(argv):
                     print("================================================")
                     print("Learning rate: {} | Global gradient norm: {:.2f}".format(optimizer._lr, global_norm))
                     print("Step {}) Time = {:2f}".format(i, time.time() - t0))
-                    # kl = 0
-                    # nll = 0
                     loss, nll, kl = model.compute_loss(x_seq, m_mask=m_seq, return_parts=True)
                     print("Train loss = {:.3f} | NLL = {:.3f} | KL = {:.3f}".format(loss, nll, kl))
 
