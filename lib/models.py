@@ -365,7 +365,7 @@ class HI_VAE(VAE):
 
 class GP_VAE(HI_VAE):
     def __init__(self, *args, kernel="cauchy", sigma=1., length_scale=1.0,
-                 kernel_scales=1, **kwargs):
+                 kernel_scales=1, learnable_len_scale=False, **kwargs):
         """ Proposed GP-VAE model with Gaussian Process prior
             :param kernel: Gaussial Process kernel ["cauchy", "diffusion", "rbf", "matern"]
             :param sigma: scale parameter for a kernel function
@@ -384,7 +384,10 @@ class GP_VAE(HI_VAE):
             # Varying initialization
             for i in range(self.kernel_scales):
                 length_scales.append(length_scale / 2**i)
-            self.length_scale = tf.Variable(length_scales, trainable=True, name='len_scale')
+            if learnable_len_scale:
+                self.length_scale = tf.Variable(length_scales, trainable=True, name='len_scale')
+            else:
+                self.length_scale = length_scales
         else:
             raise ValueError("kernel_scales must be at least 1!")
 
@@ -406,15 +409,6 @@ class GP_VAE(HI_VAE):
     def _get_prior(self):
         # Compute kernel matrices for each latent dimension
         kernel_matrices = []
-        # for i in range(self.kernel_scales):
-        #     if self.kernel == "rbf":
-        #         kernel_matrices.append(rbf_kernel(self.time_length, self.length_scale / 2**i))
-        #     elif self.kernel == "diffusion":
-        #         kernel_matrices.append(diffusion_kernel(self.time_length, self.length_scale / 2**i))
-        #     elif self.kernel == "matern":
-        #         kernel_matrices.append(matern_kernel(self.time_length, self.length_scale / 2**i))
-        #     elif self.kernel == "cauchy":
-        #         kernel_matrices.append(cauchy_kernel(self.time_length, self.sigma, self.length_scale / 2**i))
 
         for i in range(self.kernel_scales):
             if self.kernel == "rbf":
@@ -492,11 +486,16 @@ class GP_VAE(HI_VAE):
         return kl_div
 
 class AdaGPVAE(GP_VAE):
-    """
-    Class that implements pairwise loss, as described in Eq. 6 of
-    "Weakly-Supervised Disentanglement Without Compromises"
-    (https://arxiv.org/abs/2002.02886).
-    """
+    def __init__(self, *args, **kwargs):
+        """
+        Class that implements pairwise loss, as described in Eq. 6 of
+        "Weakly-Supervised Disentanglement Without Compromises"
+        (https://arxiv.org/abs/2002.02886).
+        """
+        super(AdaGPVAE, self).__init__(*args, **kwargs)
+        # Only exists to compute running average of shared dims
+        self.running_avg_shared_dims = None
+
     def _compute_loss(self, x, m_mask=None, return_parts=False):
         assert len(x.shape) == 3, "Input should have shape: [batch_size, time_length, data_dim]"
         x = tf.identity(x)  # in case x is not a Tensor already...
@@ -523,6 +522,12 @@ class AdaGPVAE(GP_VAE):
                 sample, [tf.reduce_min(sample), tf.reduce_max(sample)], nbins=2)
         binned_kl = tf.map_fn(f, kl_dim_wise, dtype=tf.dtypes.int32)
         dim_mask = tf.equal(binned_kl, 1)
+        # Get average number of shared dimensions per batch and compute running average
+        avg_shared_dims = np.mean(np.sum(np.invert(dim_mask.numpy()), axis=1))
+        if self.running_avg_shared_dims is not None:
+            self.running_avg_shared_dims = np.mean([self.running_avg_shared_dims, avg_shared_dims])
+        else:
+            self.running_avg_shared_dims = avg_shared_dims
         # Extend mask to all timesteps
         dim_mask_mean = tf.tile(tf.expand_dims(dim_mask, 2), [1, 1, x.get_shape().as_list()[1]])
         dim_mask_cov = tf.tile(tf.expand_dims(dim_mask_mean, 3), [1, 1, 1, x.get_shape().as_list()[1]])

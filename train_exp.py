@@ -82,7 +82,7 @@ flags.DEFINE_boolean('testing', False, 'Use the actual test set for testing')
 flags.DEFINE_boolean('banded_covar', False, 'Use a banded covariance matrix instead of a diagonal one for the output of the inference network: Ignored if model_type is not gp-vae')
 flags.DEFINE_integer('batch_size', 64, 'Batch size for training')
 
-flags.DEFINE_bool('lagging_inference', False, 'Apply aggressive encoder training to prevent posterior collapse')
+flags.DEFINE_bool('aggressive_train', False, 'Apply aggressive encoder training to prevent posterior collapse')
 flags.DEFINE_float('encoder_epsilon', 10.0, 'Convergence epsilon for to check convergence of aggressive encoder training') # TODO: find proper tuning
 
 flags.DEFINE_integer('M', 1, 'Number of samples for ELBO estimation')
@@ -90,6 +90,7 @@ flags.DEFINE_integer('K', 1, 'Number of importance sampling weights')
 
 flags.DEFINE_enum('kernel', 'cauchy', ['rbf', 'diffusion', 'matern', 'cauchy'], 'Kernel to be used for the GP prior: Ignored if model_type is not (m)gp-vae')
 flags.DEFINE_integer('kernel_scales', 1, 'Number of different length scales sigma for the GP prior: Ignored if model_type is not gp-vae')
+flags.DEFINE_bool('learn_len', False, 'Whether to make length scales learnable or not.')
 
 
 def main(argv):
@@ -266,8 +267,9 @@ def main(argv):
                        decoder_sizes=FLAGS.decoder_sizes, decoder=decoder,
                        kernel=FLAGS.kernel, sigma=FLAGS.sigma,
                        length_scale=FLAGS.length_scale, kernel_scales = FLAGS.kernel_scales,
-                       image_preprocessor=image_preprocessor, window_size=FLAGS.window_size,
-                       beta=FLAGS.beta, M=FLAGS.M, K=FLAGS.K, data_type=FLAGS.data_type)
+                       learnable_len_scale=FLAGS.learn_len, image_preprocessor=image_preprocessor,
+                       window_size=FLAGS.window_size, beta=FLAGS.beta, M=FLAGS.M,
+                       K=FLAGS.K, data_type=FLAGS.data_type)
     elif FLAGS.model_type == "ada-gp-vae":
         encoder = BandedJointEncoder if FLAGS.banded_covar else JointEncoder
         model = AdaGPVAE(latent_dim=FLAGS.latent_dim, data_dim=data_dim,
@@ -277,6 +279,7 @@ def main(argv):
                        kernel=FLAGS.kernel, sigma=FLAGS.sigma,
                        length_scale=FLAGS.length_scale,
                        kernel_scales=FLAGS.kernel_scales,
+                       learnable_len_scale=FLAGS.learn_len,
                        image_preprocessor=image_preprocessor,
                        window_size=FLAGS.window_size,
                        beta=FLAGS.beta, M=FLAGS.M, K=FLAGS.K,
@@ -336,7 +339,7 @@ def main(argv):
     t0_global = time.time()
     t0 = time.time()
 
-    if FLAGS.lagging_inference:
+    if FLAGS.aggressive_train:
         aggressive = True
     else:
         aggressive = False
@@ -377,7 +380,7 @@ def main(argv):
                                 if convergence_counter >= 10: break
 
                         prev_loss = loss
-                        # print('In inner loop, at step {}. Loss currently: {}'.format(j, loss))
+                        print('In inner loop, at step {}. Loss currently: {}'.format(j, loss))
 
                     # Decoder and preprocessor training
                     with tf.GradientTape() as dec_tape:
@@ -488,6 +491,9 @@ def main(argv):
     #############
 
     print("Evaluation...")
+
+    if FLAGS.model_type == 'ada-gp-vae':
+        print(F'Average shared dimensions: {model.running_avg_shared_dims} of {FLAGS.latent_dim}')
 
     # Split data on batches
     num_split = np.ceil(len(x_val_full) / FLAGS.batch_size)
