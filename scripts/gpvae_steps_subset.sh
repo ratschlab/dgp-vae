@@ -1,12 +1,14 @@
 #!/bin/bash
 
-for epochs in 1 3 7 14 19; do
+for epochs in 14 19; do
   mkdir -p models/gpvae/epoch_sweep0/epoch_"$epochs"
 done
 
-for n in {1..10}; do
-  seed=$RANDOM
-  for epochs in 1 3 7 14 19; do
+seeds=(20546 15386 3698 6891 21971 10675 19213 27236 24241 15150)
+
+for n in {!seeds[@]}; do
+  let n+=1
+  for epochs in 14 19; do
     bsub -o models/gpvae/epoch_sweep0/epoch_"$epochs"/log_"$epochs"_"$n" -g /gpvae_disent \
     -R "rusage[mem=200000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]"\
     python run_experiment.py --model_type gp-vae --data_type dsprites --testing\
