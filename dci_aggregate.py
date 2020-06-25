@@ -95,7 +95,7 @@ def aggregate_baseline(N, params, base_dir='dim'):
 def main(argv):
     del argv # Unused
 
-    n_experiments = 4 # TODO: CHANGE THIS BACK TO 10
+    n_experiments = 3 # TODO: CHANGE THIS BACK TO 10
 
     if FLAGS.model == 'gpvae':
         dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
