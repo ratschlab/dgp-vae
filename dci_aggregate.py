@@ -80,7 +80,7 @@ def aggregate_baseline(N, params, base_dir='dim'):
         for _, dirs, _ in walklevel(model_path):
             # print(dirs[:N])
             for n, dir in enumerate(dirs[:N]):
-                print(n, dir)
+                # print(n, dir)
                 json_path = os.path.join(model_path, dir, 'metrics', 'dci',
                                          'results', 'aggregate',
                                          'evaluation.json')
@@ -105,7 +105,7 @@ def main(argv):
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
     print(dci_scores.shape)
-    print(dci_scores)
+    print(dci_scores[0,:,:])
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
