@@ -78,7 +78,7 @@ def aggregate_baseline(N, params, base_dir='dim'):
         model_path = os.path.join('baselines', FLAGS.model, param_dir)
 
         for _, dirs, _ in walklevel(model_path):
-            print(dirs)
+            print(dirs[:N])
             for n, dir in enumerate(dirs):
                 print(n, dir)
                 json_path = os.path.join(model_path, dir, 'metrics', 'dci',
