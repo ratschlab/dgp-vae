@@ -98,7 +98,7 @@ def main(argv):
 
     if FLAGS.model == 'gpvae':
         dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
-    elif FLAGS.model in ['annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
+    elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
         dci_scores = aggregate_baseline(n_experiments, FLAGS.params, FLAGS.base_dir)
     else:
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
