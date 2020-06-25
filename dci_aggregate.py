@@ -76,7 +76,6 @@ def aggregate_baseline(N, params, base_dir='dim'):
     for m, param in enumerate(params):
         param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
         model_path = os.path.join('baselines', FLAGS.model, param_dir)
-        print(model_path)
 
         for _, dirs, _ in walklevel(model_path):
             for n, dir in enumerate(dirs):
