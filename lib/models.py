@@ -378,7 +378,6 @@ class GP_VAE(HI_VAE):
         self.kernel_scales = kernel_scales
         if kernel_scales >= 1:
             length_scales = []
-            # Constant initialization
             for i in range(self.kernel_scales):
                 if len_init=='same':
                     length_scales.append(length_scale)
@@ -386,9 +385,6 @@ class GP_VAE(HI_VAE):
                     length_scales.append(length_scale / 2 ** i)
                 else:
                     raise ValueError("len_scale must be same or scaled")
-            # Varying initialization
-            # for i in range(self.kernel_scales):
-            #     length_scales.append(length_scale / 2**i)
             if learnable_len_scale:
                 self.length_scale = tf.Variable(length_scales, trainable=True, name='len_scale')
             else:
