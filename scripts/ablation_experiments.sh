@@ -19,7 +19,7 @@ for n in {1..10}; do
   --seed "$seed" --banded_covar --latent_dim 64 --encoder_sizes=32,256,256 \
   --decoder_sizes=256,256,256 --window_size 3 --sigma 1 --length_scale 2 \
   --beta 1.0 --num_epochs 1 --kernel cauchy --learn_len --kernel_scales 64 \
-  --len_init scale --aggressive_train\
+  --len_init same --aggressive_train\
   --z_name factors_100k_5k.npz --save_score
   # ws + ls
   bsub -o models/extensions/ws_ls/log_"$n" -g /gpvae_disent \
@@ -30,7 +30,7 @@ for n in {1..10}; do
   --seed "$seed" --banded_covar --latent_dim 64 --encoder_sizes=32,256,256 \
   --decoder_sizes=256,256,256 --window_size 3 --sigma 1 --length_scale 2 \
   --beta 1.0 --num_epochs 1 --kernel cauchy --learn_len --kernel_scales 64 \
-  --len_init scaled --z_name factors_100k_5k.npz --save_score
+  --len_init same --z_name factors_100k_5k.npz --save_score
   # ws + at
   bsub -o models/extensions/ws_at/log_"$n" -g /gpvae_disent \
   -R "rusage[mem=200000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]"\
@@ -50,6 +50,6 @@ for n in {1..10}; do
   --seed "$seed" --banded_covar --latent_dim 64 --encoder_sizes=32,256,256 \
   --decoder_sizes=256,256,256 --window_size 3 --sigma 1 --length_scale 2 \
   --beta 1.0 --num_epochs 1 --kernel cauchy --kernel_scales 64 --learn_len \
-  --len_init scaled --aggressive_train \
+  --len_init same --aggressive_train \
   --z_name factors_100k_5k.npz --save_score
 done
