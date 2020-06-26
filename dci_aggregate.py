@@ -41,10 +41,13 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
         dci_scores, [3xNxM] np array
     """
     dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
-    print(len(params))
+    # print(len(params))
 
     for m, param in enumerate(params):
-        param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
+        if param is not None:
+            param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
+        else:
+            param_dir = os.path.join(base_dir, FLAGS.exp_name)
 
         models_path = os.path.join('models', param_dir)
         print(models_path)
