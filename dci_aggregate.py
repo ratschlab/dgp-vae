@@ -95,7 +95,7 @@ def aggregate_baseline(N, params, base_dir='dim'):
 def main(argv):
     del argv # Unused
 
-    n_experiments = 3 # TODO: CHANGE THIS BACK TO 10
+    n_experiments = 10
 
     if FLAGS.model == 'gpvae':
         dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
@@ -105,7 +105,7 @@ def main(argv):
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
     print(dci_scores.shape)
-    print(dci_scores[0,:,:])
+    # print(dci_scores[0,:,:])
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
