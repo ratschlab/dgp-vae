@@ -15,7 +15,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string('model', 'gpvae', 'Model for which dci score should be calculated')
 flags.DEFINE_string('base_dir', '', 'base directory of models')
-flags.DEFINE_list('params', [64], 'Parameters tested in experiment')
+flags.DEFINE_list('params', [None], 'Parameters tested in experiment')
 flags.DEFINE_string('exp_name', '', 'Experiment naming scheme')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
@@ -41,6 +41,7 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
         dci_scores, [3xNxM] np array
     """
     dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
+    print(len(params))
 
     for m, param in enumerate(params):
         param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
