@@ -1,17 +1,18 @@
-# GP-VAE: Deep Probabilistic Time Series Imputation
-
-Code for [paper](http://arxiv.org/abs/1907.04155)
+# DGP-VAE: Disentangled GP-VAE
+Model to learn disentangled representations from time series. 
 
 ## Overview
-Our approach utilizes Variational Autoencoders with Gaussian Process prior for time series imputation. 
+Our model is an extension of the GP-VAE model used for time series imputation ([code](https://github.com/ratschlab/GP-VAE), [paper](http://arxiv.org/abs/1907.04155)).
 
-* The inference model takes time series with missingness and predicts variational parameters for multivariate Gaussian variational distribution.
+The base GP-VAE model uses Variational Autoencoders in conjunction with a Gaussian Process prior to encode a latent time series from the time series in the feature space. 
+We test a number of extensions to this model with the goal of further improving disentanglement.
 
-* The Gaussian Process prior encourages latent representations to capture the temporal correlations in data.
+* Weak Supervision: As the change over time of the underlying factors of variation is sparse in all
+time series, we argue that most of the latent factors of paired time series will be shared. We explicitly enforce the sharing of some factors to exploit this assumption.
 
-* The generative model takes the sample from posterior approximation and reconstructs the original time series with imputed missing values.  
+* Learnable Length Scales: The length scales of the GP kernel can now be learned to increase the expressive power of the model.
 
-![img](./figures/overview.png)
+More extensions and improvements tbd. This is still a work in progress.
 
 ## Dependencies
 
@@ -23,18 +24,15 @@ Our approach utilizes Variational Autoencoders with Gaussian Process prior for t
 1. Clone or download this repo. `cd` yourself to it's root directory.
 2. Grab or build a working python enviromnent. [Anaconda](https://www.anaconda.com/) works fine.
 3. Install dependencies, using `pip install -r requirements.txt`
-4. Download data: `bash data/load_{hmnist, sprites, physionet}.sh`.
-5. Run command `CUDA_VISIBLE_DEVICES=* python train.py --model_type {vae, hi-vae, gp-vae} --data_type {hmnist, sprites, physionet} --exp_name <your_name> ...`
+4. Download data: TODO: Dump data and create download link.
+5. Run command `python run_experiment.py ada-gp-vae --data_type dsprites --testing --exp_name <your_name> ...`
+
+To run on ETH cluster prepend command with:
+`-R "rusage[mem=200000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]"`
    
    To see all available flags run: `python train.py --help`
 
 ## Reproducibility
 
-We provide a set of hyperparameters used in our final runs. Some flags have common values for all datasets by default. For reproducibility of reported results run:
-  * HMNIST: `python train.py --model_type gp-vae --data_type hmnist --exp_name reproduce_hmnist --seed $RANDOM --testing --banded_covar
-    --latent_dim 256 --encoder_sizes=256,256 --decoder_sizes=256,256,256 --window_size 3 --sigma 1 --length_scale 2 --beta 0.8 --num_epochs 20`
-  * SPRITES: `python train.py --model_type gp-vae --data_type sprites --exp_name reproduce_sprites --seed $RANDOM --testing --banded_covar
-    --latent_dim 256 --encoder_sizes=32,256,256 --decoder_sizes=256,256,256 --window_size 3 --sigma 1 --length_scale 2 --beta 0.1 --num_epochs 20`
-  * Physionet: `python train.py --model_type gp-vae --data_type physionet --exp_name reproduce_physionet --seed $RANDOM --testing --banded_covar
-    --latent_dim 35 --encoder_sizes=128,128 --decoder_sizes=256,256 --window_size 24 --sigma 1.005 --length_scale 7 --beta 0.2 --num_epochs 40`
+TODO: add command for best run configuration.
   
