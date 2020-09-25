@@ -21,7 +21,7 @@ More extensions and improvements tbd. This is still a work in progress.
 * Some more packages: see `requirements.txt`
 
 ## Run
-1. Clone or download this repo. `cd` yourself to it's root directory.
+1. Clone or download this repo. `cd` yourself to its root directory.
 2. Grab or build a working python enviromnent. [Anaconda](https://www.anaconda.com/) works fine.
 3. Install dependencies, using `pip install -r requirements.txt`
 4. Download data: TODO: Dump data and create download link.
