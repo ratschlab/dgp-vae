@@ -18,12 +18,14 @@ More extensions and improvements tbd. This is still a work in progress.
 
 * Python >= 3.6
 * TensorFlow = 1.15
+* disentanglement_lib (Available [here](https://github.com/google-research/disentanglement_lib))
 * Some more packages: see `requirements.txt`
 
 ## Run
 1. Clone or download this repo. `cd` yourself to its root directory.
 2. Grab or build a working python enviromnent. [Anaconda](https://www.anaconda.com/) works fine.
 3. Install dependencies, using `pip install -r requirements.txt`
+4. Add the disentanglement_lib to your pythonpath.
 4. Download data: TODO: Dump data and create download link.
 5. Run command `python run_experiment.py ada-gp-vae --data_type dsprites --testing --exp_name <your_name> ...`
 
