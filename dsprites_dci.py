@@ -1,5 +1,7 @@
 """
 Simon Bing ETHZ, 2020
+
+Script to compute dci score of learned representation.
 """
 import warnings
 from typing import Union, Iterable
