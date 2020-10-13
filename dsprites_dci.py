@@ -18,12 +18,17 @@ import os
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('z_name', '', 'Filename for underlying factors z')
+flags.DEFINE_string('z_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npy', 'File path for underlying factors z')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
 flags.DEFINE_bool('save_score', False, 'Whether or not to save calculated score')
 
 def load_z_c(z_path, c_path):
-    z_full = np.load(z_path)['factors_test']
+    # z_test = np.load(z_path)
+
+    try:
+        z_full = np.load(z_path)['factors_test']
+    except IndexError:
+        z_full = np.load(z_path)
     c = np.load(c_path)
 
     # Check length of c and only take same amount of z values. Corresponds to z_test.
@@ -41,10 +46,10 @@ def main(argv, model_dir=None):
         out_dir = model_dir
 
     c_path = '{}/z_mean.npy'.format(out_dir)
-    project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites'
-    z_path = os.path.join(project_path, FLAGS.z_name)
+    # project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npy'
+    # z_path = os.path.join(project_path, FLAGS.z_name)
 
-    z, c = load_z_c(z_path, c_path)
+    z, c = load_z_c(FLAGS.z_path, c_path)
 
     z_shape = z.shape
     c_shape = c.shape
