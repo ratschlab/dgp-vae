@@ -14,12 +14,14 @@ import numpy as np
 from absl import flags, app
 from sklearn.model_selection import train_test_split
 from disentanglement_lib.evaluation.metrics import dci
+from disentanglement_lib.visualize import visualize_scores
 import os
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npy', 'File path for underlying factors z')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
+flags.DEFINE_bool('visualize_score', False, 'Whether or not to visualize score')
 flags.DEFINE_bool('save_score', False, 'Whether or not to save calculated score')
 
 def load_z_c(c_path, z_path):
@@ -64,7 +66,16 @@ def main(argv, model_dir=None):
     c_reshape = c_reshape[:,mask]
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
-    scores = dci._compute_dci(z_train[:8000,:].transpose(), c_train[:8000,:].transpose(), z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
+    scores = dci._compute_dci(z_train[:800,:].transpose(), c_train[:800,:].transpose(), z_test[:200,:].transpose(), c_test[:200,:].transpose())
+
+    # Visualization
+    if FLAGS.visualize_score:
+        importance_matrix, _, _ = dci.compute_importance_gbt(
+            z_train[:800,:].transpose(), c_train[:800,:].transpose(),
+            z_test[:200,:].transpose(), c_test[:200,:].transpose())
+
+        visualize_scores.heat_square(importance_matrix, out_dir, "dci_matrix",
+                                     "x_axis", "y_axis")
 
     print('D: {}'.format(scores['disentanglement']))
     print('C: {}'.format(scores['completeness']))
