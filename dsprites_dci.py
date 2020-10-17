@@ -66,7 +66,7 @@ def main(argv, model_dir=None):
     c_reshape = c_reshape[:,mask]
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
-    scores = dci._compute_dci(z_train[:800,:].transpose(), c_train[:800,:].transpose(), z_test[:200,:].transpose(), c_test[:200,:].transpose())
+    scores = dci._compute_dci(z_train[:8000,:].transpose(), c_train[:8000,:].transpose(), z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
 
     # Visualization
     if FLAGS.visualize_score:
