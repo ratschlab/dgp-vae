@@ -21,7 +21,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npz', 'File path for underlying factors c')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
-flags.DEFINE_list('score_factors', [3, 4, 5], 'Underlying factors to consider in DCI score calculation')
+flags.DEFINE_list('score_factors', [0, 1, 2, 3, 4, 5], 'Underlying factors to consider in DCI score calculation')
 flags.DEFINE_bool('visualize_score', False, 'Whether or not to visualize score')
 flags.DEFINE_bool('save_score', False, 'Whether or not to save calculated score')
 
