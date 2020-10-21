@@ -19,8 +19,9 @@ import os
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npy', 'File path for underlying factors z')
+flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npz', 'File path for underlying factors c')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
+flags.DEFINE_list('score_factors', [3, 4, 5], 'Underlying factors to consider in DCI score calculation')
 flags.DEFINE_bool('visualize_score', False, 'Whether or not to visualize score')
 flags.DEFINE_bool('save_score', False, 'Whether or not to save calculated score')
 
@@ -61,7 +62,7 @@ def main(argv, model_dir=None):
     mask = np.ones(c_reshape.shape[1], dtype=bool)
     for i in range(c_reshape.shape[1]):
         c_change = np.sum(np.diff(c_reshape[:,i]))
-        if not c_change:
+        if not c_change or i not in FLAGS.score_factors:
             mask[i] = False
     c_reshape = c_reshape[:,mask]
 
