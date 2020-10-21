@@ -62,7 +62,7 @@ def main(argv, model_dir=None):
     mask = np.ones(c_reshape.shape[1], dtype=bool)
     for i in range(c_reshape.shape[1]):
         c_change = np.sum(np.diff(c_reshape[:,i]))
-        if not c_change or i not in FLAGS.score_factors:
+        if (not c_change) or (F"{i}" not in FLAGS.score_factors):
             mask[i] = False
     c_reshape = c_reshape[:,mask]
 
