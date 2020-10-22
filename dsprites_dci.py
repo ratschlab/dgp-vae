@@ -77,7 +77,7 @@ def main(argv, model_dir=None):
 
         visualize_scores.heat_square(importance_matrix, out_dir, "dci_matrix",
                                      "x_axis", "y_axis")
-        np.save("impt_matrix", importance_matrix)
+        np.save(F"{out_dir}/impt_matrix", importance_matrix)
 
     print('D: {}'.format(scores['disentanglement']))
     print('C: {}'.format(scores['completeness']))
