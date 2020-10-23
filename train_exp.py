@@ -151,7 +151,10 @@ def main(argv):
         if FLAGS.data_dir == "":
             FLAGS.data_dir = "data/dsprites/dsprites_sin_no_ss_5000.npz"
         data_dim = 4096
-        time_length = 10
+        if FLAGS.model_type == "ada-gp-vae":
+            time_length = 5
+        else:
+            time_length = 10
         decoder = GaussianDecoder
         img_shape = (64, 64, 1)
         val_split = 4000

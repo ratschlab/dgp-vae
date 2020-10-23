@@ -502,12 +502,17 @@ class AdaGPVAE(GP_VAE):
         x = tf.identity(x)  # in case x is not a Tensor already...
         x = tf.tile(x, [self.M * self.K, 1, 1])  # shape=(M*K*BS, TL, D)
 
-        # TODO: pass pairs directly instead of splitting batch like this.
         # TODO: pairing that makes more sense than just arbitrarily like this
-        assert x.shape[0] % 2
-        n_split = x.shape[0] // 2
-        x_1 = x[:n_split,...]
-        x_2 = x[n_split:, ...]
+        # assert x.shape[0] % 2
+        # n_split = x.shape[0] // 2
+        # x_1 = x[:n_split,...]
+        # x_2 = x[n_split:, ...]
+
+        # Alternate splitting along length. Pairs stem from the same timeseries.
+        assert x.shape[1] % 2
+        n_split = x.shape[1] // 2
+        x_1 = x[:, :n_split, :]
+        x_2 = x[:, n_split:, :]
 
         # Encode both pairs with variable reuse
         with tf.variable_scope(tf.get_variable_scope(), reuse=tf.AUTO_REUSE):
@@ -530,8 +535,8 @@ class AdaGPVAE(GP_VAE):
         else:
             self.running_avg_shared_dims = avg_shared_dims
         # Extend mask to all timesteps
-        dim_mask_mean = tf.tile(tf.expand_dims(dim_mask, 2), [1, 1, x.get_shape().as_list()[1]])
-        dim_mask_cov = tf.tile(tf.expand_dims(dim_mask_mean, 3), [1, 1, 1, x.get_shape().as_list()[1]])
+        dim_mask_mean = tf.tile(tf.expand_dims(dim_mask, 2), [1, 1, x_1.get_shape().as_list()[1]])
+        dim_mask_cov = tf.tile(tf.expand_dims(dim_mask_mean, 3), [1, 1, 1, x_1.get_shape().as_list()[1]])
         # Compute averaged mean and covariance
         new_z_mean = 0.5 * (qz_x_1.mean() + qz_x_2.mean())
         new_z_cov = 0.5 * (qz_x_1.covariance() + qz_x_2.covariance())
@@ -563,9 +568,9 @@ class AdaGPVAE(GP_VAE):
         nll_2 = -px_z_2.log_prob(x_2)
         nll_2 = tf.where(tf.math.is_finite(nll_2), nll_2, tf.zeros_like(nll_2))
 
-        if m_mask is not None:
-            nll_1 = tf.where(m_mask[:n_split,...], tf.zeros_like(nll_1), nll_1)
-            nll_2 = tf.where(m_mask[n_split:,...], tf.zeros_like(nll_2), nll_2)
+        # if m_mask is not None:
+        #     nll_1 = tf.where(m_mask[:n_split,...], tf.zeros_like(nll_1), nll_1)
+        #     nll_2 = tf.where(m_mask[n_split:,...], tf.zeros_like(nll_2), nll_2)
         nll_1 = tf.reduce_sum(nll_1, [1, 2])
         nll_2 = tf.reduce_sum(nll_2, [1, 2])
         nll = tf.concat([nll_1, nll_2], 0)
@@ -610,6 +615,9 @@ class AdaGPVAE(GP_VAE):
             return -elbo
 
     def get_trainable_vars(self):
-        self.compute_loss(tf.random.normal(shape=(2, self.time_length, self.data_dim), dtype=tf.float32),
-                          tf.zeros(shape=(2, self.time_length, self.data_dim), dtype=tf.float32))
+        # self.compute_loss(tf.random.normal(shape=(2, self.time_length, self.data_dim), dtype=tf.float32),
+        #                   tf.zeros(shape=(2, self.time_length, self.data_dim), dtype=tf.float32))
+        # For splitting within time series
+        self.compute_loss(tf.random.normal(shape=(1, self.time_length * 2, self.data_dim), dtype=tf.float32),
+                          tf.zeros(shape=(1, self.time_length * 2, self.data_dim), dtype=tf.float32))
         return self.trainable_variables
