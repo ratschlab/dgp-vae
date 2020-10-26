@@ -152,7 +152,7 @@ def main(argv):
             FLAGS.data_dir = "data/dsprites/dsprites_sin_no_ss_5000.npz"
         data_dim = 4096
         if FLAGS.model_type == "ada-gp-vae":
-            time_length = 5
+            time_length = 10
         else:
             time_length = 10
         decoder = GaussianDecoder
