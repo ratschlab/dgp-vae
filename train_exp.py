@@ -31,6 +31,7 @@ from absl import flags
 
 sys.path.append("..")
 from lib.models import *
+from lib.utils import dyn_data_reshape
 
 
 FLAGS = flags.FLAGS
@@ -76,6 +77,7 @@ flags.DEFINE_string('data_dir', "", 'Directory from where the data should be rea
 flags.DEFINE_enum('data_type', 'hmnist', ['hmnist', 'physionet', 'sprites', 'dsprites'], 'Type of data to be trained on')
 flags.DEFINE_integer('seed', 1337, 'Seed for the random number generator')
 flags.DEFINE_enum('model_type', 'gp-vae', ['vae', 'hi-vae', 'gp-vae', 'ada-gp-vae'], 'Type of model to be trained')
+flags.DEFINE_integer('time_len', 10, 'Window size at which to consider time series')
 flags.DEFINE_integer('cnn_kernel_size', 3, 'Kernel size for the CNN preprocessor')
 flags.DEFINE_list('cnn_sizes', [256], 'Number of filters for the layers of the CNN preprocessor')
 flags.DEFINE_boolean('testing', False, 'Use the actual test set for testing')
@@ -152,9 +154,9 @@ def main(argv):
             FLAGS.data_dir = "data/dsprites/dsprites_sin_no_ss_5000.npz"
         data_dim = 4096
         if FLAGS.model_type == "ada-gp-vae":
-            time_length = 10
+            time_length = FLAGS.time_len
         else:
-            time_length = 10
+            time_length = FLAGS.time_len
         decoder = GaussianDecoder
         img_shape = (64, 64, 1)
         val_split = 4000
@@ -166,7 +168,13 @@ def main(argv):
     # Load data #
     #############
 
-    data = np.load(FLAGS.data_dir)
+    data_orig = np.load(FLAGS.data_dir)
+    if FLAGS.model_type == "ada-gp-vae":
+        new_length = FLAGS.time_len * 2
+    else:
+        new_length = FLAGS.time_len
+    data = dyn_data_reshape(data_orig, new_length)
+
     x_train_full = data['x_train_full']
     x_train_miss = data['x_train_miss']
     m_train_miss = data['m_train_miss']

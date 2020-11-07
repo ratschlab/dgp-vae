@@ -32,9 +32,11 @@ def load_z_c(c_path, z_path):
         c_full = np.load(c_path)
     z = np.load(z_path)
 
+    len_new = z.shape[2]
     # Check length of c and only take same amount of z values. Corresponds to z_test.
-    c = c_full[:z.shape[0],:,:]
-    assert z.shape[0] == c.shape[0]
+    # c = c_full[:z.shape[0],:,:]
+    c = c_full
+    # assert z.shape[0] == c.shape[0]
 
     return c, z
 
@@ -57,6 +59,7 @@ def main(argv, model_dir=None):
 
     z_reshape = np.reshape(np.transpose(z, (0,2,1)),(z_shape[0]*z_shape[2],z_shape[1]))
     c_reshape = np.reshape(np.transpose(c, (0,2,1)),(c_shape[0]*c_shape[2],c_shape[1]))
+    c_reshape = c_reshape[:z_reshape.shape[0], ...]
 
     # Check if latent factor doesn't change and remove if is the case
     mask = np.ones(c_reshape.shape[1], dtype=bool)
