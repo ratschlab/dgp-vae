@@ -16,7 +16,7 @@ def dyn_data_reshape(data, new_len):
     if orig_len == new_len:
         return data
 
-    assert orig_len % new_len == 0, 'New length must be integer multiple of original length'
+    assert orig_len % new_len == 0, F'original length {orig_len} must be integer multiple of new length {new_len}'
     assert orig_len > new_len, 'New length must be less than original length'
 
     c = orig_len // new_len
