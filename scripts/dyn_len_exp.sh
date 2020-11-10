@@ -1,17 +1,17 @@
 #!/bin/bash
 
-mkdir -p models/dyn_len_exp/base/len_1_old
-mkdir -p models/dyn_len_exp/base/len_10_old
-mkdir -p models/dyn_len_exp/base/len_5_old
-mkdir -p models/dyn_len_exp/ada/len_1_old
-mkdir -p models/dyn_len_exp/ada/len_10_old
-mkdir -p models/dyn_len_exp/ada/len_5_old
+mkdir -p models/dyn_len_exp/base/len_1
+mkdir -p models/dyn_len_exp/base/len_10
+mkdir -p models/dyn_len_exp/base/len_5
+mkdir -p models/dyn_len_exp/ada/len_1
+mkdir -p models/dyn_len_exp/ada/len_10
+mkdir -p models/dyn_len_exp/ada/len_5
 
 for len in 1 5; do
   for n in {6..10}; do
     seed=$RANDOM
     # Base
-    bsub -o models/dci_factors_comp/log_%J -g /gpvae_disent \
+    bsub -o models/dyn_len_exp/base/len_"$len"/log_%J -g /gpvae_disent \
     -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
     python run_experiment.py --model_type gp-vae --data_type dsprites --time_len "$len" --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/dsprites_100k_5k_100.npz \
@@ -22,7 +22,7 @@ for len in 1 5; do
     --score_factors=1,2,3,4,5 --save_score --visualize_score
 
     # Weak supervision
-    bsub -o models/dci_factors_comp/log_%J -g /gpvae_disent \
+    bsub -o models/dyn_len_exp/ada/len_"$len"/log_%J -g /gpvae_disent \
     -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
     python run_experiment.py --model_type ada-gp-vae --data_type dsprites --time_len "$len" --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/dsprites_100k_5k_100.npz \
