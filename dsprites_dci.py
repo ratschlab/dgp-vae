@@ -72,16 +72,6 @@ def main(argv, model_dir=None):
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
     scores = dci._compute_dci(z_train[:8000,:].transpose(), c_train[:8000,:].transpose(), z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
 
-    # Visualization
-    if FLAGS.visualize_score:
-        importance_matrix, _, _ = dci.compute_importance_gbt(
-            z_train[:800,:].transpose(), c_train[:800,:].transpose(),
-            z_test[:200,:].transpose(), c_test[:200,:].transpose())
-
-        visualize_scores.heat_square(importance_matrix, out_dir, "dci_matrix",
-                                     "x_axis", "y_axis")
-        np.save(F"{out_dir}/impt_matrix", importance_matrix)
-
     print('D: {}'.format(scores['disentanglement']))
     print('C: {}'.format(scores['completeness']))
     print('I: {}'.format(scores['informativeness_test']))
@@ -94,6 +84,16 @@ def main(argv, model_dir=None):
                  disentanglement=scores['disentanglement'],
                  completeness=scores['completeness'])
         print("Score saved")
+
+    # Visualization
+    if FLAGS.visualize_score:
+        importance_matrix, _, _ = dci.compute_importance_gbt(
+            z_train[:8000,:].transpose(), c_train[:8000,:].transpose(),
+            z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
+
+        visualize_scores.heat_square(importance_matrix, out_dir, "dci_matrix",
+                                     "x_axis", "y_axis")
+        np.save(F"{out_dir}/impt_matrix", importance_matrix)
 
 
 if __name__ == '__main__':
