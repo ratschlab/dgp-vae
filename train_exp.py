@@ -90,7 +90,7 @@ flags.DEFINE_float('encoder_epsilon', 10.0, 'Convergence epsilon for to check co
 flags.DEFINE_integer('M', 1, 'Number of samples for ELBO estimation')
 flags.DEFINE_integer('K', 1, 'Number of importance sampling weights')
 
-flags.DEFINE_enum('kernel', 'cauchy', ['rbf', 'diffusion', 'matern', 'cauchy'], 'Kernel to be used for the GP prior: Ignored if model_type is not (m)gp-vae')
+flags.DEFINE_enum('kernel', 'cauchy', ['rbf', 'diffusion', 'matern', 'periodic', 'cauchy'], 'Kernel to be used for the GP prior: Ignored if model_type is not (m)gp-vae')
 flags.DEFINE_integer('kernel_scales', 1, 'Number of different length scales sigma for the GP prior: Ignored if model_type is not gp-vae')
 flags.DEFINE_bool('learn_len', False, 'Whether to make length scales learnable or not.')
 flags.DEFINE_enum('len_init', 'same', ['same', 'scaled'], 'initalization of multiple length scales')

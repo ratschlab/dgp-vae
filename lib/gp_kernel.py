@@ -1,4 +1,5 @@
 import tensorflow as tf
+import math
 
 ''' 
 
@@ -47,3 +48,14 @@ def cauchy_kernel(T, sigma, length_scale):
     alpha = 0.001
     eye = tf.eye(num_rows=kernel_matrix.shape.as_list()[-1])
     return kernel_matrix + alpha * eye
+
+def periodic_kernel(T, sigma, length_scale):
+    l = 1.0
+    period = length_scale
+    xs = tf.range(T, dtype=tf.float32)
+    xs_in = tf.expand_dims(xs, 0)
+    xs_out = tf.expand_dims(xs, 1)
+    distance_matrix = tf.math.abs(tf.math.subtract(xs_in, xs_out))
+    sin_arg = math.pi * distance_matrix / period
+    kernel_matrix = sigma * tf.math.exp(-2 * tf.math.square(tf.math.sin(sin_arg)) / (l**2))
+    return kernel_matrix

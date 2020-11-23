@@ -418,6 +418,8 @@ class GP_VAE(HI_VAE):
                 kernel_matrices.append(diffusion_kernel(self.time_length, self.length_scale[i]))
             elif self.kernel == "matern":
                 kernel_matrices.append(matern_kernel(self.time_length, self.length_scale[i]))
+            elif self.kernel == "periodic":
+                kernel_matrices.append(periodic_kernel(self.time_length, self.sigma, self.length_scale[i]))
             elif self.kernel == "cauchy":
                 kernel_matrices.append(cauchy_kernel(self.time_length, self.sigma, self.length_scale[i]))
 
