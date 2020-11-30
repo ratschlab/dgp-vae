@@ -34,3 +34,11 @@ for len in 1 5 10; do
 
   done
 done
+
+bsub -R "rusage[mem=65000]" python disentanglement_lib/disentanglement_lib/data/ground_truth/create_dataset.py --seed 42 --num_timeseries 10500 --length 100 --kernel sinusoid --periods=0,0,0,5,10,20 --resample_period --save_data --file_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/dsprites_sin_resample --factors_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_dsprites_sin_resample
+
+bsub -R "rusage[mem=65000]" python disentanglement_lib/disentanglement_lib/data/ground_truth/create_dataset.py --seed 42 --num_timeseries 10500 --length 100 --kernel rbf --gp_weight 1 --periods=0,0,0,1.5,0.5,0.01 --debug --file_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/dsprites_gp_full_range1 --factors_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_dsprites_gp_full_range1
+
+bsub -R "rusage[mem=65000]" python disentanglement_lib/disentanglement_lib/data/ground_truth/create_dataset.py --seed 42 --num_timeseries 10500 --length 100 --kernel rbf --gp_weight 1 --univ_rescaling --periods=0,0,2,15.0,1.0,0.1 --file_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/dsprites_gp_part4 --factors_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_dsprites_gp_part4 --save_data
+
+
