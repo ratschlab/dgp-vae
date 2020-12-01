@@ -186,6 +186,10 @@ def main(argv):
             x_val_full = data['x_test_full']
             x_val_miss = data['x_test_miss']
             m_val_miss = data['m_test_miss']
+            # EXPERIMENTAL, UNCOMMENT TO TRAIN ON ALL AVAILABLE DATA
+            x_train_full = np.concatenate((x_train_full, x_val_full))
+            x_train_miss = np.concatenate((x_train_miss, x_val_miss))
+            m_train_miss = np.concatenate((m_train_miss, m_val_miss))
         if FLAGS.data_type == 'hmnist':
             y_val = data['y_test']
         elif FLAGS.data_type == 'physionet':
