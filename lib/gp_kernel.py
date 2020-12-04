@@ -49,6 +49,22 @@ def cauchy_kernel(T, sigma, length_scale):
     eye = tf.eye(num_rows=kernel_matrix.shape.as_list()[-1])
     return kernel_matrix + alpha * eye
 
+def cauchy_const_mix_kernel(T, sigma, length_scale, const_val):
+    xs = tf.range(T, dtype=tf.float32)
+    xs_in = tf.expand_dims(xs, 0)
+    xs_out = tf.expand_dims(xs, 1)
+    distance_matrix = tf.math.squared_difference(xs_in, xs_out)
+    distance_matrix_scaled = distance_matrix / length_scale ** 2
+    kernel_matrix = tf.math.divide(sigma, (distance_matrix_scaled + 1.))
+
+    alpha = 0.001
+    eye = tf.eye(num_rows=kernel_matrix.shape.as_list()[-1])
+    cauchy_kernel = kernel_matrix + alpha * eye
+
+    const_kernel = const_val * tf.ones_like(cauchy_kernel)
+
+    return cauchy_kernel + const_kernel
+
 def periodic_kernel(T, sigma, length_scale):
     l = 1.0
     period = length_scale

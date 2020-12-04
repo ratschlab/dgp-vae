@@ -422,6 +422,8 @@ class GP_VAE(HI_VAE):
                 kernel_matrices.append(periodic_kernel(self.time_length, self.sigma, self.length_scale[i]))
             elif self.kernel == "cauchy":
                 kernel_matrices.append(cauchy_kernel(self.time_length, self.sigma, self.length_scale[i]))
+            elif self.kernel == "cauchy_const":
+                kernel_matrices.append(cauchy_const_mix_kernel(self.time_length, self.sigma, self.length_scale[i], const_val=5.0))
 
         # Combine kernel matrices for each latent dimension
         tiled_matrices = []
