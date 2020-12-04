@@ -20,26 +20,12 @@ def dyn_data_reshape(data, new_len):
     assert orig_len > new_len, 'New length must be less than original length'
 
     c = orig_len // new_len
-    N_new = N * c
 
-    x_train_full = np.reshape(data['x_train_full'], (N_new, new_len, data_dim))
-    x_train_miss = np.reshape(data['x_train_miss'], (N_new, new_len, data_dim))
-    m_train_miss = np.reshape(data['m_train_miss'], (N_new, new_len, data_dim))
-
-    N_test_new = data['x_test_full'].shape[0] * c
-    x_test_full = np.reshape(data['x_test_full'], (N_test_new, new_len, data_dim))
-    x_test_miss = np.reshape(data['x_test_miss'], (N_test_new, new_len, data_dim))
-    m_test_miss = np.reshape(data['m_test_miss'], (N_test_new, new_len, data_dim))
-
-    data_reshape = {
-        'x_train_full': x_train_full,
-        'x_train_miss': x_train_miss,
-        'm_train_miss': m_train_miss,
-        'x_test_full': x_test_full,
-        'x_test_miss': x_test_miss,
-        'm_test_miss': m_test_miss
-    }
-
+    data_reshape = {}
+    for file in data.files:
+        if len(data[file].shape) > 2: # Only reshape if there are enough dimensions
+            N_new = data[file].shape[0] * c
+            data_reshape[file] = np.reshape(data[file], (N_new, new_len, data_dim))
 
     return data_reshape
 
