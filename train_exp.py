@@ -137,7 +137,7 @@ def main(argv):
         if FLAGS.data_dir == "":
             FLAGS.data_dir = "data/physionet/physionet.npz"
         data_dim = 35
-        time_length = 48
+        time_length = FLAGS.time_len
         num_classes = 2
 
         decoder = GaussianDecoder
@@ -178,8 +178,8 @@ def main(argv):
     x_train_full = data['x_train_full']
     x_train_miss = data['x_train_miss']
     m_train_miss = data['m_train_miss']
-    if FLAGS.data_type in ['hmnist', 'physionet']:
-        y_train = data['y_train']
+    # if FLAGS.data_type in ['hmnist', 'physionet']:
+    #     y_train = data['y_train']
 
     if FLAGS.testing:
         if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites']:
@@ -193,11 +193,18 @@ def main(argv):
         if FLAGS.data_type == 'hmnist':
             y_val = data['y_test']
         elif FLAGS.data_type == 'physionet':
-            x_val_full = data['x_train_full']
-            x_val_miss = data['x_train_miss']
-            m_val_miss = data['m_train_miss']
-            y_val = data['y_train']
+            x_val_full = data['x_val_full']
+            x_val_miss = data['x_val_miss']
+            m_val_miss = data['m_val_miss']
+            x_test_full = data['x_test_full']
+            x_test_miss = data['x_test_miss']
+            m_test_miss = data['m_test_miss']
+            # y_val = data['y_train']
             m_val_artificial = data["m_train_artificial"]
+            # EXPERIMENTAL, UNCOMMENT TO TRAIN ON ALL AVAILABLE DATA
+            x_train_full = np.concatenate((x_train_full, x_val_full, x_test_full))
+            x_train_miss = np.concatenate((x_train_miss, x_val_miss, x_test_miss))
+            m_train_miss = np.concatenate((m_train_miss, m_val_miss, m_test_miss))
     elif FLAGS.data_type in ['hmnist', 'sprites', 'dsprites']:
         x_val_full = x_train_full[val_split:]
         x_val_miss = x_train_miss[val_split:]
@@ -213,7 +220,7 @@ def main(argv):
         x_val_miss = data["x_val_miss"]
         m_val_miss = data["m_val_miss"]
         m_val_artificial = data["m_val_artificial"]
-        y_val = data["y_val"]
+        # y_val = data["y_val"]
     else:
         raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites', 'dsprites']")
 
@@ -317,7 +324,10 @@ def main(argv):
     # encoder_trainable_vars = model.encoder.layers[0].trainable_variables
     encoder_trainable_vars = model.encoder.trainable_variables
     decoder_trainable_vars = model.decoder.trainable_variables
-    preprocessor_trainable_vars = model.preprocessor.trainable_variables
+    if model.preprocessor is not None:
+        preprocessor_trainable_vars = model.preprocessor.trainable_variables
+    else:
+        preprocessor_trainable_vars = []
     decoder_preprocessor_trainable_vars = decoder_trainable_vars + preprocessor_trainable_vars
     optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)
 
@@ -468,27 +478,31 @@ def main(argv):
                         # tf.contrib.summary.image("reconstruction_train", tf.reshape(x_hat, [-1]+list(img_shape)))
                         pass
                     elif FLAGS.data_type == 'physionet':
+                        ###################################
+                        ### DONT NEED THIS IN OUR MODEL ###
+                        ###################################
+
                         # Eval MSE and AUROC on entire val set
-                        x_val_miss_batches = np.array_split(x_val_miss, FLAGS.batch_size, axis=0)
-                        x_val_full_batches = np.array_split(x_val_full, FLAGS.batch_size, axis=0)
-                        m_val_artificial_batches = np.array_split(m_val_artificial, FLAGS.batch_size, axis=0)
-                        get_val_batches = lambda: zip(x_val_miss_batches, x_val_full_batches, m_val_artificial_batches)
-
-                        n_missings = m_val_artificial.sum()
-                        mse_miss = np.sum([model.compute_mse(x, y=y, m_mask=m).numpy()
-                                           for x, y, m in get_val_batches()]) / n_missings
-
-                        x_val_imputed = np.vstack([model.decode(model.encode(x_batch).mean()).mean().numpy()
-                                                   for x_batch in x_val_miss_batches])
-                        x_val_imputed[m_val_miss == 0] = x_val_miss[m_val_miss == 0]  # impute gt observed values
-
-                        x_val_imputed = x_val_imputed.reshape([-1, time_length * data_dim])
-                        val_split = len(x_val_imputed) // 2
-                        cls_model = LogisticRegression(solver='liblinear', tol=1e-10, max_iter=10000)
-                        cls_model.fit(x_val_imputed[:val_split], y_val[:val_split])
-                        probs = cls_model.predict_proba(x_val_imputed[val_split:])[:, 1]
-                        auroc = roc_auc_score(y_val[val_split:], probs)
-                        print("MSE miss: {:.4f} | AUROC: {:.4f}".format(mse_miss, auroc))
+                        # x_val_miss_batches = np.array_split(x_val_miss, FLAGS.batch_size, axis=0)
+                        # x_val_full_batches = np.array_split(x_val_full, FLAGS.batch_size, axis=0)
+                        # m_val_artificial_batches = np.array_split(m_val_artificial, FLAGS.batch_size, axis=0)
+                        # get_val_batches = lambda: zip(x_val_miss_batches, x_val_full_batches, m_val_artificial_batches)
+                        #
+                        # n_missings = m_val_artificial.sum()
+                        # mse_miss = np.sum([model.compute_mse(x, y=y, m_mask=m).numpy()
+                        #                    for x, y, m in get_val_batches()]) / n_missings
+                        #
+                        # x_val_imputed = np.vstack([model.decode(model.encode(x_batch).mean()).mean().numpy()
+                        #                            for x_batch in x_val_miss_batches])
+                        # x_val_imputed[m_val_miss == 0] = x_val_miss[m_val_miss == 0]  # impute gt observed values
+                        #
+                        # x_val_imputed = x_val_imputed.reshape([-1, time_length * data_dim])
+                        # val_split = len(x_val_imputed) // 2
+                        # # cls_model = LogisticRegression(solver='liblinear', tol=1e-10, max_iter=10000)
+                        # # cls_model.fit(x_val_imputed[:val_split], y_val[:val_split])
+                        # probs = cls_model.predict_proba(x_val_imputed[val_split:])[:, 1]
+                        # # auroc = roc_auc_score(y_val[val_split:], probs)
+                        # print("MSE miss: {:.4f} | AUROC: {:.4f}".format(mse_miss, auroc))
 
                         # Update learning rate (used only for physionet with decay=0.5)
                         if i > 0 and i % (10*FLAGS.print_interval) == 0:
@@ -521,14 +535,17 @@ def main(argv):
 
     x_val_miss_batches = np.array_split(x_val_miss, num_split, axis=0)
     x_val_full_batches = np.array_split(x_val_full, num_split, axis=0)
-    if FLAGS.data_type == 'physionet':
-        m_val_batches = np.array_split(m_val_artificial, num_split, axis=0)
-    else:
-        m_val_batches = np.array_split(m_val_miss, num_split, axis=0)
+    # if FLAGS.data_type == 'physionet':
+    #     m_val_batches = np.array_split(m_val_artificial, num_split, axis=0)
+    # else:
+    #     m_val_batches = np.array_split(m_val_miss, num_split, axis=0)
+    # Using this for every case
+    m_val_batches = np.array_split(m_val_miss, num_split, axis=0)
+
     get_val_batches = lambda: zip(x_val_miss_batches, x_val_full_batches, m_val_batches)
 
     # Compute NLL and MSE on missing values
-    n_missings = m_val_artificial.sum() if FLAGS.data_type == 'physionet' else m_val_miss.sum()
+    # n_missings = m_val_artificial.sum() if FLAGS.data_type == 'physionet' else m_val_miss.sum()
     # nll_miss = np.sum([model.compute_nll(x, y=y, m_mask=m).numpy()
     #                    for x, y, m in get_val_batches()]) / n_missings
     # mse_miss = np.sum([model.compute_mse(x, y=y, m_mask=m, binary=FLAGS.data_type=="hmnist").numpy()
@@ -579,16 +596,17 @@ def main(argv):
         #     np.save(os.path.join(outdir, "imputed_sample_{}".format(i)), x_val_imputed_sample)
 
         # AUROC evaluation using Logistic Regression
-        x_val_imputed = x_val_imputed.reshape([-1, time_length * data_dim])
-        val_split = len(x_val_imputed) // 2
-        cls_model = LogisticRegression(solver='liblinear', tol=1e-10, max_iter=10000)
-        cls_model.fit(x_val_imputed[:val_split], y_val[:val_split])
-        probs = cls_model.predict_proba(x_val_imputed[val_split:])[:, 1]
-        auprc = average_precision_score(y_val[val_split:], probs)
-        auroc = roc_auc_score(y_val[val_split:], probs)
+        # x_val_imputed = x_val_imputed.reshape([-1, time_length * data_dim])
+        # val_split = len(x_val_imputed) // 2
+        # cls_model = LogisticRegression(solver='liblinear', tol=1e-10, max_iter=10000)
+        # cls_model.fit(x_val_imputed[:val_split], y_val[:val_split])
+        # probs = cls_model.predict_proba(x_val_imputed[val_split:])[:, 1]
+        # auprc = average_precision_score(y_val[val_split:], probs)
+        # auroc = roc_auc_score(y_val[val_split:], probs)
 
-        print("AUROC: {:.4f}".format(auroc))
-        print("AUPRC: {:.4f}".format(auprc))
+        # print("AUROC: {:.4f}".format(auroc))
+        # print("AUPRC: {:.4f}".format(auprc))
+        auroc, auprc = 0, 0
 
     # Visualize reconstructions
     if FLAGS.data_type in ["hmnist", "sprites"]:
