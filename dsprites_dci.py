@@ -13,6 +13,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import numpy as np
 from absl import flags, app
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 from disentanglement_lib.evaluation.metrics import dci
 from disentanglement_lib.visualize import visualize_scores
 import os
@@ -21,7 +22,9 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npz', 'File path for underlying factors c')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
-flags.DEFINE_list('score_factors', [0, 1, 2, 3, 4, 5], 'Underlying factors to consider in DCI score calculation')
+flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'sprites', 'dsprites'], 'Type of data and how to evaluate')
+flags.DEFINE_list('score_factors', [], 'Underlying factors to consider in DCI score calculation')
+flags.DEFINE_enum('rescaling', 'linear', ['linear', 'standard'], 'Rescaling of ground truth factors')
 flags.DEFINE_bool('visualize_score', False, 'Whether or not to visualize score')
 flags.DEFINE_bool('save_score', False, 'Whether or not to save calculated score')
 
@@ -61,15 +64,35 @@ def main(argv, model_dir=None):
     c_reshape = np.reshape(np.transpose(c, (0,2,1)),(c_shape[0]*c_shape[2],c_shape[1]))
     c_reshape = c_reshape[:z_reshape.shape[0], ...]
 
-    # Check if latent factor doesn't change and remove if is the case
+    # Experimental physionet rescaling
+    if FLAGS.data_type_dci == 'physionet':
+        if FLAGS.rescaling == 'linear':
+            # linear rescaling
+            c_rescale = 10 * c_reshape
+            c_reshape = c_rescale.astype(int)
+        elif FLAGS.rescaling == 'standard':
+            # standardizing
+            scaler = StandardScaler()
+            c_rescale = scaler.fit_transform(c_reshape)
+            c_reshape = c_rescale.astype(int)
+        else:
+            raise ValueError("Rescaling must be 'linear' or 'standard'")
+
+
+    # Include all factors in score calculation, if not specified otherwise
+    if not FLAGS.score_factors:
+        FLAGS.score_factors = np.arange(c_shape[1]).astype(str)
+
+    # Check if ground truth factor doesn't change and remove if is the case
     mask = np.ones(c_reshape.shape[1], dtype=bool)
     for i in range(c_reshape.shape[1]):
-        c_change = np.sum(np.diff(c_reshape[:,i]))
+        c_change = np.sum(abs(np.diff(c_reshape[:8000,i])))
         if (not c_change) or (F"{i}" not in FLAGS.score_factors):
             mask[i] = False
     c_reshape = c_reshape[:,mask]
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
+
     scores = dci._compute_dci(z_train[:8000,:].transpose(), c_train[:8000,:].transpose(), z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
 
     print('D: {}'.format(scores['disentanglement']))
@@ -88,8 +111,13 @@ def main(argv, model_dir=None):
     # Visualization
     if FLAGS.visualize_score:
         importance_matrix, _, _ = dci.compute_importance_gbt(
-            z_train[:8000,:].transpose(), c_train[:8000,:].transpose(),
-            z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
+            z_train[:8000,:].transpose(), c_train[:8000,:].transpose().astype(int),
+            z_test[:2000,:].transpose(), c_test[:2000,:].transpose().astype(int))
+
+        if FLAGS.data_type_dci == 'physionet':
+            importance_matrix = np.insert(importance_matrix,
+                                               np.nonzero(np.invert(mask))[0],
+                                               0, axis=1)
 
         visualize_scores.heat_square(importance_matrix, out_dir, "dci_matrix",
                                      "x_axis", "y_axis")
