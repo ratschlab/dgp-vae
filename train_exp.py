@@ -136,7 +136,7 @@ def main(argv):
     elif FLAGS.data_type == "physionet":
         if FLAGS.data_dir == "":
             FLAGS.data_dir = "data/physionet/physionet.npz"
-        data_dim = 35
+        data_dim = 36
         time_length = FLAGS.time_len
         num_classes = 2
 
@@ -200,11 +200,11 @@ def main(argv):
             x_test_miss = data['x_test_miss']
             m_test_miss = data['m_test_miss']
             # y_val = data['y_train']
-            m_val_artificial = data["m_train_artificial"]
+            # m_val_artificial = data["m_train_artificial"]
             # EXPERIMENTAL, UNCOMMENT TO TRAIN ON ALL AVAILABLE DATA
-            x_train_full = np.concatenate((x_train_full, x_val_full, x_test_full))
-            x_train_miss = np.concatenate((x_train_miss, x_val_miss, x_test_miss))
-            m_train_miss = np.concatenate((m_train_miss, m_val_miss, m_test_miss))
+            x_train_full = np.concatenate((x_train_full, x_val_full))
+            x_train_miss = np.concatenate((x_train_miss, x_val_miss))
+            m_train_miss = np.concatenate((m_train_miss, m_val_miss))
     elif FLAGS.data_type in ['hmnist', 'sprites', 'dsprites']:
         x_val_full = x_train_full[val_split:]
         x_val_miss = x_train_miss[val_split:]
@@ -559,12 +559,13 @@ def main(argv):
     # Save imputed values
     z_mean = [model.encode(x_batch).mean().numpy() for x_batch in x_val_miss_batches]
     np.save(os.path.join(outdir, "z_mean"), np.vstack(z_mean))
-    # x_val_imputed = np.vstack([model.decode(z_batch).mean().numpy() for z_batch in z_mean])
-    # np.save(os.path.join(outdir, "imputed_no_gt"), x_val_imputed)
+    if FLAGS.data_type == "physionet":
+        x_val_imputed = np.vstack([model.decode(z_batch).mean().numpy() for z_batch in z_mean])
+        # np.save(os.path.join(outdir, "imputed_no_gt"), x_val_imputed)
 
-    # impute gt observed values
-    # x_val_imputed[m_val_miss == 0] = x_val_miss[m_val_miss == 0]
-    # np.save(os.path.join(outdir, "imputed"), x_val_imputed)
+        # impute gt observed values
+        x_val_imputed[m_val_miss == 0] = x_val_miss[m_val_miss == 0]
+        np.save(os.path.join(outdir, "imputed"), x_val_imputed)
 
     if FLAGS.data_type == "hmnist":
         # AUROC evaluation using Logistic Regression

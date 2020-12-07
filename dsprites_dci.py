@@ -21,6 +21,7 @@ import os
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npz', 'File path for underlying factors c')
+flags.DEFINE_string('assign_mat_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/physionet/assignment_matrix.npy', 'Path for assignment matrix')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
 flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'sprites', 'dsprites'], 'Type of data and how to evaluate')
 flags.DEFINE_list('score_factors', [], 'Underlying factors to consider in DCI score calculation')
@@ -54,8 +55,12 @@ def main(argv, model_dir=None):
     z_path = '{}/z_mean.npy'.format(out_dir)
     # project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npy'
     # z_path = os.path.join(project_path, FLAGS.z_name)
-
-    c, z = load_z_c(FLAGS.c_path, z_path)
+    if FLAGS.data_type_dci == "physionet":
+        # Use imputed values as ground truth for physionet data
+        c, z = load_z_c('{}/imputed.npy'.format(out_dir), z_path)
+        c = np.transpose(c, (0,2,1))
+    else:
+        c, z = load_z_c(FLAGS.c_path, z_path)
 
     z_shape = z.shape
     c_shape = c.shape
@@ -118,10 +123,18 @@ def main(argv, model_dir=None):
             importance_matrix = np.insert(importance_matrix,
                                                np.nonzero(np.invert(mask))[0],
                                                0, axis=1)
-
-        visualize_scores.heat_square(importance_matrix, out_dir, "dci_matrix",
-                                     "x_axis", "y_axis")
-        np.save(F"{out_dir}/impt_matrix", importance_matrix)
+            assign_mat = np.load(FLAGS.assign_mat_path)
+            importance_matrix_physio = np.matmul(importance_matrix, assign_mat)
+            visualize_scores.heat_square(importance_matrix_physio, out_dir,
+                                         "dci_matrix",
+                                         "x_axis", "y_axis")
+            np.save(F"{out_dir}/impt_matrix", importance_matrix)
+            np.save(F"{out_dir}/impt_matrix_phys", importance_matrix_physio)
+        else:
+            visualize_scores.heat_square(importance_matrix, out_dir,
+                                         "dci_matrix",
+                                         "x_axis", "y_axis")
+            np.save(F"{out_dir}/impt_matrix", importance_matrix)
 
 
 if __name__ == '__main__':
