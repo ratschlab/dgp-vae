@@ -125,8 +125,11 @@ def main(argv, model_dir=None):
                                                0, axis=1)
             assign_mat = np.load(FLAGS.assign_mat_path)
             importance_matrix_physio = np.matmul(importance_matrix, assign_mat)
-            visualize_scores.heat_square(importance_matrix_physio, out_dir,
+            visualize_scores.heat_square(importance_matrix, out_dir,
                                          "dci_matrix",
+                                         "x_axis", "y_axis")
+            visualize_scores.heat_square(importance_matrix_physio, out_dir,
+                                         "dci_matrix_physio",
                                          "x_axis", "y_axis")
             np.save(F"{out_dir}/impt_matrix", importance_matrix)
             np.save(F"{out_dir}/impt_matrix_phys", importance_matrix_physio)
