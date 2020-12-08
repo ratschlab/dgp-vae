@@ -517,6 +517,8 @@ def main(argv):
 
     t_train_total = time.time() - t0_global
 
+    print(F"Total training time: {t_train_total}")
+
 
     #############
     # Evaluation #
