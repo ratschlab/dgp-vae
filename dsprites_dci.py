@@ -79,7 +79,7 @@ def main(argv, model_dir=None):
             # standardizing
             scaler = StandardScaler()
             c_rescale = scaler.fit_transform(c_reshape)
-            c_reshape = c_rescale.astype(int)
+            c_reshape = (10*c_rescale).astype(int)
         else:
             raise ValueError("Rescaling must be 'linear' or 'standard'")
 
