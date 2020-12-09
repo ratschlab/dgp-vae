@@ -75,3 +75,7 @@ def periodic_kernel(T, sigma, length_scale):
     sin_arg = math.pi * distance_matrix / period
     kernel_matrix = sigma * tf.math.exp(-2 * tf.math.square(tf.math.sin(sin_arg)) / (l**2))
     return kernel_matrix
+
+def const_kernel(T, const_val):
+    kernel_matrix = const_val * tf.ones([T,T])
+    return kernel_matrix
