@@ -23,7 +23,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npz', 'File path for underlying factors c')
 flags.DEFINE_string('assign_mat_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/physionet/assignment_matrix.npy', 'Path for assignment matrix')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
-flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'sprites', 'dsprites'], 'Type of data and how to evaluate')
+flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'sprites', 'dsprites', 'smallnorb', 'cars3d'], 'Type of data and how to evaluate')
 flags.DEFINE_list('score_factors', [], 'Underlying factors to consider in DCI score calculation')
 flags.DEFINE_enum('rescaling', 'linear', ['linear', 'standard'], 'Rescaling of ground truth factors')
 flags.DEFINE_bool('visualize_score', False, 'Whether or not to visualize score')

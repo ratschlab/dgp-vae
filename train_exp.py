@@ -74,7 +74,7 @@ flags.DEFINE_integer('print_interval', 0, 'Interval for printing the loss and sa
 flags.DEFINE_string('exp_name', "debug", 'Name of the experiment')
 flags.DEFINE_string('basedir', "models", 'Directory where the models should be stored')
 flags.DEFINE_string('data_dir', "", 'Directory from where the data should be read in')
-flags.DEFINE_enum('data_type', 'hmnist', ['hmnist', 'physionet', 'sprites', 'dsprites', 'smallnorb'], 'Type of data to be trained on')
+flags.DEFINE_enum('data_type', 'hmnist', ['hmnist', 'physionet', 'sprites', 'dsprites', 'smallnorb', 'cars3d'], 'Type of data to be trained on')
 flags.DEFINE_integer('seed', 1337, 'Seed for the random number generator')
 flags.DEFINE_enum('model_type', 'gp-vae', ['vae', 'hi-vae', 'gp-vae', 'ada-gp-vae'], 'Type of model to be trained')
 flags.DEFINE_integer('time_len', 10, 'Window size at which to consider time series')
@@ -171,6 +171,17 @@ def main(argv):
         decoder = GaussianDecoder
         img_shape = (64, 64, 1)
         val_split = 4000
+    elif FLAGS.data_type == "cars3d":
+        if FLAGS.data_dir == "":
+           FLAGS.data_dir = "daata/cars3d/cars3d.npz"
+        data_dim = 12288
+        if FLAGS.model_type == "ada-gp-vae":
+            time_length = FLAGS.time_len
+        else:
+            time_length = FLAGS.time_len
+        decoder = GaussianDecoder
+        img_shape = (64, 64, 3)
+        val_split = 4000
     else:
         raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites', 'dsprites', 'smallnorb']")
 
@@ -193,7 +204,7 @@ def main(argv):
     #     y_train = data['y_train']
 
     if FLAGS.testing:
-        if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb']:
+        if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb', 'cars3d']:
             x_val_full = data['x_test_full']
             x_val_miss = data['x_test_miss']
             m_val_miss = data['m_test_miss']
@@ -216,7 +227,7 @@ def main(argv):
             # x_train_full = np.concatenate((x_train_full, x_val_full))
             # x_train_miss = np.concatenate((x_train_miss, x_val_miss))
             # m_train_miss = np.concatenate((m_train_miss, m_val_miss))
-    elif FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb']:
+    elif FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb', 'cars3d']:
         x_val_full = x_train_full[val_split:]
         x_val_miss = x_train_miss[val_split:]
         m_val_miss = m_train_miss[val_split:]
@@ -269,7 +280,7 @@ def main(argv):
     tf_x_val_miss = tf.compat.v1.data.make_one_shot_iterator(tf_x_val_miss)
 
     # Build Conv2D preprocessor for image data
-    if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb']:
+    if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb', 'cars3d']:
         print("Using CNN preprocessor")
         image_preprocessor = ImagePreprocessor(img_shape, FLAGS.cnn_sizes, FLAGS.cnn_kernel_size)
     elif FLAGS.data_type == 'physionet':
@@ -596,7 +607,7 @@ def main(argv):
         print("AUROC: {:.4f}".format(auroc))
         print("AUPRC: {:.4f}".format(auprc))
 
-    elif FLAGS.data_type in ["sprites", "dsprites", "smallnorb"]:
+    elif FLAGS.data_type in ["sprites", "dsprites", "smallnorb", "cars3d"]:
         auroc, auprc = 0, 0
 
     elif FLAGS.data_type == "physionet":
