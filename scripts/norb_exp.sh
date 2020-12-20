@@ -9,12 +9,12 @@ mkdir -p models/norb_full1/ada/len_5/scaled
 mkdir -p models/norb_full1/ada/len_10/same
 mkdir -p models/norb_full1/ada/len_10/scaled
 
-for n in {1..5};do
+for n in {1..10};do
   seed=$RANDOM
   for len in 5 10;do
     bsub -o models/norb_full1/base/len_"$len"/same/log_%J -g /gpvae_disent \
     -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
-    python run_experiment.py --model_type gp-vae --data_type smallnorb --time_len 5 --testing --batch_size 32 \
+    python run_experiment.py --model_type gp-vae --data_type smallnorb --time_len "$len" --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/norb/norb_full1.npz \
     --exp_name n_"$n" --basedir models/norb_full1/base/len_"$len"/same \
     --seed "$seed" --banded_covar --latent_dim 64 --encoder_sizes=32,256,256 --len_init same \
@@ -24,7 +24,7 @@ for n in {1..5};do
 
     bsub -o models/norb_full1/base/len_"$len"/scaled/log_%J -g /gpvae_disent \
     -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
-    python run_experiment.py --model_type gp-vae --data_type smallnorb --time_len 5 --testing --batch_size 32 \
+    python run_experiment.py --model_type gp-vae --data_type smallnorb --time_len "$len" --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/norb/norb_full1.npz \
     --exp_name n_"$n" --basedir models/norb_full1/base/len_"$len"/same \
     --seed "$seed" --banded_covar --latent_dim 64 --encoder_sizes=32,256,256 --len_init scaled --kernel_scales 16 \
@@ -34,7 +34,7 @@ for n in {1..5};do
 
     bsub -o models/norb_full1/ada/len_"$len"/same/log_%J -g /gpvae_disent \
     -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
-    python run_experiment.py --model_type ada-gp-vae --data_type smallnorb --time_len 5 --testing --batch_size 32 \
+    python run_experiment.py --model_type ada-gp-vae --data_type smallnorb --time_len "$len" --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/norb/norb_full1.npz \
     --exp_name n_"$n" --basedir models/norb_full1/ada/len_"$len"/same \
     --seed "$seed" --banded_covar --latent_dim 64 --encoder_sizes=32,256,256 --len_init same \
@@ -44,7 +44,7 @@ for n in {1..5};do
 
     bsub -o models/norb_full1/ada/len_"$len"/scaled/log_%J -g /gpvae_disent \
     -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
-    python run_experiment.py --model_type ada-gp-vae --data_type smallnorb --time_len 5 --testing --batch_size 32 \
+    python run_experiment.py --model_type ada-gp-vae --data_type smallnorb --time_len "$len" --testing --batch_size 32 \
     --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/norb/norb_full1.npz \
     --exp_name n_"$n" --basedir models/norb_full1/ada/len_"$len"/same \
     --seed "$seed" --banded_covar --latent_dim 64 --encoder_sizes=32,256,256 --len_init scaled --kernel_scales 16 \
