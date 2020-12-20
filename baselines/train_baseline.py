@@ -23,6 +23,7 @@ from absl import app, flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('model', 'betatcvae', 'Baseline to train')
+flags.DEFINE_string('data', 'dsprites_full', 'Dataset to train on')
 flags.DEFINE_string('base_dir', 'base', 'Base directory')
 flags.DEFINE_string('output_dir', 'test_output', 'Directory to save results in')
 flags.DEFINE_integer('dim', 64, 'Latent dimension of encoder')
@@ -47,6 +48,7 @@ def main(argv):
 
     gin_bindings = [
         "model.random_seed = {}".format(FLAGS.seed),
+        "dataset.name = '{}'".format(FLAGS.data),
         "subset.name = '{}'".format(FLAGS.subset),
         "encoder.num_latent = {}".format(FLAGS.dim),
         "model.training_steps = {}".format(FLAGS.steps)
