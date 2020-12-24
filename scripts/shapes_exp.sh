@@ -23,7 +23,7 @@ for n in {1..10};do
   for num in 1 2;do
     for len in 5 10;do
       bsub -o models/shapes_full"$num"/base/len_"$len"/same/log_%J -g /gpvae_disent \
-      -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
+      -R "rusage[mem=220000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
       python run_experiment.py --model_type gp-vae --data_type shapes3d --time_len "$len" --testing --batch_size 32 \
       --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/shapes3d/shapes_full"$num".npz \
       --exp_name n_"$n" --basedir models/shapes_full"$num"/base/len_"$len"/same \
@@ -33,7 +33,7 @@ for n in {1..10};do
       --save_score
 
       bsub -o models/shapes_full"$num"/base/len_"$len"/scaled/log_%J -g /gpvae_disent \
-      -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
+      -R "rusage[mem=220000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
       python run_experiment.py --model_type gp-vae --data_type shapes3d --time_len "$len" --testing --batch_size 32 \
       --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/shapes3d/shapes_full"$num".npz \
       --exp_name n_"$n" --basedir models/shapes_full"$num"/base/len_"$len"/scaled \
@@ -43,7 +43,7 @@ for n in {1..10};do
       --save_score
 
       bsub -o models/shapes_full"$num"/ada/len_"$len"/same/log_%J -g /gpvae_disent \
-      -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
+      -R "rusage[mem=220000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
       python run_experiment.py --model_type ada-gp-vae --data_type shapes3d --time_len "$len" --testing --batch_size 32 \
       --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/shapes3d/shapes_full"$num".npz \
       --exp_name n_"$n" --basedir models/shapes_full"$num"/ada/len_"$len"/same \
@@ -53,7 +53,7 @@ for n in {1..10};do
       --save_score
 
       bsub -o models/shapes_full"$num"/ada/len_"$len"/scaled/log_%J -g /gpvae_disent \
-      -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
+      -R "rusage[mem=220000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
       python run_experiment.py --model_type ada-gp-vae --data_type shapes3d --time_len "$len" --testing --batch_size 32 \
       --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/shapes3d/shapes_full"$num".npz \
       --exp_name n_"$n" --basedir models/shapes_full"$num"/ada/len_"$len"/scaled \
