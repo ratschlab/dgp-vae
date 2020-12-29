@@ -62,7 +62,7 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
                             dci_scores[1,n,m] = dci['completeness']
                             dci_scores[2,n,m] = dci['informativeness_test']
 
-    return dci_scores
+    return np.squeeze(dci_scores)
 
 def aggregate_baseline(N, params, base_dir='dim'):
     """
