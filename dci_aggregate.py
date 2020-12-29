@@ -85,7 +85,7 @@ def aggregate_baseline(N, params, base_dir='dim'):
         model_path = os.path.join('baselines', FLAGS.model, FLAGS.exp_name)
 
         for _, dirs, _ in walklevel(model_path):
-            print(dirs[:N])
+            # print(dirs[:N])
             for n, dir in enumerate(dirs[:N]):
                 # print(n, dir)
                 json_path = os.path.join(model_path, dir, 'metrics', 'dci',
@@ -97,7 +97,7 @@ def aggregate_baseline(N, params, base_dir='dim'):
                     dci_scores[1, n, m] = dci['evaluation_results.completeness']
                     dci_scores[2, n, m] = dci['evaluation_results.informativeness_test']
 
-    return dci_scores
+    return np.squeeze(dci_scores)
 
 def main(argv):
     del argv # Unused
