@@ -78,11 +78,14 @@ def aggregate_baseline(N, params, base_dir='dim'):
     dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
 
     for m, param in enumerate(params):
-        param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
-        model_path = os.path.join('baselines', FLAGS.model, param_dir)
+        # if param is not None:
+        #     param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
+        # else:
+        #     param_dir = os.path.join(base_dir, FLAGS.exp_name)
+        model_path = os.path.join('baselines', FLAGS.model, FLAGS.exp_name)
 
         for _, dirs, _ in walklevel(model_path):
-            # print(dirs[:N])
+            print(dirs[:N])
             for n, dir in enumerate(dirs[:N]):
                 # print(n, dir)
                 json_path = os.path.join(model_path, dir, 'metrics', 'dci',
