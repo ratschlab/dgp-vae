@@ -11,7 +11,7 @@ mkdir -p models/cars_full1/ada/len_10/scaled
 
 for n in {1..10};do
   seed=$RANDOM
-  for dataset in cars_part1 cars_full2 cars_full3 cars_full4 cars_full5
+  for dataset in cars_part1 cars_full2 cars_full3 cars_full4 cars_full5;do
     for len in 5 10;do
       bsub -o models/"$dataset"/base/len_"$len"/same/log_%J -g /gpvae_disent \
       -R "rusage[mem=220000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
