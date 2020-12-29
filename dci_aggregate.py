@@ -112,7 +112,7 @@ def main(argv):
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
     print(dci_scores.shape)
-    print("{:.2f}".format(dci_scores[0,...]))
+    print(np.round(dci_scores[0,...], 2))
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
