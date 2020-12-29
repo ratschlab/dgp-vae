@@ -91,14 +91,14 @@ def main(argv, model_dir=None):
     # Check if ground truth factor doesn't change and remove if is the case
     mask = np.ones(c_reshape.shape[1], dtype=bool)
     for i in range(c_reshape.shape[1]):
-        c_change = np.sum(abs(np.diff(c_reshape[:8000,i])))
+        c_change = np.sum(abs(np.diff(c_reshape[:80,i])))
         if (not c_change) or (F"{i}" not in FLAGS.score_factors):
             mask[i] = False
     c_reshape = c_reshape[:,mask]
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
 
-    scores = dci._compute_dci(z_train[:8000,:].transpose(), c_train[:8000,:].transpose(), z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
+    scores = dci._compute_dci(z_train[:80,:].transpose(), c_train[:80,:].transpose(), z_test[:20,:].transpose(), c_test[:20,:].transpose())
 
     print('D: {}'.format(scores['disentanglement']))
     print('C: {}'.format(scores['completeness']))
