@@ -113,6 +113,8 @@ def main(argv):
 
     print(dci_scores.shape)
     print(np.round(dci_scores[0,...], 2))
+    print(F"Mean: {np.mean(np.round(dci_scores[0,...], 2))}")
+    print(F"Median: {np.median(np.round(dci_scores[0, ...], 2))}")
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
