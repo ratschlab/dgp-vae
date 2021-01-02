@@ -213,6 +213,12 @@ def main(argv):
     m_train_miss = data['m_train_miss']
     # if FLAGS.data_type in ['hmnist', 'physionet']:
     #     y_train = data['y_train']
+    # Load evaluation data for physionet
+    if FLAGS.data_type in ['physionet']:
+        base_data_path, _ = os.path.split(FLAGS.data_dir)
+        sens_eval_data_path = os.path.join(base_data_path, "physio_sensitivity_eval.npz")
+        sens_eval_data = np.load(sens_eval_data_path)
+        eval_feature_batches = sens_eval_data['feature_batches']
 
     if FLAGS.testing:
         if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d']:
@@ -229,15 +235,15 @@ def main(argv):
             x_val_full = data['x_val_full']
             x_val_miss = data['x_val_miss']
             m_val_miss = data['m_val_miss']
-            x_test_full = data['x_test_full']
-            x_test_miss = data['x_test_miss']
-            m_test_miss = data['m_test_miss']
+            # x_test_full = data['x_test_full']
+            # x_test_miss = data['x_test_miss']
+            # m_test_miss = data['m_test_miss']
             # y_val = data['y_train']
             # m_val_artificial = data["m_train_artificial"]
             # EXPERIMENTAL, UNCOMMENT TO TRAIN ON ALL AVAILABLE DATA
-            # x_train_full = np.concatenate((x_train_full, x_val_full))
-            # x_train_miss = np.concatenate((x_train_miss, x_val_miss))
-            # m_train_miss = np.concatenate((m_train_miss, m_val_miss))
+            x_train_full = np.concatenate((x_train_full, x_val_full))
+            x_train_miss = np.concatenate((x_train_miss, x_val_miss))
+            m_train_miss = np.concatenate((m_train_miss, m_val_miss))
     elif FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d']:
         x_val_full = x_train_full[val_split:]
         x_val_miss = x_train_miss[val_split:]
@@ -570,6 +576,8 @@ def main(argv):
 
     x_val_miss_batches = np.array_split(x_val_miss, num_split, axis=0)
     x_val_full_batches = np.array_split(x_val_full, num_split, axis=0)
+    if FLAGS.data_type in ['physionet']:
+        sens_eval_batches = np.array_split(eval_feature_batches, num_split * 2, axis=0)
     # if FLAGS.data_type == 'physionet':
     #     m_val_batches = np.array_split(m_val_artificial, num_split, axis=0)
     # else:
@@ -594,7 +602,10 @@ def main(argv):
     # Save imputed values
     z_mean = [model.encode(x_batch).mean().numpy() for x_batch in x_val_miss_batches]
     np.save(os.path.join(outdir, "z_mean"), np.vstack(z_mean))
-    if FLAGS.data_type == "physionet":
+    if FLAGS.data_type in ["physionet"]:
+        z_eval_mean = [model.encode(sens_eval_batch).mean().numpy() for sens_eval_batch in sens_eval_batches]
+        np.save(os.path.join(outdir, "z_eval_mean"), np.vstack(z_eval_mean))
+
         x_val_imputed = np.vstack([model.decode(z_batch).mean().numpy() for z_batch in z_mean])
         # np.save(os.path.join(outdir, "imputed_no_gt"), x_val_imputed)
 
