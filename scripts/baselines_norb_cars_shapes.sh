@@ -4,11 +4,11 @@ for n in {1..10}; do
   seed=$RANDOM
   for model in adagvae annealedvae betavae betatcvae factorvae dipvae_i dipvae_ii; do
 #    for i in smallnorb,norb_full1 cars3d,cars_full1 shapes3d,shapes_full1 shapes3d,shapes_full2; do
-    for i in cars3d,cars_part1 cars3d,cars_full4; do
+    for i in shapes3d,shapes_part1 shapes3d,shapes_part2; do
       IFS=',' read data subset <<< "${i}"
       bsub -o baselines/adagvae/"$subset"/log_%J \
       -g /disent_baseline -R "rusage[mem=60000,ngpus_excl_p=1]" \
-      python baselines/train_baseline.py --base_dir "$subset"_2 \
+      python baselines/train_baseline.py --base_dir "$subset"_1 \
       --output_dir n_"$n" --dim 64 --model "$model" --seed "$seed" \
       --steps 15620 --data "$data" --subset "$subset"
     done
