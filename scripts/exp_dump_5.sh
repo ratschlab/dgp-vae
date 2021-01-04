@@ -30,7 +30,7 @@ mkdir -p models/gp_full4/ada/len_5/scaled
 
 
 
-for n in {1..5}; do
+for n in {6..10}; do
   seed=$RANDOM
   for type in part full; do
     for count in 3 4; do
@@ -101,3 +101,66 @@ for n in {1..5}; do
     done
   done
 done
+#
+#bsub -o models/physionet/test0/log_%J -g /gpvae_norm \
+#-W 8:00 -R "rusage[mem=20000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
+#python run_experiment.py --model_type gp-vae --data_type physionet --time_len 24 --testing --batch_size 64 \
+#--exp_name n_0 --basedir models/physionet/test0 --len_init same \
+#--data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/physionet/physionet_norm.npz \
+#--seed 0 --banded_covar --latent_dim 32 --encoder_sizes=128,128 \
+#--decoder_sizes=256,256 --window_size 24 --sigma 1.005 --length_scale 1.0 --beta 0.2 \
+#--num_epochs 5 --kernel cauchy \
+#--save_score --visualize_score --data_type_dci physionet --rescaling linear
+#
+#bsub -o models/physionet/test0/log_%J -g /gpvae_norm -W 8:00 -R "rusage[mem=150000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" python run_experiment.py --model_type gp-vae --data_type physionet --time_len 24 --testing --batch_size 64 --exp_name n_1 --basedir models/physionet/test0 --len_init same --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/physionet/physionet_norm.npz --seed 0 --banded_covar --latent_dim 32 --encoder_sizes=128,128 --decoder_sizes=256,256 --window_size 24 --sigma 1.005 --length_scale 1.0 --beta 0.2 --num_epochs 1 --kernel cauchy --save_score --visualize_score --data_type_dci physionet --rescaling linear
+#
+#
+#
+#--model_type
+#gp-vae
+#--data_type
+#physionet
+#--time_len
+#24
+#--testing
+#--exp_name
+#dsprites_debug_local0
+#--basedir
+#/Users/Simon/Documents/Uni/HiWi-Stellen/BMI/dgpvae/models/local_debug0
+#--seed
+#0
+#--banded_covar
+#--latent_dim
+#32
+#--encoder_sizes=128,128
+#--decoder_sizes=256,256
+#--window_size
+#24
+#--sigma
+#1.005
+#--length_scale
+#1.0
+#--beta
+#0.2
+#--num_steps
+#1
+#--print_interval
+#1
+#--kernel
+#cauchy
+#--kernel_scales
+#16
+#--c_path
+#/Users/Simon/Documents/Uni/HiWi-Stellen/BMI/dgpvae/data/physionet/physionet_dci_features.npz
+#--save_score
+#--visualize_score
+#--data_type_dci
+#physionet
+#--rescaling
+#linear
+#
+#bsub -R "rusage[mem=65000]" python disentanglement_lib/disentanglement_lib/data/ground_truth/create_dataset.py --data_type smallnorb --seed 42 --num_timeseries 10500 --length 100 --kernel rbf --gp_weight 1 --periods=0,15,0.1,1 --file_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/norb/norb_full1 --factors_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/norb/factors_norb_full1
+#
+#bsub -R "rusage[mem=200000]" python disentanglement_lib/disentanglement_lib/data/ground_truth/create_dataset.py --data_type cars3d --seed 42 --num_timeseries 6500 --length 100 --kernel rbf --gp_weight 1 --periods=3,10,0 --file_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/cars3d/cars_full5 --factors_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/cars3d/factors_cars_full5 --save_data
+#
+#bsub -R "rusage[mem=200000]" python disentanglement_lib/disentanglement_lib/data/ground_truth/create_dataset.py --data_type shapes3d --seed 42 --num_timeseries 6500 --length 100 --kernel rbf --gp_weight 1 --periods=0,0,0,5,0,1 --file_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/shapes3d/shapes_part1 --factors_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/shapes3d/factors_shapes_part1 --univ_rescaling --save_data
