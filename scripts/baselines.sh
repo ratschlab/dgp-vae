@@ -8,7 +8,7 @@ for n in {1..10}; do
       IFS=',' read data subset <<< "${i}"
       bsub -o baselines/adagvae/"$subset"/log_%J \
       -g /disent_baseline -R "rusage[mem=60000,ngpus_excl_p=1]" \
-      python baselines/train_baseline.py --base_dir "$subset"_1 \
+      python baselines/train_baseline.py --base_dir "$subset"_2 \
       --output_dir n_"$n" --dim 64 --model "$model" --seed "$seed" \
       --steps 15620 --data "$data" --subset "$subset"
     done
