@@ -16,6 +16,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('model', 'gpvae', 'Model for which dci score should be calculated')
 flags.DEFINE_string('base_dir', '', 'base directory of models')
 flags.DEFINE_list('params', [None], 'Parameters tested in experiment')
+flags.DEFINE_integer('n', 10, 'Number of experiments.')
 flags.DEFINE_string('exp_name', '', 'Experiment naming scheme')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
 
@@ -102,12 +103,10 @@ def aggregate_baseline(N, params, base_dir='dim'):
 def main(argv):
     del argv # Unused
 
-    n_experiments = 10
-
     if FLAGS.model == 'gpvae':
-        dci_scores = aggregate_gpvae(n_experiments, FLAGS.params, FLAGS.base_dir)
+        dci_scores = aggregate_gpvae(FLAGS.n, FLAGS.params, FLAGS.base_dir)
     elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
-        dci_scores = aggregate_baseline(n_experiments, FLAGS.params, FLAGS.base_dir)
+        dci_scores = aggregate_baseline(FLAGS.n, FLAGS.params, FLAGS.base_dir)
     else:
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
