@@ -20,13 +20,39 @@ def aggregate_pq(base_dir):
 
     return full_df
 
+def filter_and_reshape(data, idxs, counts, patients, len):
+    """
+    Throw out time series below len threshold and reshape for later training.
+    """
+    min_len_idxs = np.where(counts >= len)
+    idxs_filter = idxs[min_len_idxs]
+    counts_filter = counts[min_len_idxs]
+    patients_filter = patients[min_len_idxs]
+
+    # Calculate total number of samples
+    N = np.sum(counts_filter//len)
+    data_filter_reshape = np.zeros((N, len, data.shape[1]), dtype=np.float32)
+
+    k=0
+    for i in range(len(idxs_filter)):
+        start_idx = idxs_filter[i]
+        num_chunks = counts_filter[i] // len
+        for j in range(num_chunks):
+            chunk = data[start_idx:start_idx+len,:]
+            data_filter_reshape[k,:,:] = chunk
+            start_idx = start_idx + len
+            k = k + 1
+    print(F'Huge loop finished. N={N}, k={k}')
+
+    return data_filter_reshape
+
 def main(argv):
     del argv # Unused
 
     full_df = aggregate_pq(FLAGS.base_dir)
     # Convert to np array
     full_np = full_df.to_numpy(dtype=np.float32)
-    unique_patients, counts = np.unique(full_np[:,0], return_counts=True)
+    unique_patients, idxs, counts = np.unique(full_np[:,0], return_index=True, return_counts=True)
 
     print(F'Unique idxs: {len(unique_patients)}')
     print(F'Min time series len: {np.min(counts)}')
@@ -35,6 +61,8 @@ def main(argv):
     min_len_idxs = np.where(counts >= 100)
     min_len_patients = unique_patients[min_len_idxs]
     print(F'Number of min len patients: {len(min_len_patients)}')
+
+    filtered_np = filter_and_reshape(full_np, counts, unique_patients, len=100)
 
 if __name__ == '__main__':
     app.run(main)
