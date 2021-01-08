@@ -39,6 +39,7 @@ def filter_and_reshape(data, idxs, counts, patients, time_len):
         num_chunks = counts_filter[i] // time_len
         for j in range(num_chunks):
             chunk = data[start_idx:start_idx+time_len,:]
+            assert np.sum(np.diff(chunk[:,0])) == 0
             data_filter_reshape[k,:,:] = chunk
             start_idx = start_idx + time_len
             k = k + 1
