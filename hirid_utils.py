@@ -11,7 +11,8 @@ from absl import flags, app
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('base_dir', '/cluster/work/grlab/clinical/hirid_public/v1/imputed_stage')
+flags.DEFINE_string('base_dir', '/cluster/work/grlab/clinical/hirid_public/v1/imputed_stage',
+                    'Base directory of pq partitions.')
 
 def aggregate_pq(base_dir):
     base_dir = Path(base_dir)
