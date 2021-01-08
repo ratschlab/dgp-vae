@@ -26,12 +26,15 @@ def main(argv):
     full_df = aggregate_pq(FLAGS.base_dir)
     # Convert to np array
     full_np = full_df.to_numpy(dtype=np.float32)
-    unique_idxs, counts = np.unique(full_np[:,0], return_counts=True)
+    unique_patients, counts = np.unique(full_np[:,0], return_counts=True)
 
-    print(F'Unique idxs: {len(unique_idxs)}')
-    print(F'Max idx diff: {np.max(np.diff(unique_idxs))}')
+    print(F'Unique idxs: {len(unique_patients)}')
     print(F'Min time series len: {np.min(counts)}')
     print(F'Max time series len: {np.max(counts)}')
+
+    min_len_idxs = np.where(counts >= 100)
+    min_len_patients = unique_patients(min_len_idxs)
+    print(F'Number of min len patients: {len(min_len_patients)}')
 
 if __name__ == '__main__':
     app.run(main)
