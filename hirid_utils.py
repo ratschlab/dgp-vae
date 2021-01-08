@@ -13,6 +13,8 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string('base_dir', '/cluster/work/grlab/clinical/hirid_public/v1/imputed_stage',
                     'Base directory of pq partitions.')
+flags.DEFINE_bool('save', False, 'Save data.')
+flags.DEFINE_string('out_dir', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid', 'Where to save data.')
 
 def aggregate_pq(base_dir):
     base_dir = Path(base_dir)
@@ -39,7 +41,7 @@ def filter_and_reshape(data, idxs, counts, patients, time_len):
         num_chunks = counts_filter[i] // time_len
         for j in range(num_chunks):
             chunk = data[start_idx:start_idx+time_len,:]
-            assert np.sum(np.diff(chunk[:,0])) == 0
+            assert np.sum(np.diff(chunk[:,0])) == 0 # Check that patient id really is shared i.e. one coherent time series
             data_filter_reshape[k,:,:] = chunk
             start_idx = start_idx + time_len
             k = k + 1
@@ -64,6 +66,12 @@ def main(argv):
     print(F'Number of min len patients: {len(min_len_patients)}')
 
     filtered_np = filter_and_reshape(full_np, idxs, counts, unique_patients, time_len=100)
+
+    if FLAGS.save:
+        full_save_path = os.path.join(FLAGS.out_dir, 'hirid_full.npy')
+        np.save(full_save_path, full_np)
+        filter_reshape_save_path = os.path.join(FLAGS.out_dir, 'hirid_filter_reshape.npy')
+        np.save(filter_reshape_save_path)
 
 if __name__ == '__main__':
     app.run(main)
