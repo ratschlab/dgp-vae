@@ -62,7 +62,7 @@ def main(argv):
     min_len_patients = unique_patients[min_len_idxs]
     print(F'Number of min len patients: {len(min_len_patients)}')
 
-    filtered_np = filter_and_reshape(full_np, counts, unique_patients, len=100)
+    filtered_np = filter_and_reshape(full_np, idxs, counts, unique_patients, len=100)
 
 if __name__ == '__main__':
     app.run(main)
