@@ -33,7 +33,7 @@ def main(argv):
     print(F'Max time series len: {np.max(counts)}')
 
     min_len_idxs = np.where(counts >= 100)
-    min_len_patients = unique_patients(min_len_idxs)
+    min_len_patients = unique_patients[min_len_idxs]
     print(F'Number of min len patients: {len(min_len_patients)}')
 
 if __name__ == '__main__':
