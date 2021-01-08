@@ -16,7 +16,7 @@ flags.DEFINE_string('base_dir', '/cluster/work/grlab/clinical/hirid_public/v1/im
 
 def aggregate_pq(base_dir):
     base_dir = Path(base_dir)
-    full_df = pd.concat(pd.read_parquet(pq_file for pq_file in base_dir.glob('*.parquet')))
+    full_df = pd.concat(pd.read_parquet(pq_file) for pq_file in base_dir.glob('*.parquet'))
 
     return full_df
 
