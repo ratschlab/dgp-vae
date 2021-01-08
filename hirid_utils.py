@@ -45,7 +45,7 @@ def filter_and_reshape(data, idxs, counts, patients, time_len):
             data_filter_reshape[k,:,:] = chunk
             start_idx = start_idx + time_len
             k = k + 1
-    print(F'Huge loop finished. N={N}, k={k}')
+    print(F'Filtered and reshaped data shape: {data_filter_reshape.shape}')
 
     return data_filter_reshape
 
@@ -71,7 +71,7 @@ def main(argv):
         full_save_path = os.path.join(FLAGS.out_dir, 'hirid_full.npy')
         np.save(full_save_path, full_np)
         filter_reshape_save_path = os.path.join(FLAGS.out_dir, 'hirid_filter_reshape.npy')
-        np.save(filter_reshape_save_path)
+        np.save(filter_reshape_save_path, filtered_np)
 
 if __name__ == '__main__':
     app.run(main)
