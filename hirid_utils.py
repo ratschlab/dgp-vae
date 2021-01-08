@@ -29,6 +29,8 @@ def main(argv):
     unique_idxs, counts = np.unique(full_np[:,0], return_counts=True)
 
     print(F'Unique idxs: {len(unique_idxs)}')
+    print(F'Min idx: {np.min(unique_idxs)}')
+    print(F'Max idx: {np.max(unique_idxs)}')
     print(F'Min time series len: {np.min(counts)}')
     print(F'Max time series len: {np.max(counts)}')
 
