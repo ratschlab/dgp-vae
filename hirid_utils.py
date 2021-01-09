@@ -7,6 +7,7 @@ import numpy as np
 import os
 import pandas as pd
 from pathlib import Path
+from sklearn.model_selection import train_test_split
 from absl import flags, app
 
 FLAGS = flags.FLAGS
@@ -22,14 +23,13 @@ def aggregate_pq(base_dir):
 
     return full_df
 
-def filter_and_reshape(data, idxs, counts, patients, time_len):
+def filter_and_reshape(data, idxs, counts, time_len):
     """
     Throw out time series below len threshold and reshape for later training.
     """
     min_len_idxs = np.where(counts >= time_len)
     idxs_filter = idxs[min_len_idxs]
     counts_filter = counts[min_len_idxs]
-    patients_filter = patients[min_len_idxs]
 
     # Calculate total number of samples
     N = np.sum(counts_filter//time_len)
@@ -49,6 +49,17 @@ def filter_and_reshape(data, idxs, counts, patients, time_len):
 
     return data_filter_reshape
 
+def pre_process(data):
+    # Remove patient_id and timestamp
+    data_no_id = data[:,:,2:]
+    # Standardize data
+    means = np.mean(data_no_id, axis=(0,1))
+    std_devs = np.std(data_no_id, axis=(0,1))
+    data_standardized = (data_no_id - means) / std_devs
+    data_standardized[:,:,-1] = data_no_id[:,:,-1] # Last feature is binary
+
+    return data_no_id, data_standardized
+
 def main(argv):
     del argv # Unused
 
@@ -65,13 +76,37 @@ def main(argv):
     min_len_patients = unique_patients[min_len_idxs]
     print(F'Number of min len patients: {len(min_len_patients)}')
 
-    filtered_np = filter_and_reshape(full_np, idxs, counts, unique_patients, time_len=100)
+    filtered_np = filter_and_reshape(full_np, idxs, counts, time_len=100)
+
+    data_raw, data_std = pre_process(filtered_np)
+    print(data_raw.shape)
+    print(data_std.shape)
 
     if FLAGS.save:
-        full_save_path = os.path.join(FLAGS.out_dir, 'hirid_full.npy')
-        np.save(full_save_path, full_np)
-        filter_reshape_save_path = os.path.join(FLAGS.out_dir, 'hirid_filter_reshape.npy')
-        np.save(filter_reshape_save_path, filtered_np)
+        # full_save_path = os.path.join(FLAGS.out_dir, 'hirid_full.npy')
+        # np.save(full_save_path, full_np)
+        # filter_reshape_save_path = os.path.join(FLAGS.out_dir, 'hirid_filter_reshape.npy')
+        # np.save(filter_reshape_save_path, filtered_np)
+
+        data_raw_train, data_raw_test, data_std_train, data_std_test = train_test_split(data_raw, data_std, train_size=(100/105))
+        print(data_raw_train.shape)
+        print(data_raw_test.shape)
+        print(data_std_train.shape)
+        print(data_std_test.shape)
+        raw_path = os.path.join(FLAGS.out_dir, 'hirid_no_std.npz')
+        np.savez(raw_path, x_train_full=data_raw_train,
+                 x_train_miss=data_raw_train,
+                 m_train_miss=np.zeros_like(data_raw_train),
+                 x_test_full=data_raw_test,
+                 x_test_miss=data_raw_test,
+                 m_test_miss=np.zeros_like(data_raw_test))
+        std_path = os.path.join(FLAGS.out_dir, 'hirid_std.npz')
+        np.savez(std_path, x_train_full=data_std_train,
+                 x_train_miss=data_std_train,
+                 m_train_miss=np.zeros_like(data_std_train),
+                 x_test_full=data_std_test,
+                 x_test_miss=data_std_test,
+                 m_test_miss=np.zeros_like(data_std_test))
 
 if __name__ == '__main__':
     app.run(main)
