@@ -74,7 +74,7 @@ flags.DEFINE_integer('print_interval', 0, 'Interval for printing the loss and sa
 flags.DEFINE_string('exp_name', "debug", 'Name of the experiment')
 flags.DEFINE_string('basedir', "models", 'Directory where the models should be stored')
 flags.DEFINE_string('data_dir', "", 'Directory from where the data should be read in')
-flags.DEFINE_enum('data_type', 'hmnist', ['hmnist', 'physionet', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d'], 'Type of data to be trained on')
+flags.DEFINE_enum('data_type', 'hmnist', ['hmnist', 'physionet', 'hirid', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d'], 'Type of data to be trained on')
 flags.DEFINE_integer('seed', 1337, 'Seed for the random number generator')
 flags.DEFINE_enum('model_type', 'gp-vae', ['vae', 'hi-vae', 'gp-vae', 'ada-gp-vae'], 'Type of model to be trained')
 flags.DEFINE_integer('time_len', 10, 'Window size at which to consider time series')
