@@ -124,13 +124,13 @@ def main(argv):
 
         eval_path_no_std = os.path.join(FLAGS.out_dir, 'hirid_sensitivity_eval_no_std.npz')
         np.savez(eval_path_no_std,
-                 feature_batches=feature_batches_raw,
-                 feature_idxs=feature_idxs_raw)
+                 feature_batches=feature_batches_raw[:20000,...],
+                 feature_idxs=feature_idxs_raw[:20000,...])
         eval_path_std = os.path.join(FLAGS.out_dir,
                                         'hirid_sensitivity_eval_std.npz')
         np.savez(eval_path_std,
-                 feature_batches=feature_batches_std,
-                 feature_idxs=feature_idxs_std)
+                 feature_batches=feature_batches_std[:20000,...],
+                 feature_idxs=feature_idxs_std[:20000,...])
 
 
 if __name__ == '__main__':
