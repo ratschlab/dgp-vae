@@ -139,7 +139,13 @@ def main(argv):
         data_dim = 36
         time_length = FLAGS.time_len
         num_classes = 2
-
+        decoder = GaussianDecoder
+    elif FLAGS.data_type == "hirid":
+        if FLAGS.data_dir == "":
+            FLAGS.data_dir = "data/hirid/hirid_std.npz"
+        data_dim = 18
+        time_length = FLAGS.time_len
+        num_classes = 2
         decoder = GaussianDecoder
     elif FLAGS.data_type == "sprites":
         if FLAGS.data_dir == "":
@@ -214,9 +220,9 @@ def main(argv):
     # if FLAGS.data_type in ['hmnist', 'physionet']:
     #     y_train = data['y_train']
     # Load evaluation data for physionet
-    if FLAGS.data_type in ['physionet']:
+    if FLAGS.data_type in ['physionet','hirid']:
         base_data_path, _ = os.path.split(FLAGS.data_dir)
-        sens_eval_data_path = os.path.join(base_data_path, "physio_sensitivity_eval.npz")
+        sens_eval_data_path = os.path.join(base_data_path, "hirid_sensitivity_eval_std.npz")
         sens_eval_data = np.load(sens_eval_data_path)
         eval_feature_batches = sens_eval_data['feature_batches']
 
@@ -231,7 +237,7 @@ def main(argv):
             # m_train_miss = np.concatenate((m_train_miss, m_val_miss))
         if FLAGS.data_type == 'hmnist':
             y_val = data['y_test']
-        elif FLAGS.data_type == 'physionet':
+        elif FLAGS.data_type in ['physionet', 'hirid']:
             x_val_full = data['x_val_full']
             x_val_miss = data['x_val_miss']
             m_val_miss = data['m_val_miss']
@@ -254,7 +260,7 @@ def main(argv):
         x_train_full = x_train_full[:val_split]
         x_train_miss = x_train_miss[:val_split]
         m_train_miss = m_train_miss[:val_split]
-    elif FLAGS.data_type == 'physionet':
+    elif FLAGS.data_type in ['physionet', 'hirid']:
         x_val_full = data["x_val_full"]  # full for artificial missings
         x_val_miss = data["x_val_miss"]
         m_val_miss = data["m_val_miss"]
@@ -300,7 +306,7 @@ def main(argv):
     if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d']:
         print("Using CNN preprocessor")
         image_preprocessor = ImagePreprocessor(img_shape, FLAGS.cnn_sizes, FLAGS.cnn_kernel_size)
-    elif FLAGS.data_type == 'physionet':
+    elif FLAGS.data_type in ['physionet', 'hirid']:
         image_preprocessor = None
     else:
         raise ValueError("Data type must be one of ['hmnist', 'physionet', 'sprites', 'dsprites']")
@@ -576,7 +582,7 @@ def main(argv):
 
     x_val_miss_batches = np.array_split(x_val_miss, num_split, axis=0)
     x_val_full_batches = np.array_split(x_val_full, num_split, axis=0)
-    if FLAGS.data_type in ['physionet']:
+    if FLAGS.data_type in ['physionet', 'hirid']:
         sens_eval_batches = np.array_split(eval_feature_batches, num_split * 2, axis=0)
     # if FLAGS.data_type == 'physionet':
     #     m_val_batches = np.array_split(m_val_artificial, num_split, axis=0)
@@ -602,7 +608,7 @@ def main(argv):
     # Save imputed values
     z_mean = [model.encode(x_batch).mean().numpy() for x_batch in x_val_miss_batches]
     np.save(os.path.join(outdir, "z_mean"), np.vstack(z_mean))
-    if FLAGS.data_type in ["physionet"]:
+    if FLAGS.data_type in ["physionet", "hirid"]:
         z_eval_mean = [model.encode(sens_eval_batch).mean().numpy() for sens_eval_batch in sens_eval_batches]
         np.save(os.path.join(outdir, "z_eval_mean"), np.vstack(z_eval_mean))
 
@@ -632,7 +638,7 @@ def main(argv):
     elif FLAGS.data_type in ["sprites", "dsprites", "smallnorb", "cars3d", "shapes3d"]:
         auroc, auprc = 0, 0
 
-    elif FLAGS.data_type == "physionet":
+    elif FLAGS.data_type in ["physionet", "hirid"]:
         # Uncomment to preserve some z_samples and their reconstructions
         # for i in range(5):
         #     z_sample = [model.encode(x_batch).sample().numpy() for x_batch in x_val_miss_batches]

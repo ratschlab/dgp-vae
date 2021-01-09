@@ -87,36 +87,36 @@ def main(argv, model_dir=None):
 
     # Generate training votes
     n_samples = min(z_eval.shape[0], 10000)
-    training_votes = generate_training_batch(num_features=36, num_samples=n_samples,
+    training_votes = generate_training_batch(num_features=18, num_samples=n_samples,
                                              feature_idxs= idxs_eval, representation_batches=z_eval,
                                              variances=variances, active_dims=active_dims)
     # Aggregate votes according to underlying organs systems
-    assign_mat = np.load(FLAGS.assign_mat)
-    training_votes_aggregate = np.matmul(np.transpose(assign_mat), training_votes)
+    # assign_mat = np.load(FLAGS.assign_mat)
+    # training_votes_aggregate = np.matmul(np.transpose(assign_mat), training_votes)
 
     classifier = np.argmax(training_votes, axis=0)
     other_index = np.arange(training_votes.shape[1])
     train_accuracy = np.sum(
         training_votes[classifier, other_index]) * 1. / np.sum(training_votes)
 
-    classifier_aggr = np.argmax(training_votes_aggregate, axis=0)
-    other_index_aggr = np.arange(training_votes_aggregate.shape[1])
-    train_accuracy_aggr = np.sum(
-        training_votes_aggregate[classifier_aggr, other_index_aggr]) * 1. / np.sum(training_votes_aggregate)
+    # classifier_aggr = np.argmax(training_votes_aggregate, axis=0)
+    # other_index_aggr = np.arange(training_votes_aggregate.shape[1])
+    # train_accuracy_aggr = np.sum(
+    #     training_votes_aggregate[classifier_aggr, other_index_aggr]) * 1. / np.sum(training_votes_aggregate)
 
     if FLAGS.visualize:
         visualize_scores.heat_square(training_votes, out_dir, 'sensitivity',
                                      'feature', 'latent dim')
-        visualize_scores.heat_square(training_votes_aggregate, out_dir, 'sensitivity_aggr',
-                                     'organ system', 'latent dim')
+        # visualize_scores.heat_square(training_votes_aggregate, out_dir, 'sensitivity_aggr',
+        #                              'organ system', 'latent dim')
         if FLAGS.save:
             np.save(F"{out_dir}/sens_matrix", training_votes)
-            np.save(F"{out_dir}/sens_matrix_aggr", training_votes_aggregate)
+            # np.save(F"{out_dir}/sens_matrix_aggr", training_votes_aggregate)
 
     # TODO: add eval accuracy, save score, do summation with assignment matrix
 
     print(F"Train accuracy: {train_accuracy}")
-    print(F"Train accuracy aggregate: {train_accuracy_aggr}")
+    # print(F"Train accuracy aggregate: {train_accuracy_aggr}")
 
 
 if __name__ == '__main__':
