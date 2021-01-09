@@ -238,9 +238,9 @@ def main(argv):
         if FLAGS.data_type == 'hmnist':
             y_val = data['y_test']
         elif FLAGS.data_type in ['physionet', 'hirid']:
-            x_val_full = data['x_val_full']
-            x_val_miss = data['x_val_miss']
-            m_val_miss = data['m_val_miss']
+            x_val_full = data['x_test_full']
+            x_val_miss = data['x_test_miss']
+            m_val_miss = data['m_test_miss']
             # x_test_full = data['x_test_full']
             # x_test_miss = data['x_test_miss']
             # m_test_miss = data['m_test_miss']
@@ -261,9 +261,9 @@ def main(argv):
         x_train_miss = x_train_miss[:val_split]
         m_train_miss = m_train_miss[:val_split]
     elif FLAGS.data_type in ['physionet', 'hirid']:
-        x_val_full = data["x_val_full"]  # full for artificial missings
-        x_val_miss = data["x_val_miss"]
-        m_val_miss = data["m_val_miss"]
+        x_val_full = data["x_test_full"]  # full for artificial missings
+        x_val_miss = data["x_test_miss"]
+        m_val_miss = data["m_test_miss"]
         m_val_artificial = data["m_val_artificial"]
         # y_val = data["y_val"]
     else:
