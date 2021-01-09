@@ -82,31 +82,56 @@ def main(argv):
     print(data_raw.shape)
     print(data_std.shape)
 
+    # Eval data for FactorVAE metric
+    N = data_raw.shape[0]
+    n_feats = data_raw.shape[2]
+    feature_idxs_raw = np.zeros(N, dtype=np.int64)
+    feature_batches_raw = np.copy(data_raw)
+    feature_idxs_std = np.zeros(N, dtype=np.int64)
+    feature_batches_std = np.copy(data_std)
+    for i in range(N):
+        idx = np.random.choice(n_feats)
+        feature_idxs_raw[i] = idx
+        feature_idxs_std[i] = idx
+        feature_batches_raw[i, :, idx] = feature_batches_raw[i, 0, idx]
+        feature_batches_std[i, :, idx] = feature_batches_std[i, 0, idx]
+
     if FLAGS.save:
         # full_save_path = os.path.join(FLAGS.out_dir, 'hirid_full.npy')
         # np.save(full_save_path, full_np)
         # filter_reshape_save_path = os.path.join(FLAGS.out_dir, 'hirid_filter_reshape.npy')
         # np.save(filter_reshape_save_path, filtered_np)
 
-        data_raw_train, data_raw_test, data_std_train, data_std_test = train_test_split(data_raw, data_std, train_size=(100/105))
-        print(data_raw_train.shape)
-        print(data_raw_test.shape)
-        print(data_std_train.shape)
-        print(data_std_test.shape)
-        raw_path = os.path.join(FLAGS.out_dir, 'hirid_no_std.npz')
-        np.savez(raw_path, x_train_full=data_raw_train,
-                 x_train_miss=data_raw_train,
-                 m_train_miss=np.zeros_like(data_raw_train),
-                 x_test_full=data_raw_test,
-                 x_test_miss=data_raw_test,
-                 m_test_miss=np.zeros_like(data_raw_test))
-        std_path = os.path.join(FLAGS.out_dir, 'hirid_std.npz')
-        np.savez(std_path, x_train_full=data_std_train,
-                 x_train_miss=data_std_train,
-                 m_train_miss=np.zeros_like(data_std_train),
-                 x_test_full=data_std_test,
-                 x_test_miss=data_std_test,
-                 m_test_miss=np.zeros_like(data_std_test))
+        # data_raw_train, data_raw_test, data_std_train, data_std_test = train_test_split(data_raw, data_std, train_size=(100/105))
+        # print(data_raw_train.shape)
+        # print(data_raw_test.shape)
+        # print(data_std_train.shape)
+        # print(data_std_test.shape)
+        # raw_path = os.path.join(FLAGS.out_dir, 'hirid_no_std.npz')
+        # np.savez(raw_path, x_train_full=data_raw_train,
+        #          x_train_miss=data_raw_train,
+        #          m_train_miss=np.zeros_like(data_raw_train),
+        #          x_test_full=data_raw_test,
+        #          x_test_miss=data_raw_test,
+        #          m_test_miss=np.zeros_like(data_raw_test))
+        # std_path = os.path.join(FLAGS.out_dir, 'hirid_std.npz')
+        # np.savez(std_path, x_train_full=data_std_train,
+        #          x_train_miss=data_std_train,
+        #          m_train_miss=np.zeros_like(data_std_train),
+        #          x_test_full=data_std_test,
+        #          x_test_miss=data_std_test,
+        #          m_test_miss=np.zeros_like(data_std_test))
+
+        eval_path_no_std = os.path.join(FLAGS.out_dir, 'hirid_sensitivity_eval_no_std.npz')
+        np.savez(eval_path_no_std,
+                 feature_batches=feature_batches_raw,
+                 feature_idxs=feature_idxs_raw)
+        eval_path_std = os.path.join(FLAGS.out_dir,
+                                        'hirid_sensitivity_eval_std.npz')
+        np.savez(eval_path_std,
+                 feature_batches=feature_batches_std,
+                 feature_idxs=feature_idxs_std)
+
 
 if __name__ == '__main__':
     app.run(main)
