@@ -92,7 +92,7 @@ class BandedJointEncoder(tf.keras.Model):
         mapped_covar = mapped_transposed[:, self.z_size:]
 
         # tf.nn.sigmoid provides more stable performance on Physionet dataset
-        if self.data_type == 'physionet':
+        if self.data_type in ['physionet', 'hirid']:
             mapped_covar = tf.nn.sigmoid(mapped_covar)
         else:
             mapped_covar = tf.nn.softplus(mapped_covar)
