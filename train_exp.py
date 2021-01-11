@@ -94,6 +94,7 @@ flags.DEFINE_enum('kernel', 'cauchy', ['rbf', 'diffusion', 'matern', 'periodic',
 flags.DEFINE_integer('kernel_scales', 1, 'Number of different length scales sigma for the GP prior: Ignored if model_type is not gp-vae')
 flags.DEFINE_bool('learn_len', False, 'Whether to make length scales learnable or not.')
 flags.DEFINE_enum('len_init', 'same', ['same', 'scaled'], 'initalization of multiple length scales')
+flags.DEFINE_enum('sens_eval_type', 'std', ['std', 'no_std'], 'Use stanradized or normal data for sensitivity eval data.')
 
 
 def main(argv):
@@ -222,7 +223,7 @@ def main(argv):
     # Load evaluation data for physionet
     if FLAGS.data_type in ['physionet','hirid']:
         base_data_path, _ = os.path.split(FLAGS.data_dir)
-        sens_eval_data_path = os.path.join(base_data_path, "hirid_sensitivity_eval_std.npz")
+        sens_eval_data_path = os.path.join(base_data_path, F"hirid_sensitivity_eval_{FLAGS.sens_eval_type}.npz")
         sens_eval_data = np.load(sens_eval_data_path)
         eval_feature_batches = sens_eval_data['feature_batches']
 
