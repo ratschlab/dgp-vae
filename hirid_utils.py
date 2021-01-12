@@ -122,6 +122,10 @@ def main(argv):
         #          x_test_miss=data_std_test,
         #          m_test_miss=np.zeros_like(data_std_test))
 
+        np.random.shuffle(feature_batches_raw)
+        np.random.shuffle(feature_idxs_raw)
+        np.random.shuffle(feature_batches_std)
+        np.random.shuffle(feature_idxs_std)
         eval_path_no_std = os.path.join(FLAGS.out_dir, 'hirid_sensitivity_eval_no_std.npz')
         np.savez(eval_path_no_std,
                  feature_batches=feature_batches_raw[:20000,...],
