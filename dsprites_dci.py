@@ -100,6 +100,8 @@ def main(argv, model_dir=None):
         if (not c_change) or (F"{i}" not in FLAGS.score_factors):
             mask[i] = False
     c_reshape = c_reshape[:,mask]
+    print(F'C shape: {c_reshape.shape}')
+    print(F'Z shape: {z_reshape.shape}')
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=False)
 
