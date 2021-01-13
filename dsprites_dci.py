@@ -61,7 +61,8 @@ def main(argv, model_dir=None):
         c, z = load_z_c('{}/imputed.npy'.format(out_dir), z_path)
         c = np.transpose(c, (0,2,1))
     elif FLAGS.data_type_dci == "hirid":
-        c = np.load(FLAGS.c_path)['x_test_miss']
+        # c = np.load(FLAGS.c_path)['x_test_miss']
+        c = np.load(FLAGS.c_path)['feature_batches']
         c = np.transpose(c, (0, 2, 1))
         c = c.astype(int)
         z = np.load(z_path)
