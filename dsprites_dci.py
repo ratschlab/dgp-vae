@@ -138,6 +138,14 @@ def main(argv, model_dir=None):
                                          "x_axis", "y_axis")
             np.save(F"{out_dir}/impt_matrix", importance_matrix)
             np.save(F"{out_dir}/impt_matrix_phys", importance_matrix_physio)
+        elif FLAGS.data_type_dci == 'hirid':
+            importance_matrix = np.insert(importance_matrix,
+                                          np.nonzero(np.invert(mask))[0],
+                                          0, axis=1)
+            visualize_scores.heat_square(np.transpose(importance_matrix), out_dir,
+                                         "dci_matrix",
+                                         "feature", "latent dim")
+            np.save(F"{out_dir}/impt_matrix", importance_matrix)
         else:
             visualize_scores.heat_square(importance_matrix, out_dir,
                                          "dci_matrix",
