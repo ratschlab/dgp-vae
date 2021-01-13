@@ -53,8 +53,8 @@ def main(argv, model_dir=None):
     else:
         out_dir = model_dir
 
-    # z_path = '{}/z_mean.npy'.format(out_dir)
-    z_path = '{}/z_eval_mean.npy'.format(out_dir)
+    z_path = '{}/z_mean.npy'.format(out_dir)
+    # z_path = '{}/z_eval_mean.npy'.format(out_dir)
     # project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npy'
     # z_path = os.path.join(project_path, FLAGS.z_name)
     if FLAGS.data_type_dci == "physionet":
@@ -62,8 +62,8 @@ def main(argv, model_dir=None):
         c, z = load_z_c('{}/imputed.npy'.format(out_dir), z_path)
         c = np.transpose(c, (0,2,1))
     elif FLAGS.data_type_dci == "hirid":
-        # c = np.load(FLAGS.c_path)['x_test_miss']
-        c = np.load(FLAGS.c_path)['feature_batches']
+        c = np.load(FLAGS.c_path)['x_test_miss']
+        # c = np.load(FLAGS.c_path)['feature_batches']
         c = np.transpose(c, (0, 2, 1))
         c = c.astype(int)
         z = np.load(z_path)
@@ -99,7 +99,7 @@ def main(argv, model_dir=None):
     # Check if ground truth factor doesn't change and remove if is the case
     mask = np.ones(c_reshape.shape[1], dtype=bool)
     for i in range(c_reshape.shape[1]):
-        c_change = np.sum(abs(np.diff(c_reshape[:20000,i])))
+        c_change = np.sum(abs(np.diff(c_reshape[:8000,i])))
         if (not c_change) or (F"{i}" not in FLAGS.score_factors):
             mask[i] = False
     c_reshape = c_reshape[:,mask]
