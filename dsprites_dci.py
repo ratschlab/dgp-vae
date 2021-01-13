@@ -106,7 +106,7 @@ def main(argv, model_dir=None):
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=FLAGS.shuffle)
 
-    scores = dci._compute_dci(z_train[:8000,:].transpose(), c_train[:8000,:].transpose(), z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
+    scores = dci._compute_dci(z_train[:80000,:].transpose(), c_train[:80000,:].transpose(), z_test[:20000,:].transpose(), c_test[:20000,:].transpose())
 
     print('D: {}'.format(scores['disentanglement']))
     print('C: {}'.format(scores['completeness']))
@@ -124,8 +124,8 @@ def main(argv, model_dir=None):
     # Visualization
     if FLAGS.visualize_score:
         importance_matrix, _, _ = dci.compute_importance_gbt(
-            z_train[:8000,:].transpose(), c_train[:8000,:].transpose().astype(int),
-            z_test[:2000,:].transpose(), c_test[:2000,:].transpose().astype(int))
+            z_train[:80000,:].transpose(), c_train[:80000,:].transpose().astype(int),
+            z_test[:20000,:].transpose(), c_test[:20000,:].transpose().astype(int))
 
         if FLAGS.data_type_dci == 'physionet':
             importance_matrix = np.insert(importance_matrix,
