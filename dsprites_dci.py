@@ -139,6 +139,9 @@ def main(argv, model_dir=None):
             np.save(F"{out_dir}/impt_matrix", importance_matrix)
             np.save(F"{out_dir}/impt_matrix_phys", importance_matrix_physio)
         elif FLAGS.data_type_dci == 'hirid':
+            print(importance_matrix.shape)
+            print(mask.shape)
+            print(np.nonzero(np.invert(mask)))
             importance_matrix = np.insert(importance_matrix,
                                           np.nonzero(np.invert(mask))[0],
                                           0, axis=1)

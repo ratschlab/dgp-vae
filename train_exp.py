@@ -94,7 +94,7 @@ flags.DEFINE_enum('kernel', 'cauchy', ['rbf', 'diffusion', 'matern', 'periodic',
 flags.DEFINE_integer('kernel_scales', 1, 'Number of different length scales sigma for the GP prior: Ignored if model_type is not gp-vae')
 flags.DEFINE_bool('learn_len', False, 'Whether to make length scales learnable or not.')
 flags.DEFINE_enum('len_init', 'same', ['same', 'scaled'], 'initalization of multiple length scales')
-flags.DEFINE_enum('sens_eval_type', 'std', ['std', 'no_std'], 'Use stanradized or normal data for sensitivity eval data.')
+flags.DEFINE_enum('sens_eval_type', 'std', ['std', 'no_std'], 'Use standardized or normal data for sensitivity eval data.')
 
 
 def main(argv):
