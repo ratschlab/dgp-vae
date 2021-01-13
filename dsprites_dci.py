@@ -97,7 +97,7 @@ def main(argv, model_dir=None):
     # Check if ground truth factor doesn't change and remove if is the case
     mask = np.ones(c_reshape.shape[1], dtype=bool)
     for i in range(c_reshape.shape[1]):
-        c_change = np.sum(abs(np.diff(c_reshape[:8000,i])))
+        c_change = np.sum(abs(np.diff(c_reshape[:20000,i])))
         if (not c_change) or (F"{i}" not in FLAGS.score_factors):
             mask[i] = False
     c_reshape = c_reshape[:,mask]
