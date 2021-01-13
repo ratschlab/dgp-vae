@@ -53,7 +53,8 @@ def main(argv, model_dir=None):
     else:
         out_dir = model_dir
 
-    z_path = '{}/z_mean.npy'.format(out_dir)
+    # z_path = '{}/z_mean.npy'.format(out_dir)
+    z_path = '{}/z_eval_mean.npy'.format(out_dir)
     # project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npy'
     # z_path = os.path.join(project_path, FLAGS.z_name)
     if FLAGS.data_type_dci == "physionet":
