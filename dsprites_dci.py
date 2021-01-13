@@ -103,6 +103,7 @@ def main(argv, model_dir=None):
     c_reshape = c_reshape[:,mask]
     print(F'C shape: {c_reshape.shape}')
     print(F'Z shape: {z_reshape.shape}')
+    print(F'Shuffle: {FLAGS.shuffle}')
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=FLAGS.shuffle)
 
