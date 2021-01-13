@@ -9,7 +9,7 @@ import factorvae_metric as sens
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_enum('eval_type', 'dci', ['dci', 'sens'], 'Evaluation metric to use')
+flags.DEFINE_enum('eval_type', 'dci', ['dci', 'sens', 'both'], 'Evaluation metric to use')
 
 def run_experiment(argv):
     # del argv
@@ -20,7 +20,9 @@ def run_experiment(argv):
         dci.main(argv, model_dir=model_dir)
     elif FLAGS.eval_type == 'sens':
         sens.main(argv, model_dir=model_dir)
-
+    elif FLAGS.eval_type == 'both':
+        dci.main(argv, model_dir=model_dir)
+        sens.main(argv, model_dir=model_dir)
 
 if __name__ == '__main__':
     app.run(run_experiment)
