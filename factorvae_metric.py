@@ -86,7 +86,8 @@ def main(argv, model_dir=None):
         return
 
     # Generate training votes
-    n_samples = min(z_eval.shape[0], 10000)
+    # n_samples = min(z_eval.shape[0], 10000)
+    n_samples = z_eval.shape[0]
     training_votes = generate_training_batch(num_features=18, num_samples=n_samples,
                                              feature_idxs= idxs_eval, representation_batches=z_eval,
                                              variances=variances, active_dims=active_dims)
