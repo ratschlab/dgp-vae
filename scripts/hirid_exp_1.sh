@@ -65,7 +65,7 @@ for n in {1..5}; do
         python run_experiment.py --model_type gp-vae --data_type hirid --time_len "$time_len" \
         --testing --batch_size 64 --exp_name n_"$n" --basedir models/hirid/"$sens_eval_type"/dim_"$lat_dim"/len_"$time_len"/scaled \
         --len_init scaled --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/hirid_"$sens_eval_type".npz \
-        --seed "$seed" --banded_covar --latent_dim "$lat_dim" --encoder_sizes=128,128 --kernel_scales "$latent_dim"\
+        --seed "$seed" --banded_covar --latent_dim "$lat_dim" --encoder_sizes=128,128 --kernel_scales "$lat_dim"\
         --decoder_sizes=256,256 --window_size "$window_size" --sigma 1.005 --length_scale 20.0 --beta 1.0 \
         --num_epochs 1 --kernel cauchy --eval_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/hirid_sensitivity_eval_"$sens_eval_type".npz \
         --visualize --save --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/hirid_"$sens_eval_type".npz \
