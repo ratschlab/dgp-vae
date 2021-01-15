@@ -79,3 +79,7 @@ def periodic_kernel(T, sigma, length_scale):
 def const_kernel(T, const_val):
     kernel_matrix = const_val * tf.ones([T,T])
     return kernel_matrix
+
+def id_kernel(T):
+    kernel_matrix = tf.eye(T)
+    return kernel_matrix
