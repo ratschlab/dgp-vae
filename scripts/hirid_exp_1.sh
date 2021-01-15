@@ -42,10 +42,10 @@ mkdir -p models/hirid/no_std/dim_16/len_50/scaled
 mkdir -p models/hirid/std/dim_32/len_50/scaled
 mkdir -p models/hirid/no_std/dim_32/len_50/scaled
 
-for n in {1..5}; do
+for n in {1..3}; do
   seed=$RANDOM
-  for sens_eval_type in std no_std; do
-    for lat_dim in 8 16 32; do
+  for sens_eval_type in no_std; do
+    for lat_dim in 8 16; do
       for len in 5,3,10 25,12,4 50,25,4; do
         IFS=',' read time_len window_size run_time <<< "${len}"
         bsub -o models/hirid/"$sens_eval_type"/dim_"$lat_dim"/len_"$time_len"/same/log_%J \
