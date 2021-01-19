@@ -395,6 +395,7 @@ def main(argv):
         num_steps = FLAGS.num_epochs * len(x_train_miss) // FLAGS.batch_size
     else:
         num_steps = FLAGS.num_steps
+    print(F"Number of training steps: {num_steps}")
 
     if FLAGS.print_interval == 0:
         FLAGS.print_interval = num_steps // FLAGS.num_epochs
