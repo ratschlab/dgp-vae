@@ -27,6 +27,7 @@ flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'hirid', 
 flags.DEFINE_list('score_factors', [], 'Underlying factors to consider in DCI score calculation')
 flags.DEFINE_enum('rescaling', 'linear', ['linear', 'standard'], 'Rescaling of ground truth factors')
 flags.DEFINE_bool('shuffle', False, 'Whether or not to shuffle evaluation data.')
+flags.DEFINE_integer('dci_seed', 42, 'Random seed.')
 flags.DEFINE_bool('visualize_score', False, 'Whether or not to visualize score')
 flags.DEFINE_bool('save_score', False, 'Whether or not to save calculated score')
 
@@ -107,7 +108,7 @@ def main(argv, model_dir=None):
     print(F'Z shape: {z_reshape.shape}')
     print(F'Shuffle: {FLAGS.shuffle}')
 
-    c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=FLAGS.shuffle, random_state=42)
+    c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=FLAGS.shuffle, random_state=FLAGS.dci_seed)
 
     scores = dci._compute_dci(z_train[:8000,:].transpose(), c_train[:8000,:].transpose(), z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
 
@@ -142,8 +143,8 @@ def main(argv, model_dir=None):
             visualize_scores.heat_square(importance_matrix_physio, out_dir,
                                          "dci_matrix_physio",
                                          "x_axis", "y_axis")
-            np.save(F"{out_dir}/impt_matrix", importance_matrix)
-            np.save(F"{out_dir}/impt_matrix_phys", importance_matrix_physio)
+            np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
+            np.save(F"{out_dir}/impt_matrix_phys_{FLAGS.dci_seed}", importance_matrix_physio)
         elif FLAGS.data_type_dci == 'hirid':
             miss_idxs = np.nonzero(np.invert(mask))[0]
             for idx in miss_idxs:
@@ -156,12 +157,12 @@ def main(argv, model_dir=None):
             visualize_scores.heat_square(np.transpose(importance_matrix), out_dir,
                                          "dci_matrix",
                                          "feature", "latent dim")
-            np.save(F"{out_dir}/impt_matrix", importance_matrix)
+            np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
         else:
             visualize_scores.heat_square(importance_matrix, out_dir,
                                          "dci_matrix",
                                          "x_axis", "y_axis")
-            np.save(F"{out_dir}/impt_matrix", importance_matrix)
+            np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
 
 
 if __name__ == '__main__':
