@@ -107,7 +107,7 @@ def main(argv, model_dir=None):
     print(F'Z shape: {z_reshape.shape}')
     print(F'Shuffle: {FLAGS.shuffle}')
 
-    c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=FLAGS.shuffle)
+    c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=FLAGS.shuffle, random_state=42)
 
     scores = dci._compute_dci(z_train[:8000,:].transpose(), c_train[:8000,:].transpose(), z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
 
