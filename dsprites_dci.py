@@ -128,8 +128,8 @@ def main(argv, model_dir=None):
     # Visualization
     if FLAGS.visualize_score:
         importance_matrix, _, _ = dci.compute_importance_gbt(
-            z_train[:8000,:].transpose(), c_train[:8000,:].transpose().astype(int),
-            z_test[:2000,:].transpose(), c_test[:2000,:].transpose().astype(int))
+            z_train[:20000,:].transpose(), c_train[:20000,:].transpose().astype(int),
+            z_test[:5000,:].transpose(), c_test[:5000,:].transpose().astype(int))
 
         if FLAGS.data_type_dci == 'physionet':
             importance_matrix = np.insert(importance_matrix,
