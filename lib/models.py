@@ -49,16 +49,28 @@ class JointEncoder(tf.keras.Model):
 
     def __call__(self, x):
         mapped = self.net(x)
-        if self.transpose:
-            num_dim = len(x.shape.as_list())
-            perm = list(range(num_dim - 2)) + [num_dim - 1, num_dim - 2]
-            mapped = tf.transpose(mapped, perm=perm)
+        if self.data_type in ['physionet', 'hirid']:
+            if self.transpose:
+                num_dim = len(x.shape.as_list())
+                perm = list(range(num_dim - 2)) + [num_dim - 1, num_dim - 2]
+                mapped = tf.transpose(mapped, perm=perm)
+                return tfd.MultivariateNormalDiag(
+                        loc=mapped[..., :self.z_size, :],
+                        scale_diag=tf.nn.sigmoid(mapped[..., self.z_size:, :]))
             return tfd.MultivariateNormalDiag(
-                    loc=mapped[..., :self.z_size, :],
-                    scale_diag=tf.nn.softplus(mapped[..., self.z_size:, :]))
-        return tfd.MultivariateNormalDiag(
-                    loc=mapped[..., :self.z_size],
-                    scale_diag=tf.nn.softplus(mapped[..., self.z_size:]))
+                        loc=mapped[..., :self.z_size],
+                        scale_diag=tf.nn.sigmoid(mapped[..., self.z_size:]))
+        else:
+            if self.transpose:
+                num_dim = len(x.shape.as_list())
+                perm = list(range(num_dim - 2)) + [num_dim - 1, num_dim - 2]
+                mapped = tf.transpose(mapped, perm=perm)
+                return tfd.MultivariateNormalDiag(
+                        loc=mapped[..., :self.z_size, :],
+                        scale_diag=tf.nn.softplus(mapped[..., self.z_size:, :]))
+            return tfd.MultivariateNormalDiag(
+                        loc=mapped[..., :self.z_size],
+                        scale_diag=tf.nn.softplus(mapped[..., self.z_size:]))
 
 
 class BandedJointEncoder(tf.keras.Model):
