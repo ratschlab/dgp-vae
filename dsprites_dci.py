@@ -138,7 +138,7 @@ def main(argv, model_dir=None):
             assign_mat = np.load(FLAGS.assign_mat_path)
             importance_matrix_physio = np.matmul(importance_matrix, assign_mat)
             visualize_scores.heat_square(importance_matrix, out_dir,
-                                         "dci_matrix",
+                                         F"dci_matrix_{FLAGS.dci_seed}",
                                          "x_axis", "y_axis")
             visualize_scores.heat_square(importance_matrix_physio, out_dir,
                                          "dci_matrix_physio",
@@ -155,12 +155,12 @@ def main(argv, model_dir=None):
             #                               np.nonzero(np.invert(mask))[0],
             #                               0, axis=1)
             visualize_scores.heat_square(np.transpose(importance_matrix), out_dir,
-                                         "dci_matrix",
+                                         F"dci_matrix_{FLAGS.dci_seed}",
                                          "feature", "latent dim")
             np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
         else:
             visualize_scores.heat_square(importance_matrix, out_dir,
-                                         "dci_matrix",
+                                         F"dci_matrix_{FLAGS.dci_seed}",
                                          "x_axis", "y_axis")
             np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
 
