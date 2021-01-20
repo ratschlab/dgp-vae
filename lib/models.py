@@ -364,18 +364,20 @@ class HI_VAE(VAE):
 
 
 class GP_VAE(HI_VAE):
-    def __init__(self, *args, kernel="cauchy", sigma=1., length_scale=1.0,
+    def __init__(self, *args, kernel="cauchy", sigma=1., length_scale=1.0, const_val=5.,
                  kernel_scales=1, learnable_len_scale=False, len_init='scaled', **kwargs):
         """ Proposed GP-VAE model with Gaussian Process prior
             :param kernel: Gaussial Process kernel ["cauchy", "diffusion", "rbf", "matern"]
             :param sigma: scale parameter for a kernel function
             :param length_scale: length scale parameter for a kernel function
             :param kernel_scales: number of different length scales over latent space dimensions
+            :param const_val: scaling of constant kernel
         """
         super(GP_VAE, self).__init__(*args, **kwargs)
         self.kernel = kernel
         self.sigma = sigma
         self.kernel_scales = kernel_scales
+        self.const_val = const_val
         if kernel_scales >= 1:
             length_scales = []
             for i in range(self.kernel_scales):
@@ -423,9 +425,9 @@ class GP_VAE(HI_VAE):
             elif self.kernel == "cauchy":
                 kernel_matrices.append(cauchy_kernel(self.time_length, self.sigma, self.length_scale[i]))
             elif self.kernel == "cauchy_const":
-                kernel_matrices.append(cauchy_const_mix_kernel(self.time_length, self.sigma, self.length_scale[i], const_val=5.0))
+                kernel_matrices.append(cauchy_const_mix_kernel(self.time_length, self.sigma, self.length_scale[i], const_val=self.const_val))
             elif self.kernel == "const":
-                kernel_matrices.append(const_kernel(self.time_length, const_val=1))
+                kernel_matrices.append(const_kernel(self.time_length, const_val=self.const_val))
             elif self.kernel == "id":
                 kernel_matrices.append(id_kernel(self.time_length))
 
