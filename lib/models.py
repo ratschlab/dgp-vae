@@ -33,7 +33,7 @@ class DiagonalEncoder(tf.keras.Model):
 
 
 class JointEncoder(tf.keras.Model):
-    def __init__(self, z_size, hidden_sizes=(64, 64), window_size=3, transpose=False, **kwargs):
+    def __init__(self, z_size, hidden_sizes=(64, 64), window_size=3, transpose=False, data_type=None, **kwargs):
         """ Encoder with 1d-convolutional network and factorized Normal posterior
             Used by joint VAE and HI-VAE with Standard Normal prior or GP-VAE with factorized Normal posterior
             :param z_size: latent space dimensionality
@@ -46,6 +46,7 @@ class JointEncoder(tf.keras.Model):
         self.z_size = int(z_size)
         self.net = make_cnn(2*z_size, hidden_sizes, window_size)
         self.transpose = transpose
+        self.data_type = data_type
 
     def __call__(self, x):
         mapped = self.net(x)
