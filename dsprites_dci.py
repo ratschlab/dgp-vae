@@ -21,7 +21,7 @@ import os
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npz', 'File path for underlying factors c')
-flags.DEFINE_string('assign_mat_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/physionet/assignment_matrix.npy', 'Path for assignment matrix')
+flags.DEFINE_string('assign_mat_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/assign_mats/assign_mat_1.npy', 'Path for assignment matrix')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
 flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'hirid', 'sprites', 'dsprites', 'smallnorb', 'cars3d'], 'Type of data and how to evaluate')
 flags.DEFINE_list('score_factors', [], 'Underlying factors to consider in DCI score calculation')
@@ -151,13 +151,39 @@ def main(argv, model_dir=None):
                 importance_matrix = np.insert(importance_matrix,
                                               idx,
                                               0, axis=1)
-            # importance_matrix = np.insert(importance_matrix,
-            #                               np.nonzero(np.invert(mask))[0],
-            #                               0, axis=1)
+            assign_mat = np.load(FLAGS.assign_mat_path)
+            impt_mat_assign = np.matmul(importance_matrix, assign_mat)
+            impt_mat_assign_norm = np.nan_to_num(impt_mat_assign/np.sum(impt_mat_assign, axis=0))
+
+            # Calculate scores
+            d = dci.disentanglement(importance_matrix)
+            c = dci.completeness(importance_matrix)
+            d_assign = dci.disentanglement(impt_mat_assign_norm)
+            c_assign = dci.completeness(impt_mat_assign_norm)
+
+            # Visualize
             visualize_scores.heat_square(np.transpose(importance_matrix), out_dir,
                                          F"dci_matrix_{FLAGS.dci_seed}",
                                          "feature", "latent dim")
-            np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
+            visualize_scores.heat_square(np.transpose(impt_mat_assign_norm), out_dir,
+                                         F"dci_matrix_assign_{FLAGS.dci_seed}",
+                                         "feature", "latent_dim")
+
+            # Save importance matrices and scores
+            if FLAGS.save_score:
+                np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
+                np.save(F"{out_dir}/impt_matrix_assign_{FLAGS.dci_seed}", impt_mat_assign_norm)
+
+                np.savez(
+                    '{}/dci_{}_{}_{}'.format(out_dir, z_shape[1], c_shape[1],
+                                             z_shape[0]),
+                    informativeness_train=scores['informativeness_train'],
+                    informativeness_test=scores['informativeness_test'],
+                    disentanglement=d,
+                    completeness=c,
+                    disentanglement_assign=d_assign,
+                    completeness_assign=c_assign)
+
         else:
             visualize_scores.heat_square(importance_matrix, out_dir,
                                          F"dci_matrix_{FLAGS.dci_seed}",
