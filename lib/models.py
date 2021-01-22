@@ -566,13 +566,21 @@ class AdaGPVAE(GP_VAE):
         # Share distribution at common latent factors
         new_z_mean_1 = tf.where(dim_mask_mean, qz_x_1.mean(), new_z_mean)
         new_z_mean_2 = tf.where(dim_mask_mean, qz_x_2.mean(), new_z_mean)
-        new_z_cov_1 = tf.linalg.cholesky(tf.where(dim_mask_cov, qz_x_1.covariance(), new_z_cov))
-        new_z_cov_2 = tf.linalg.cholesky(tf.where(dim_mask_cov, qz_x_2.covariance(), new_z_cov))
-        # Create new distributions q(z|x)
-        qz_x_1_new = tfd.MultivariateNormalTriL(loc=new_z_mean_1,
-                                                scale_tril=new_z_cov_1)
-        qz_x_2_new = tfd.MultivariateNormalTriL(loc=new_z_mean_2,
-                                                scale_tril=new_z_cov_2)
+        if isinstance(self.encoder, JointEncoder):
+            new_z_cov_1 = tf.where(dim_mask_cov, qz_x_1.covariance(), new_z_cov)
+            new_z_cov_2 = tf.where(dim_mask_cov, qz_x_2.covariance(), new_z_cov)
+            qz_x_1_new = tfd.MultivariateNormalDiag(loc=new_z_mean_1,
+                                                    scale_diag=tf.linalg.diag_part(new_z_cov_1))
+            qz_x_2_new = tfd.MultivariateNormalDiag(loc=new_z_mean_2,
+                                                    scale_diag=tf.linalg.diag_part(new_z_cov_2))
+        else:
+            new_z_cov_1 = tf.linalg.cholesky(tf.where(dim_mask_cov, qz_x_1.covariance(), new_z_cov))
+            new_z_cov_2 = tf.linalg.cholesky(tf.where(dim_mask_cov, qz_x_2.covariance(), new_z_cov))
+            # Create new distributions q(z|x)
+            qz_x_1_new = tfd.MultivariateNormalTriL(loc=new_z_mean_1,
+                                                    scale_tril=new_z_cov_1)
+            qz_x_2_new = tfd.MultivariateNormalTriL(loc=new_z_mean_2,
+                                                    scale_tril=new_z_cov_2)
 
         if m_mask is not None:
             m_mask = tf.identity(m_mask)  # in case m_mask is not a Tensor already...
