@@ -140,9 +140,9 @@ def main(argv):
     # print(np.round(dci_scores[0,...], 2))
     mean_scores = np.mean(dci_scores, axis=0)
     print(F'Mean D: {np.round(mean_scores[0], 2)}')
-    print(F'Mean C: {mean_scores[1]}')
-    print(F'Mean D assign: {mean_scores[2]}')
-    print(F'Mean C assign: {mean_scores[3]}')
+    print(F'Mean C: {np.round(mean_scores[1], 2)')
+    print(F'Mean D assign: {np.round(mean_scores[2], 2)}')
+    print(F'Mean C assign: {np.round(mean_scores[3], 2)}')
     # print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
     # print(F"Median: {np.round(np.median(dci_scores[0,...]), 2)}")
 
@@ -153,9 +153,15 @@ def main(argv):
         elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
             np.save(os.path.join('baselines', FLAGS.model, FLAGS.exp_name, F'{FLAGS.model}_{FLAGS.exp_name}_dci.npy'), dci_scores)
             print(F"Saved scores at :{os.path.join('baselines', FLAGS.model, FLAGS.exp_name, 'dci_aggr.npy')}")
+        elif FLAGS.model == 'hirid':
+            if FLAGS.dci_seed is not None:
+                filename = os.path.join(FLAGS.base_dir, F'dci_assign_{FLAGS.exp_name}_{FLAGS.dci_seed}.npy')
+            else:
+                filename = os.path.join(FLAGS.base_dir, F'dci_assign_{FLAGS.exp_name}_orig.npy')
+            np.save(filename, dci_scores)
         else:
             raise ValueError(
-                "Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
+                "Model must be one of: ['gpvae', 'hirid', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
 if __name__ == '__main__':
     app.run(main)
