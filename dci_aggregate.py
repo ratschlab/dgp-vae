@@ -140,7 +140,7 @@ def main(argv):
     # print(np.round(dci_scores[0,...], 2))
     mean_scores = np.mean(dci_scores, axis=0)
     print(F'Mean D: {np.round(mean_scores[0], 2)}')
-    print(F'Mean C: {np.round(mean_scores[1], 2)')
+    print(F'Mean C: {np.round(mean_scores[1], 2)}')
     print(F'Mean D assign: {np.round(mean_scores[2], 2)}')
     print(F'Mean C assign: {np.round(mean_scores[3], 2)}')
     # print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
