@@ -81,7 +81,10 @@ def aggregate_hirid(N, base_dir='/cluster/work/grlab/projects/projects2020_disen
 
             single_score_path = os.path.join(subdir,potential_paths[0])
         single_score = np.load(single_score_path)
-        print(single_score.files)
+        scores[i, 0] = single_score['disentanglement']
+        scores[i, 1] = single_score['completeness']
+        scores[i, 2] = single_score['disentanglement_assign']
+        scores[i, 3] = single_score['completeness_assign']
 
     return scores
 
@@ -134,7 +137,8 @@ def main(argv):
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
     print(dci_scores.shape)
-    print(np.round(dci_scores[0,...], 2))
+    # print(np.round(dci_scores[0,...], 2))
+    print(np.mean(dci_scores, axis=0))
     print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
     print(F"Median: {np.round(np.median(dci_scores[0,...]), 2)}")
 
