@@ -132,6 +132,8 @@ def main(argv, model_dir=None):
                                           idx,
                                           0, axis=1)
         assign_mat = np.load(FLAGS.assign_mat_path)
+        print(importance_matrix.shape)
+        print(assign_mat.shape)
         impt_mat_assign = np.matmul(importance_matrix, assign_mat)
         impt_mat_assign_norm = np.nan_to_num(
             impt_mat_assign / np.sum(impt_mat_assign, axis=0))
