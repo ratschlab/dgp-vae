@@ -65,6 +65,14 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
 
     return np.squeeze(dci_scores)
 
+def aggregate_hirid(N, base_dir='/cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/hirid/comp1/base/dim_8/len_50/same'):
+    scores = np.zeros((N,4))
+
+    for _, dirs, _ in os.walk(base_dir):
+        print(dirs)
+
+    return scores
+
 def aggregate_baseline(N, params, base_dir='dim'):
     """
     Collects all dci scores and aggregates into single array.
@@ -107,6 +115,8 @@ def main(argv):
         dci_scores = aggregate_gpvae(FLAGS.n, FLAGS.params, FLAGS.base_dir)
     elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
         dci_scores = aggregate_baseline(FLAGS.n, FLAGS.params, FLAGS.base_dir)
+    elif FLAGS.model == 'hirid':
+        dci_scores = aggregate_hirid(FLAGS.n, FLAGS.base_dir)
     else:
         raise ValueError("Model must be one of: ['gpvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']")
 
