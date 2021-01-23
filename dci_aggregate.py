@@ -157,6 +157,7 @@ def main(argv):
                 filename = os.path.join(FLAGS.base_dir, F'dci_assign_{FLAGS.exp_name}_{FLAGS.dci_seed}.npy')
             else:
                 filename = os.path.join(FLAGS.base_dir, F'dci_assign_{FLAGS.exp_name}_orig.npy')
+            print(filename)
             np.save(filename, dci_scores)
         else:
             raise ValueError(
