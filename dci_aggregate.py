@@ -69,7 +69,7 @@ def aggregate_hirid(N, base_dir='/cluster/work/grlab/projects/projects2020_disen
     scores = np.zeros((N,4))
 
     for _, dirs, _ in os.walk(base_dir):
-        print(dirs)
+        print(F'Dirs: {dirs}')
 
     return scores
 
