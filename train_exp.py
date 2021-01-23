@@ -222,11 +222,11 @@ def main(argv):
     # if FLAGS.data_type in ['hmnist', 'physionet']:
     #     y_train = data['y_train']
     # Load evaluation data for physionet
-    # if FLAGS.data_type in ['physionet','hirid']:
-    #     base_data_path, _ = os.path.split(FLAGS.data_dir)
-    #     sens_eval_data_path = os.path.join(base_data_path, F"hirid_sensitivity_eval_{FLAGS.sens_eval_type}.npz")
-    #     sens_eval_data = np.load(sens_eval_data_path)
-    #     eval_feature_batches = sens_eval_data['feature_batches']
+    if FLAGS.data_type in ['physionet','hirid']:
+        base_data_path, _ = os.path.split(FLAGS.data_dir)
+        sens_eval_data_path = os.path.join(base_data_path, F"hirid_sensitivity_eval_{FLAGS.sens_eval_type}.npz")
+        sens_eval_data = np.load(sens_eval_data_path)
+        eval_feature_batches = sens_eval_data['feature_batches']
 
     if FLAGS.testing:
         if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d']:
