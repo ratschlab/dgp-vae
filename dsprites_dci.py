@@ -21,7 +21,7 @@ import os
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npz', 'File path for underlying factors c')
-flags.DEFINE_string('assign_mat_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/physionet/assignment_matrix.npy', 'Path for assignment matrix')
+flags.DEFINE_string('assign_mat_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/assign_mats/assign_mat_1.npy', 'Path for assignment matrix')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
 flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'hirid', 'sprites', 'dsprites', 'smallnorb', 'cars3d'], 'Type of data and how to evaluate')
 flags.DEFINE_list('score_factors', [], 'Underlying factors to consider in DCI score calculation')
@@ -132,8 +132,6 @@ def main(argv, model_dir=None):
                                           idx,
                                           0, axis=1)
         assign_mat = np.load(FLAGS.assign_mat_path)
-        print(importance_matrix.shape)
-        print(assign_mat.shape)
         impt_mat_assign = np.matmul(importance_matrix, assign_mat)
         impt_mat_assign_norm = np.nan_to_num(
             impt_mat_assign / np.sum(impt_mat_assign, axis=0))
