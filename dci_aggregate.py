@@ -65,7 +65,7 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
 
     return np.squeeze(dci_scores)
 
-def aggregate_hirid(N, base_dir='/cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/hirid/comp1/base/dim_8/len_50/same'):
+def aggregate_hirid(N, base_dir='/cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/hirid/comp1/base/dim_8/len_50/scaled'):
     scores = np.zeros((N,4))
 
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
