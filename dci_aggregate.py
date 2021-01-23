@@ -70,8 +70,8 @@ def aggregate_hirid(N, base_dir='/cluster/work/grlab/projects/projects2020_disen
 
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
     print(F'subdirs: {subdirs}')
-    for _, dirs, _ in os.walk(base_dir):
-        print(F'Dirs: {dirs}')
+    # for _, dirs, _ in os.walk(base_dir):
+    #     print(F'Dirs: {dirs}')
 
     return scores
 
