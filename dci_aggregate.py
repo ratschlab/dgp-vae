@@ -78,8 +78,10 @@ def aggregate_hirid(N, base_dir='/cluster/work/grlab/projects/projects2020_disen
             single_score_path = os.path.join(subdir,FLAGS.dci_seed)
         else:
             potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign')]
-            print(F'potential paths: {potential_paths}')
-            single_score_path = potential_paths[0]
+
+            single_score_path = os.path.join(subdir,potential_paths[0])
+        single_score = np.load(single_score_path)
+        print(single_score.files)
 
     return scores
 
