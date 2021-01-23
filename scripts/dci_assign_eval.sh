@@ -4,6 +4,7 @@ for model_seed in 210120_n_1,22019 210121_n_2,3412 210121_n_3,13351 210121_n_4,2
   IFS=',' read model seed <<< "${model_seed}"
   bsub -o /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/hirid/comp1/base/dim_8/len_50/scaled/log_%J \
   -g /gpvae_eval -R "rusage[mem=5000]" python dsprites_dci.py \
+  --assign_mat_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/assign_mats/assign_mat_1.npy \
   --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/hirid_std.npz \
   --model_name /cluster/work/grlab/projects/projects2020_disentangled_gpvae/models/hirid/comp1/base/dim_8/len_50/scaled/"$model" \
   --data_type_dci hirid --save_score --visualize_score --shuffle --dci_seed "$seed"
