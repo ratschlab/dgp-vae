@@ -80,7 +80,6 @@ def aggregate_hirid(N, base_dir):
             potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign')]
 
             single_score_path = os.path.join(subdir,potential_paths[0])
-        print(F'Path: {single_score_path}')
         single_score = np.load(single_score_path)
         scores[i, 0] = single_score['disentanglement']
         scores[i, 1] = single_score['completeness']
@@ -143,7 +142,6 @@ def main(argv):
     print(F'Mean C: {np.round(mean_scores[1], 2)}')
     print(F'Mean D assign: {np.round(mean_scores[2], 2)}')
     print(F'Mean C assign: {np.round(mean_scores[3], 2)}')
-    print(dci_scores[:,2])
     # print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
     # print(F"Median: {np.round(np.median(dci_scores[0,...]), 2)}")
 
