@@ -19,6 +19,7 @@ flags.DEFINE_list('params', [None], 'Parameters tested in experiment')
 flags.DEFINE_integer('n', 10, 'Number of experiments.')
 flags.DEFINE_string('exp_name', '', 'Experiment naming scheme')
 flags.DEFINE_boolean('save', False, 'Save aggregated scores')
+flags.DEFINE_integer('dci_seed', None, 'Take score corresponding to certain seed, if specified')
 
 def walklevel(some_dir, level=0):
     some_dir = some_dir.rstrip(os.path.sep)
@@ -69,9 +70,16 @@ def aggregate_hirid(N, base_dir='/cluster/work/grlab/projects/projects2020_disen
     scores = np.zeros((N,4))
 
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
-    print(F'subdirs: {subdirs}')
-    # for _, dirs, _ in os.walk(base_dir):
-    #     print(F'Dirs: {dirs}')
+    if FLAGS.exp_name != '':
+        subdirs = subdirs[subdirs.endwith(FLAGS.exp_name)]
+    assert len(subdirs) == N
+    for i, subdir in enumerate(subdirs):
+        if FLAGS.dci_seed is not None:
+            single_score_path = os.path.join(subdir,FLAGS.dci_seed)
+        else:
+            potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign')]
+            print(F'potential paths: {potential_paths}')
+            single_score_path = potential_paths[0]
 
     return scores
 
