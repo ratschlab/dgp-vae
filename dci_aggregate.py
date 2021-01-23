@@ -138,9 +138,13 @@ def main(argv):
 
     print(dci_scores.shape)
     # print(np.round(dci_scores[0,...], 2))
-    print(np.mean(dci_scores, axis=0))
-    print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
-    print(F"Median: {np.round(np.median(dci_scores[0,...]), 2)}")
+    mean_scores = np.mean(dci_scores, axis=0)
+    print(F'Mean D: {mean_scores[0]}')
+    print(F'Mean C: {mean_scores[1]}')
+    print(F'Mean D assign: {mean_scores[2]}')
+    print(F'Mean C assign: {mean_scores[3]}')
+    # print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
+    # print(F"Median: {np.round(np.median(dci_scores[0,...]), 2)}")
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
