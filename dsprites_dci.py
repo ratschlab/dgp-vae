@@ -142,11 +142,11 @@ def main(argv, model_dir=None):
 
     if FLAGS.save_score:
         if FLAGS.data_type_dci in ['hirid', 'physionet']:
-            np.savez(F'{out_dir}/dci', informativeness_train=0, informativeness_test=0,
+            np.savez(F'{out_dir}/dci_{FLAGS.dci_seec}', informativeness_train=0, informativeness_test=0,
                      disentanglement=d, completeness=c,
                      disentanglement_assign=d_assign, completeness_assign=c_assign)
         else:
-            np.savez(F'{out_dir}/dci', informativeness_train=0, informativeness_test=0,
+            np.savez(F'{out_dir}/dci_{FLAGS.dci_seec}', informativeness_train=0, informativeness_test=0,
                      disentanglement=d, completeness=c)
 
     # if FLAGS.save_score:
