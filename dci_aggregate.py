@@ -144,7 +144,7 @@ def main(argv):
     print(F'Mean D assign: {np.round(mean_scores[2], 3)}')
     print(F'Std D assign: {np.round(std_scores[2], 3)}')
     print(F'Mean C assign: {np.round(mean_scores[3], 3)}')
-    print(F'Std C assign: {np.round(mean_scores[3], 3)}')
+    print(F'Std C assign: {np.round(std_scores[3], 3)}')
     # print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
     # print(F"Median: {np.round(np.median(dci_scores[0,...]), 2)}")
 
