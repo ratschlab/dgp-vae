@@ -80,7 +80,7 @@ def aggregate_hirid(N, base_dir):
             single_score_path = os.path.join(subdir,F'dci_assign_{FLAGS.dci_seed}.npz')
         else:
             potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign')]
-
+            print(potential_paths)
             single_score_path = os.path.join(subdir,potential_paths[0])
         single_score = np.load(single_score_path)
         scores[i, 0] = single_score['disentanglement']
