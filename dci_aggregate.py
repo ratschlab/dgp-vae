@@ -72,7 +72,9 @@ def aggregate_hirid(N, base_dir):
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
     if FLAGS.exp_name != '':
         print(subdirs)
-        subdirs = subdirs[subdirs.endwith(FLAGS.exp_name)]
+        subdirs_idxs = [subdir.endwith(FLAGS.exp_name) for subdir in subdirs]
+        subdirs = subdirs[subdirs_idxs]
+        print(subdirs)
     assert len(subdirs) == N
     for i, subdir in enumerate(subdirs):
         if FLAGS.dci_seed is not None:
