@@ -73,6 +73,7 @@ def aggregate_hirid(N, base_dir):
     if FLAGS.exp_name != '':
         print(subdirs)
         subdirs_idxs = [subdir.endswith(FLAGS.exp_name) for subdir in subdirs]
+        print(subdirs_idxs)
         subdirs = subdirs[subdirs_idxs]
         print(subdirs)
     assert len(subdirs) == N
