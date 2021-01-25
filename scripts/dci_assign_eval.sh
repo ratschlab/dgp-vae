@@ -124,12 +124,12 @@
 
 # AdaGVAE
 
-for model_seed in 210122_n_1_noband,22019 210122_n_2_noband,3412 210122_n_4_noband,2677 210122_n_5_noband,6071 210122_n_6_noband,10843 210122_n_7_noband,16040 210122_n_8_noband,8088 210122_n_9_noband,22060 210122_n_10_noband,29153; do
+for model_seed in 210122_n_2_noband,3412 210122_n_4_noband,2677 210122_n_5_noband,6071 210122_n_6_noband,10843 210122_n_7_noband,16040 210122_n_8_noband,8088 210122_n_9_noband,22060 210122_n_10_noband,29153; do
   IFS=',' read model seed <<< "${model_seed}"
-  bsub -o /models/hirid/comp/ada/dim_8/log_%J \
+  bsub -o /cluster/home/bings/dgpvae/models/hirid/comp/ada/dim_8/log_%J \
   -g /gpvae_eval -R "rusage[mem=5000]" python dsprites_dci.py \
   --assign_mat_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/assign_mats/assign_mat_1.npy \
   --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/hirid_std.npz \
-  --model_name /models/hirid/comp/ada/dim_8/"$model" \
+  --model_name /cluster/home/bings/dgpvae/models/hirid/comp/ada/dim_8/"$model" \
   --data_type_dci hirid --save_score --visualize_score --shuffle --dci_seed "$seed"
 done
