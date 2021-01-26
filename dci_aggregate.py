@@ -144,7 +144,7 @@ def main(argv):
     del argv # Unused
 
     if FLAGS.model == 'gpvae':
-        dci_scores = aggregate_gpvae(FLAGS.n, FLAGS.params, FLAGS.base_dir)
+        dci_scores = aggregate_gpvae(FLAGS.n, FLAGS.base_dir)
     elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
         dci_scores = aggregate_baseline(FLAGS.n, FLAGS.params, FLAGS.base_dir)
     elif FLAGS.model == 'hirid':
