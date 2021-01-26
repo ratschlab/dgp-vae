@@ -198,13 +198,13 @@ def main(argv, model_dir=None):
                                          F"dci_matrix_{FLAGS.dci_seed}",
                                          "feature", "latent dim")
             visualize_scores.heat_square(np.transpose(impt_mat_assign_norm), out_dir,
-                                         F"dci_matrix_assign_{FLAGS.dci_seed}",
+                                         F"dci_matrix_assign_2_{FLAGS.dci_seed}",
                                          "feature", "latent_dim")
 
             # Save importance matrices
             if FLAGS.save_score:
                 np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
-                np.save(F"{out_dir}/impt_matrix_assign_{FLAGS.dci_seed}", impt_mat_assign_norm)
+                np.save(F"{out_dir}/impt_matrix_assign_2_{FLAGS.dci_seed}", impt_mat_assign_norm)
 
         else:
             visualize_scores.heat_square(importance_matrix, out_dir,
