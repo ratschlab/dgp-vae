@@ -42,7 +42,7 @@ def aggregate_gpvae(N, base_dir):
     Returns:
         dci_scores, [3xNxM] np array
     """
-    dci_scores = np.zeros(N,3)
+    dci_scores = np.zeros((N,3))
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
     assert len(subdirs) == N
 
