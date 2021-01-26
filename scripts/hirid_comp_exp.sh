@@ -36,7 +36,7 @@ for n_seed in 1,22019 2,3412 3,13351 4,2677 5,6071 6,10843 7,16040 8,8088 9,2206
 #      --data_type_dci hirid --shuffle --dci_seed "$seed"
 #
       bsub -o models/hirid/comp/base/dim_8/len_25/scaled/n_scales_4/log_%J \
-      -g /gpvae_disent -W 4:00 -R "rusage[mem=65000,ngpus_excl_p=1]" \
+      -g /gpvae_disent -W 4:00 -R "rusage[mem=65000,ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" \
       python run_experiment.py --model_type gp-vae --data_type hirid --time_len 25 \
       --testing --batch_size 64 --exp_name n_"$n" --basedir models/hirid/comp/base/dim_8/len_25/scaled/n_scales_4 \
       --len_init scaled --data_dir /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/hirid_std.npz \
