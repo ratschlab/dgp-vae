@@ -222,11 +222,11 @@ def main(argv):
     # if FLAGS.data_type in ['hmnist', 'physionet']:
     #     y_train = data['y_train']
     # Load evaluation data for physionet
-    if FLAGS.data_type in ['physionet','hirid']:
-        base_data_path, _ = os.path.split(FLAGS.data_dir)
-        sens_eval_data_path = os.path.join(base_data_path, F"hirid_sensitivity_eval_{FLAGS.sens_eval_type}.npz")
-        sens_eval_data = np.load(sens_eval_data_path)
-        eval_feature_batches = sens_eval_data['feature_batches']
+    # if FLAGS.data_type in ['physionet','hirid']:
+    #     base_data_path, _ = os.path.split(FLAGS.data_dir)
+    #     sens_eval_data_path = os.path.join(base_data_path, F"hirid_sensitivity_eval_{FLAGS.sens_eval_type}.npz")
+    #     sens_eval_data = np.load(sens_eval_data_path)
+    #     eval_feature_batches = sens_eval_data['feature_batches']
 
     if FLAGS.testing:
         if FLAGS.data_type in ['hmnist', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d']:
@@ -586,8 +586,8 @@ def main(argv):
 
     x_val_miss_batches = np.array_split(x_val_miss, num_split, axis=0)
     x_val_full_batches = np.array_split(x_val_full, num_split, axis=0)
-    if FLAGS.data_type in ['physionet', 'hirid']:
-        sens_eval_batches = np.array_split(eval_feature_batches, num_split * 2, axis=0)
+    # if FLAGS.data_type in ['physionet', 'hirid']:
+    #     sens_eval_batches = np.array_split(eval_feature_batches, num_split * 2, axis=0)
     # if FLAGS.data_type == 'physionet':
     #     m_val_batches = np.array_split(m_val_artificial, num_split, axis=0)
     # else:
@@ -609,12 +609,16 @@ def main(argv):
     print("NLL miss: {:.4f}".format(nll_miss))
     print("MSE miss: {:.4f}".format(mse_miss))
 
+    # Save imputed values of original time series length. EXPERIMENTAL
+    x_val_full_len_batches = np.array_split(data_orig['x_test_miss'], np.ceil(len(data_orig['x_test_miss']) / FLAGS.batch_size), axis=0)
+    z_mean_full_len = [model.encode(x_batch).mean().numpy() for x_batch in x_val_full_len_batches]
+    np.save(os.path.join(outdir, "z_mean_full_len"), np.vstack(z_mean_full_len))
     # Save imputed values
     z_mean = [model.encode(x_batch).mean().numpy() for x_batch in x_val_miss_batches]
     np.save(os.path.join(outdir, "z_mean"), np.vstack(z_mean))
     if FLAGS.data_type in ["physionet", "hirid"]:
-        z_eval_mean = [model.encode(sens_eval_batch).mean().numpy() for sens_eval_batch in sens_eval_batches]
-        np.save(os.path.join(outdir, "z_eval_mean"), np.vstack(z_eval_mean))
+        # z_eval_mean = [model.encode(sens_eval_batch).mean().numpy() for sens_eval_batch in sens_eval_batches]
+        # np.save(os.path.join(outdir, "z_eval_mean"), np.vstack(z_eval_mean))
 
         x_val_imputed = np.vstack([model.decode(z_batch).mean().numpy() for z_batch in z_mean])
         # np.save(os.path.join(outdir, "imputed_no_gt"), x_val_imputed)
