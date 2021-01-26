@@ -31,7 +31,7 @@ def walklevel(some_dir, level=0):
         if num_sep + level <= num_sep_this:
             del dirs[:]
 
-def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
+def aggregate_gpvae(N, base_dir):
     """
     Collects all dci scores and aggregates into single array.
     Args:
@@ -42,29 +42,44 @@ def aggregate_gpvae(N, params, base_dir='dsprites_dim_'):
     Returns:
         dci_scores, [3xNxM] np array
     """
-    dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
+    dci_scores = np.zeros(N,3)
+    subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
+    assert len(subdirs) == N
+
+    for i, subdir in enumerate(subdirs):
+            potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci')]
+            print(potential_paths)
+            single_score_path = os.path.join(subdir,potential_paths[0])
+        single_score = np.load(single_score_path)
+        print(single_score.files)
+        # dci_scores[i, 0] = single_score['disentanglement']
+        # dci_scores[i, 1] = single_score['completeness']
+        # dci_scores[i, 2] = single_score['disentanglement_assign']
+        # dci_scores[i, 3] = single_score['completeness_assign']
+
+    # dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
     # print(len(params))
 
-    for m, param in enumerate(params):
-        if param is not None:
-            param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
-        else:
-            param_dir = os.path.join(base_dir, FLAGS.exp_name)
+    # for m, param in enumerate(params):
+    #     if param is not None:
+    #         param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
+    #     else:
+    #         param_dir = os.path.join(base_dir, FLAGS.exp_name)
+    #
+    #     models_path = os.path.join('models', param_dir)
+    #     print(models_path)
+    #     for _, dirs, _ in os.walk(models_path):
+    #         for n, dir in enumerate(dirs):
+    #             for _, _, files in os.walk(os.path.join(models_path, dir)):
+    #                 for filename in files:
+    #                     if filename.startswith('dci'):
+    #                         # print(n, filename)
+    #                         dci = np.load(os.path.join(models_path, dir, filename)) # Might need abspath here
+    #                         dci_scores[0,n,m] = dci['disentanglement']
+    #                         dci_scores[1,n,m] = dci['completeness']
+    #                         dci_scores[2,n,m] = dci['informativeness_test']
 
-        models_path = os.path.join('models', param_dir)
-        print(models_path)
-        for _, dirs, _ in os.walk(models_path):
-            for n, dir in enumerate(dirs):
-                for _, _, files in os.walk(os.path.join(models_path, dir)):
-                    for filename in files:
-                        if filename.startswith('dci'):
-                            # print(n, filename)
-                            dci = np.load(os.path.join(models_path, dir, filename)) # Might need abspath here
-                            dci_scores[0,n,m] = dci['disentanglement']
-                            dci_scores[1,n,m] = dci['completeness']
-                            dci_scores[2,n,m] = dci['informativeness_test']
-
-    return np.squeeze(dci_scores)
+    return dci_scores
 
 def aggregate_hirid(N, base_dir):
     scores = np.zeros((N,4))
