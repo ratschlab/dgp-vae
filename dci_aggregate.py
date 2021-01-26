@@ -47,7 +47,7 @@ def aggregate_gpvae(N, base_dir):
     assert len(subdirs) == N
 
     for i, subdir in enumerate(subdirs):
-        potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci')]
+        potential_paths = [file.name for file in os.scandir(subdir) if file.name.endswith('npz')]
         print(potential_paths)
         single_score_path = os.path.join(subdir,potential_paths[0])
         single_score = np.load(single_score_path)
