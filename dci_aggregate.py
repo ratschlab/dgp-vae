@@ -54,28 +54,6 @@ def aggregate_gpvae(N, base_dir):
         dci_scores[i, 1] = single_score['completeness']
         dci_scores[i, 2] = single_score['informativeness_test']
 
-    # dci_scores = np.zeros((3,N,len(params)), dtype=np.float32)
-    # print(len(params))
-
-    # for m, param in enumerate(params):
-    #     if param is not None:
-    #         param_dir = os.path.join(base_dir, '{}_{}'.format(FLAGS.exp_name, param))
-    #     else:
-    #         param_dir = os.path.join(base_dir, FLAGS.exp_name)
-    #
-    #     models_path = os.path.join('models', param_dir)
-    #     print(models_path)
-    #     for _, dirs, _ in os.walk(models_path):
-    #         for n, dir in enumerate(dirs):
-    #             for _, _, files in os.walk(os.path.join(models_path, dir)):
-    #                 for filename in files:
-    #                     if filename.startswith('dci'):
-    #                         # print(n, filename)
-    #                         dci = np.load(os.path.join(models_path, dir, filename)) # Might need abspath here
-    #                         dci_scores[0,n,m] = dci['disentanglement']
-    #                         dci_scores[1,n,m] = dci['completeness']
-    #                         dci_scores[2,n,m] = dci['informativeness_test']
-
     return dci_scores
 
 def aggregate_hirid(N, base_dir):
@@ -155,17 +133,17 @@ def main(argv):
     std_scores = np.std(dci_scores, axis=0)
     print(F'Mean D: {np.round(mean_scores[0], 3)}')
     print(F'Mean C: {np.round(mean_scores[1], 3)}')
-    # print(F'Mean D assign: {np.round(mean_scores[2], 3)}')
-    # print(F'Std D assign: {np.round(std_scores[2], 3)}')
-    # print(F'Mean C assign: {np.round(mean_scores[3], 3)}')
-    # print(F'Std C assign: {np.round(std_scores[3], 3)}')
+    print(F'Mean D assign: {np.round(mean_scores[2], 3)}')
+    print(F'Std D assign: {np.round(std_scores[2], 3)}')
+    print(F'Mean C assign: {np.round(mean_scores[3], 3)}')
+    print(F'Std C assign: {np.round(std_scores[3], 3)}')
     # print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
     # print(F"Median: {np.round(np.median(dci_scores[0,...]), 2)}")
 
     if FLAGS.save:
         if FLAGS.model == 'gpvae':
             np.save(os.path.join(FLAGS.base_dir, 'dci_aggr.npy'), dci_scores)
-            print(F"Saved scores at :{os.path.join('models', FLAGS.exp_name, 'dci_aggr.npy')}")
+            print(F"Saved scores at :{os.path.join(FLAGS.base_dir, 'dci_aggr.npy')}")
         elif FLAGS.model in ['adagvae', 'annealedvae', 'betavae', 'betatcvae', 'factorvae', 'dipvae_i', 'dipvae_ii']:
             np.save(os.path.join('baselines', FLAGS.model, FLAGS.exp_name, F'{FLAGS.model}_{FLAGS.exp_name}_dci.npy'), dci_scores)
             print(F"Saved scores at :{os.path.join('baselines', FLAGS.model, FLAGS.exp_name, 'dci_aggr.npy')}")
