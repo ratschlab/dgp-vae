@@ -610,9 +610,9 @@ def main(argv):
     print("MSE miss: {:.4f}".format(mse_miss))
 
     # Save imputed values of original time series length. EXPERIMENTAL
-    # x_val_full_len_batches = np.array_split(data_orig['x_test_miss'], np.ceil(len(data_orig['x_test_miss']) / FLAGS.batch_size), axis=0)
-    # z_mean_full_len = [model.encode(x_batch).mean().numpy() for x_batch in x_val_full_len_batches]
-    # np.save(os.path.join(outdir, "z_mean_full_len"), np.vstack(z_mean_full_len))
+    x_val_full_len_batches = np.array_split(data_orig['x_test_miss'], np.ceil(len(data_orig['x_test_miss']) / FLAGS.batch_size), axis=0)
+    z_mean_full_len = [model.encode(x_batch).mean().numpy() for x_batch in x_val_full_len_batches]
+    np.save(os.path.join(outdir, "z_mean_full_len"), np.vstack(z_mean_full_len))
     # Save imputed values
     z_mean = [model.encode(x_batch).mean().numpy() for x_batch in x_val_miss_batches]
     np.save(os.path.join(outdir, "z_mean"), np.vstack(z_mean))
