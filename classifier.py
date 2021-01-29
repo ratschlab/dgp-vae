@@ -5,6 +5,7 @@ Classifier for downstream proxy task of hirid representations.
 import numpy as np
 import os
 from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -41,30 +42,34 @@ def main(argv):
 
     # Create train and test set
     reps_train, reps_test, labels_train, labels_test = train_test_split(reps, labels, test_size=0.25, random_state=42)
+    # Standardize data
+    scaler = preprocessing.StandardScaler().fit(reps_train)
+    reps_train_scaled = scaler.transform(reps_train)
+    reps_test_scaled = scaler.transform(reps_test)
 
     # SVM classifier
     if FLAGS.classifier == 'svm':
         svm_clf = SVC(kernel='linear', random_state=FLAGS.seed)
-        svm_clf.fit(reps_train, labels_train)
+        svm_clf.fit(reps_train_scaled, labels_train)
         svm_score = roc_auc_score(labels_test,
-                                  svm_clf.decision_function(reps_test))
+                                  svm_clf.decision_function(reps_test_scaled))
         print(F'SVM: {svm_score}')
 
     # Logistic regression classifier
     elif FLAGS.classifier == 'lr':
         lr_clf = LogisticRegression(random_state=FLAGS.seed)
-        lr_clf.fit(reps_train, labels_train)
+        lr_clf.fit(reps_train_scaled, labels_train)
         lr_score = roc_auc_score(labels_test,
-                                 lr_clf.predict_proba(reps_test)[:, 1])
+                                 lr_clf.predict_proba(reps_test_scaled)[:, 1])
         print(F'Logistic regression: {lr_score}')
 
-    # Random forrest classifier
+    # Random forest classifier
     elif FLAGS.classifier == 'rf':
         rf_clf = RandomForestClassifier(random_state=FLAGS.seed)
-        rf_clf.fit(reps_train, labels_train)
+        rf_clf.fit(reps_train_scaled, labels_train)
         rf_score = roc_auc_score(labels_test,
-                                 rf_clf.predict_proba(reps_test)[:, 1])
-        print(F'SVM: {rf_score}')
+                                 rf_clf.predict_proba(reps_test_scaled)[:, 1])
+        print(F'Random Forest: {rf_score}')
 
 
 
