@@ -62,14 +62,14 @@ def aggregate_hirid(N, base_dir):
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
     if FLAGS.exp_name != '':
         subdirs = [subdir for subdir in subdirs if subdir.endswith(FLAGS.exp_name)]
-        print(subdirs)
+        # print(subdirs)
         subdirs = subdirs[:N]
     assert len(subdirs) == N
     for i, subdir in enumerate(subdirs):
         if FLAGS.dci_seed is not None:
             single_score_path = os.path.join(subdir,F'dci_assign_{FLAGS.dci_seed}.npz')
         else:
-            potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign')]
+            potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign_2')]
             print(potential_paths)
             single_score_path = os.path.join(subdir,potential_paths[0])
         single_score = np.load(single_score_path)
