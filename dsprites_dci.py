@@ -115,10 +115,10 @@ def main(argv, model_dir=None):
     # print('D: {}'.format(scores['disentanglement']))
     # print('C: {}'.format(scores['completeness']))
     # print('I: {}'.format(scores['informativeness_test']))
-    importance_matrix, _, _ = dci.compute_importance_gbt(
-        z_train[:8000, :].transpose(),
-        c_train[:8000, :].transpose().astype(int),
-        z_test[:2000, :].transpose(), c_test[:2000, :].transpose().astype(int))
+    importance_matrix, i_train, i_test = dci.compute_importance_gbt(
+        z_train[:20000, :].transpose(),
+        c_train[:20000, :].transpose().astype(int),
+        z_test[:5000, :].transpose(), c_test[:5000, :].transpose().astype(int))
     # Calculate scores
     d = dci.disentanglement(importance_matrix)
     c = dci.completeness(importance_matrix)
@@ -142,7 +142,7 @@ def main(argv, model_dir=None):
 
     if FLAGS.save_score:
         if FLAGS.data_type_dci in ['hirid', 'physionet']:
-            np.savez(F'{out_dir}/dci_assign_{FLAGS.dci_seed}', informativeness_train=0, informativeness_test=0,
+            np.savez(F'{out_dir}/dci_assign_2_{FLAGS.dci_seed}', informativeness_train=i_train, informativeness_test=i_test,
                      disentanglement=d, completeness=c,
                      disentanglement_assign=d_assign, completeness_assign=c_assign)
         else:
