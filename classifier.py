@@ -19,6 +19,7 @@ flags.DEFINE_integer('seed', 42, 'Random seed')
 flags.DEFINE_string('labels_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/mort_labels_test.npy', 'Hirid classification labels')
 flags.DEFINE_string('representation_path', '/cluster/home/bings/dgpvae/models/hirid/comp/base/dim_8/len_25/scaled/n_scales_4/210126_n_1', 'Path to latent representation that are used as input features.')
 flags.DEFINE_enum('classifier', 'svm', ['svm', 'lr', 'rf'], 'Classifier type')
+flags.DEFINE_bool('save', False, 'Save AUROC score.')
 
 def main(argv):
     del argv # Unused
@@ -51,26 +52,29 @@ def main(argv):
     if FLAGS.classifier == 'svm':
         svm_clf = SVC(kernel='linear', random_state=FLAGS.seed)
         svm_clf.fit(reps_train_scaled, labels_train)
-        svm_score = roc_auc_score(labels_test,
+        score = roc_auc_score(labels_test,
                                   svm_clf.decision_function(reps_test_scaled))
-        print(F'SVM: {svm_score}')
+        print(F'SVM: {score}')
 
     # Logistic regression classifier
     elif FLAGS.classifier == 'lr':
         lr_clf = LogisticRegression(solver='saga', max_iter=10000, random_state=FLAGS.seed)
         lr_clf.fit(reps_train_scaled, labels_train)
-        lr_score = roc_auc_score(labels_test,
+        score = roc_auc_score(labels_test,
                                  lr_clf.predict_proba(reps_test_scaled)[:, 1])
-        print(F'Logistic regression: {lr_score}')
+        print(F'Logistic regression: {score}')
 
     # Random forest classifier
     elif FLAGS.classifier == 'rf':
         rf_clf = RandomForestClassifier(random_state=FLAGS.seed)
         rf_clf.fit(reps_train_scaled, labels_train)
-        rf_score = roc_auc_score(labels_test,
+        score = roc_auc_score(labels_test,
                                  rf_clf.predict_proba(reps_test_scaled)[:, 1])
-        print(F'Random Forest: {rf_score}')
+        print(F'Random Forest: {score}')
 
+if FLAGS.save:
+    save_path = os.path.join(FLAGS.representation_path, F'auroc_{FLAGS.classifier}.npy')
+    np.save(save_path, score)
 
 
 
