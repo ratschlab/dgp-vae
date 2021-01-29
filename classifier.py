@@ -19,9 +19,12 @@ def main(argv):
     labels_full = np.load(FLAGS.labels_path)
     reps_path = os.path.join(FLAGS.representation_path, 'z_mean.npy')
     reps_full = np.load(reps_path)
+    # Reshape representations
+    reps_full_re = np.reshape(reps_full, (labels_full.shape[0], reps_full.shape[1], -1))
 
     print(labels_full.shape)
     print(reps_full.shape)
+    print(reps_full_re.shape)
 
 if __name__ == '__main__':
     app.run(main)
