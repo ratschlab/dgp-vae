@@ -131,7 +131,7 @@ def main(argv):
     print(dci_scores.shape)
     # print(np.round(dci_scores[0,...], 2))
     mean_scores = np.mean(dci_scores, axis=0)
-    std_scores = np.std(dci_scores, axis=0)
+    std_scores = np.std(dci_scores, axis=0) / np.sqrt(len(dci_scores)) # Yields standard error
     print(F'Mean D: {np.round(mean_scores[0], 3)}')
     print(F'Mean C: {np.round(mean_scores[1], 3)}')
     print(F'Mean D assign: {np.round(mean_scores[2], 3)}')
