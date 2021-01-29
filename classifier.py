@@ -26,12 +26,15 @@ def main(argv):
 
     # Filter out samples without label
     rm_idxs = np.where(labels_full == -1.0)[0]
-
+    labels = np.delete(labels_full, rm_idxs, axis=0)
+    reps = np.delete(reps_full_flat, rm_idxs, axis=0)
 
     print(labels_full.shape)
+    print(labels.shape)
     print(reps_full_flat.shape)
+    print(reps.shape)
 
-    print(rm_idxs)
+    print(rm_idxs.shape)
 
 if __name__ == '__main__':
     app.run(main)
