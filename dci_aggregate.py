@@ -77,7 +77,7 @@ def aggregate_hirid(N, base_dir):
         scores[i, 1] = single_score['completeness']
         scores[i, 2] = single_score['disentanglement_assign']
         scores[i, 3] = single_score['completeness_assign']
-        scores[i, 4] = single_score['informativeness_train']
+        scores[i, 4] = single_score['informativeness_test']
 
     return scores
 
