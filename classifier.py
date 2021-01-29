@@ -72,9 +72,9 @@ def main(argv):
                                  rf_clf.predict_proba(reps_test_scaled)[:, 1])
         print(F'Random Forest: {score}')
 
-if FLAGS.save:
-    save_path = os.path.join(FLAGS.representation_path, F'auroc_{FLAGS.classifier}.npy')
-    np.save(save_path, score)
+    if FLAGS.save:
+        save_path = os.path.join(FLAGS.representation_path, F'auroc_{FLAGS.classifier}.npy')
+        np.save(save_path, score)
 
 
 
