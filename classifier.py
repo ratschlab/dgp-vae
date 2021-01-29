@@ -22,7 +22,7 @@ def main(argv):
     # Reshape representations
     reps_full_re = np.reshape(reps_full, (labels_full.shape[0], reps_full.shape[1], -1))
     # Flatten latent time series
-    reps_full_flat = np.reshape(reps_full_re, (reps_full_re.shape[0], -1)
+    reps_full_flat = np.reshape(reps_full_re, (reps_full_re.shape[0], -1))
 
 
     print(labels_full.shape)
