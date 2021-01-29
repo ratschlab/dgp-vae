@@ -6,6 +6,8 @@ import numpy as np
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
 
 from absl import flags, app
@@ -15,6 +17,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer('seed', 42, 'Random seed')
 flags.DEFINE_string('labels_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/mort_labels_test.npy', 'Hirid classification labels')
 flags.DEFINE_string('representation_path', '/cluster/home/bings/dgpvae/models/hirid/comp/base/dim_8/len_25/scaled/n_scales_4/210126_n_1', 'Path to latent representation that are used as input features.')
+flags.DEFINE_enum('classifier', 'svm', ['svm', 'lr', 'rf'], 'Classifier type')
 
 def main(argv):
     del argv # Unused
@@ -40,11 +43,32 @@ def main(argv):
     reps_train, reps_test, labels_train, labels_test = train_test_split(reps, labels, test_size=0.25, random_state=42)
 
     # SVM classifier
-    svm_clf = SVC(kernel='linear', random_state=FLAGS.seed)
-    svm_clf.fit(reps_train, labels_train)
+    if FLAGS.classifier == 'svm':
+        svm_clf = SVC(kernel='linear', random_state=FLAGS.seed)
+        svm_clf.fit(reps_train, labels_train)
+        svm_score = roc_auc_score(labels_test,
+                                  svm_clf.decision_function(reps_test))
+        print(F'SVM: {svm_score}')
 
-    svm_score = roc_auc_score(labels_test, svm_clf.decision_function(reps_test))
-    print(svm_score)
+    # Logistic regression classifier
+    elif FLAGS.classifier == 'lr':
+        lr_clf = LogisticRegression(random_state=FLAGS.seed)
+        lr_clf.fit(reps_train, labels_train)
+        lr_score = roc_auc_score(labels_test,
+                                 lr_clf.predict_proba(reps_test)[:, 1])
+        print(F'Logistic regression: {lr_score}')
+
+    # Random forrest classifier
+    elif FLAGS.classifier == 'rf':
+        rf_clf = RandomForestClassifier(random_state=FLAGS.seed)
+        rf_clf.fit(reps_train, labels_train)
+        rf_score = roc_auc_score(labels_test,
+                                 rf_clf.predict_proba(reps_test)[:, 1])
+        print(F'SVM: {rf_score}')
+
+
+
+
 
 
 
