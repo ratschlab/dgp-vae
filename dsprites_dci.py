@@ -116,9 +116,9 @@ def main(argv, model_dir=None):
     # print('C: {}'.format(scores['completeness']))
     # print('I: {}'.format(scores['informativeness_test']))
     importance_matrix, i_train, i_test = dci.compute_importance_gbt(
-        z_train[:20000, :].transpose(),
-        c_train[:20000, :].transpose().astype(int),
-        z_test[:5000, :].transpose(), c_test[:5000, :].transpose().astype(int))
+        z_train[:8000, :].transpose(),
+        c_train[:8000, :].transpose().astype(int),
+        z_test[:2000, :].transpose(), c_test[:2000, :].transpose().astype(int))
     # Calculate scores
     d = dci.disentanglement(importance_matrix)
     c = dci.completeness(importance_matrix)
