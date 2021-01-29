@@ -4,6 +4,8 @@ Classifier for downstream proxy task of hirid representations.
 
 import numpy as np
 import os
+from sklearn.model_selection import train_test_split
+
 from absl import flags, app
 
 FLAGS = flags.FLAGS
@@ -29,12 +31,13 @@ def main(argv):
     labels = np.delete(labels_full, rm_idxs, axis=0)
     reps = np.delete(reps_full_flat, rm_idxs, axis=0)
 
-    print(labels_full.shape)
     print(labels.shape)
-    print(reps_full_flat.shape)
     print(reps.shape)
 
-    print(rm_idxs.shape)
+    # Create train and test set
+    reps_train, reps_test, labels_train, labels_test = train_test_split(reps, labels, test_size=0.25, random_state=42)
+
+
 
 if __name__ == '__main__':
     app.run(main)
