@@ -69,7 +69,7 @@ def aggregate_hirid(N, base_dir):
         if FLAGS.dci_seed is not None:
             single_score_path = os.path.join(subdir,F'dci_assign_{FLAGS.dci_seed}.npz')
         else:
-            potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign_2')]
+            potential_paths = [file.name for file in os.scandir(subdir) if file.name.startswith('dci_assign')]
             print(potential_paths)
             single_score_path = os.path.join(subdir,potential_paths[0])
         single_score = np.load(single_score_path)
