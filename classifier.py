@@ -25,13 +25,13 @@ def main(argv):
     reps_full_flat = np.reshape(reps_full_re, (reps_full_re.shape[0], -1))
 
     # Filter out samples without label
-    _, counts, idxs = np.unique(labels_full, return_counts=True, return_index=True)
+    vals, counts, idxs = np.unique(labels_full, return_counts=True, return_index=True)
 
 
     print(labels_full.shape)
     print(reps_full_flat.shape)
 
-    print(counts, idxs.shape)
+    print(vals, counts, idxs.shape)
 
 if __name__ == '__main__':
     app.run(main)
