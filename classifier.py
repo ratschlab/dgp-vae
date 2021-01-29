@@ -57,7 +57,7 @@ def main(argv):
 
     # Logistic regression classifier
     elif FLAGS.classifier == 'lr':
-        lr_clf = LogisticRegression(max_iter=1000, random_state=FLAGS.seed)
+        lr_clf = LogisticRegression(solver='saga', max_iter=1000, random_state=FLAGS.seed)
         lr_clf.fit(reps_train_scaled, labels_train)
         lr_score = roc_auc_score(labels_test,
                                  lr_clf.predict_proba(reps_test_scaled)[:, 1])
