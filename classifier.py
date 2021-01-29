@@ -21,10 +21,14 @@ def main(argv):
     reps_full = np.load(reps_path)
     # Reshape representations
     reps_full_re = np.reshape(reps_full, (labels_full.shape[0], reps_full.shape[1], -1))
+    # Flatten latent time series
+    reps_full_flat = np.reshape(reps_full_re, (reps_full_re.shape[0], -1)
+
 
     print(labels_full.shape)
     print(reps_full.shape)
     print(reps_full_re.shape)
+    print(reps_full_flat.shape)
 
 if __name__ == '__main__':
     app.run(main)
