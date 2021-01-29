@@ -57,7 +57,7 @@ def aggregate_gpvae(N, base_dir):
     return dci_scores
 
 def aggregate_hirid(N, base_dir):
-    scores = np.zeros((N,4))
+    scores = np.zeros((N,5))
 
     subdirs = [sub.path for sub in os.scandir(base_dir) if sub.is_dir()]
     if FLAGS.exp_name != '':
@@ -77,6 +77,7 @@ def aggregate_hirid(N, base_dir):
         scores[i, 1] = single_score['completeness']
         scores[i, 2] = single_score['disentanglement_assign']
         scores[i, 3] = single_score['completeness_assign']
+        scores[i, 4] = single_score['informativeness_train']
 
     return scores
 
@@ -137,6 +138,8 @@ def main(argv):
     print(F'Std D assign: {np.round(std_scores[2], 3)}')
     print(F'Mean C assign: {np.round(mean_scores[3], 3)}')
     print(F'Std C assign: {np.round(std_scores[3], 3)}')
+    print(F'Mean I assign: {np.round(mean_scores[4], 3)}')
+    print(F'Std I assign: {np.round(std_scores[4], 3)}')
     # print(F"Mean: {np.round(np.mean(dci_scores[0,...]), 2)}")
     # print(F"Median: {np.round(np.median(dci_scores[0,...]), 2)}")
 
