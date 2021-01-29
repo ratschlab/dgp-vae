@@ -31,7 +31,7 @@ def main(argv):
     print(labels_full.shape)
     print(reps_full_flat.shape)
 
-    print(rm_idxs.shape)
+    print(rm_idxs)
 
 if __name__ == '__main__':
     app.run(main)
