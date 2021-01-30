@@ -124,6 +124,7 @@ def main(argv, model_dir=None):
     c = dci.completeness(importance_matrix)
     print(F'D: {d}')
     print(F'C: {c}')
+    print(F'I: {i_test}')
 
     if FLAGS.data_type_dci in ['hirid', 'physionet']:
         miss_idxs = np.nonzero(np.invert(mask))[0]
@@ -146,7 +147,7 @@ def main(argv, model_dir=None):
                      disentanglement=d, completeness=c,
                      disentanglement_assign=d_assign, completeness_assign=c_assign)
         else:
-            np.savez(F'{out_dir}/dci_{FLAGS.dci_seed}', informativeness_train=0, informativeness_test=0,
+            np.savez(F'{out_dir}/dci_{FLAGS.dci_seed}', informativeness_train=i_train, informativeness_test=i_test,
                      disentanglement=d, completeness=c)
 
     # if FLAGS.save_score:
