@@ -43,5 +43,9 @@ The exact hyperparameters used for the experiments are reported in our paper.
 To reproduce our final results run the following commands:
 
 * dSprites, SmallNORB, Cars3D, Shapes3D: `python run_experiment.py --model_type dgp-vae 
---data_type {dsprites, smallnorb, cars3d, shapes3d} --time_len 5 --testing --batch_size 32 --exp_name reproduce_{dsprites, smallnorb, cars3d, shapes3d} --seed $RANDOM --banded_covar --latent_dim 64 --encoder_sizes=32,256,256 --print_interval 1 --decoder_sizes=256,256,256 --window_size 3 --sigma 1 --length_scale 2 --beta 1.0 --num_steps 100 --kernel cauchy --c_path /cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_dsprites_gp_full_range4.npz --shuffle --save_score --visualize_score`
+--data_type {dsprites, smallnorb, cars3d, shapes3d} --time_len 5 --testing --batch_size 32 
+--exp_name reproduce_{dsprites, smallnorb, cars3d, shapes3d} --seed $RANDOM --banded_covar 
+--latent_dim 64 --encoder_sizes=32,256,256 --decoder_sizes=256,256,256 --window_size 3 
+--sigma 1 --length_scale 2 --beta 1.0 --data_type_dci {dsprites, smallnorb, cars3d, shapes3d} 
+--shuffle --save_score --visualize_score`
   

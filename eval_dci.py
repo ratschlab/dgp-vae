@@ -16,10 +16,10 @@ import os
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('c_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npz', 'File path for underlying factors c')
+flags.DEFINE_string('c_path', '', 'File path for underlying factors c')
 flags.DEFINE_string('assign_mat_path', '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/hirid/assign_mats/assign_mat_1.npy', 'Path for assignment matrix')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
-flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'hirid', 'sprites', 'dsprites', 'smallnorb', 'cars3d'], 'Type of data and how to evaluate')
+flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'hirid', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d'], 'Type of data and how to evaluate')
 flags.DEFINE_list('score_factors', [], 'Underlying factors to consider in DCI score calculation')
 flags.DEFINE_enum('rescaling', 'linear', ['linear', 'standard'], 'Rescaling of ground truth factors')
 flags.DEFINE_bool('shuffle', False, 'Whether or not to shuffle evaluation data.')
@@ -46,17 +46,26 @@ def main(argv, model_dir=None):
         out_dir = model_dir
 
     z_path = '{}/z_mean.npy'.format(out_dir)
+
+    if FLAGS.c_path == '':
+        if FLAGS.data_type_dci != 'hirid':
+            c_path = os.path.join(F'/data/{FLAGS.data_type_dci}', F'factors_{FLAGS.data_type_dci}.npz')
+        else:
+            c_path = os.path.join(F'/data/{FLAGS.data_type_dci}', F'{FLAGS.data_type_dci}.npz')
+    else:
+        c_path = FLAGS.c_path
+
     if FLAGS.data_type_dci == "physionet":
         # Use imputed values as ground truth for physionet data
         c, z = load_z_c('{}/imputed.npy'.format(out_dir), z_path)
         c = np.transpose(c, (0,2,1))
     elif FLAGS.data_type_dci == "hirid":
-        c = np.load(FLAGS.c_path)['x_test_miss']
+        c = np.load(c_path)['x_test_miss']
         c = np.transpose(c, (0, 2, 1))
         c = c.astype(int)
         z = np.load(z_path)
     else:
-        c, z = load_z_c(FLAGS.c_path, z_path)
+        c, z = load_z_c(c_path, z_path)
 
     z_shape = z.shape
     c_shape = c.shape
