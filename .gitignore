@@ -115,6 +115,7 @@ venv.bak/
 data/*
 !/data/create_dataset.py
 !/data/create_hirid.py
+!/data/load*
 
 models/*
 cluster_logs/*
