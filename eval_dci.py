@@ -4,10 +4,6 @@ Simon Bing ETHZ, 2020
 Script to compute dci score of learned representation.
 """
 import warnings
-from typing import Union, Iterable
-
-from numpy.core._multiarray_umath import ndarray
-
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import numpy as np
@@ -37,12 +33,7 @@ def load_z_c(c_path, z_path):
     except IndexError:
         c_full = np.load(c_path)
     z = np.load(z_path)
-
-    len_new = z.shape[2]
-    # Check length of c and only take same amount of z values. Corresponds to z_test.
-    # c = c_full[:z.shape[0],:,:]
     c = c_full
-    # assert z.shape[0] == c.shape[0]
 
     return c, z
 
@@ -55,16 +46,12 @@ def main(argv, model_dir=None):
         out_dir = model_dir
 
     z_path = '{}/z_mean.npy'.format(out_dir)
-    # z_path = '{}/z_eval_mean.npy'.format(out_dir)
-    # project_path = '/cluster/work/grlab/projects/projects2020_disentangled_gpvae/data/dsprites/factors_5000.npy'
-    # z_path = os.path.join(project_path, FLAGS.z_name)
     if FLAGS.data_type_dci == "physionet":
         # Use imputed values as ground truth for physionet data
         c, z = load_z_c('{}/imputed.npy'.format(out_dir), z_path)
         c = np.transpose(c, (0,2,1))
     elif FLAGS.data_type_dci == "hirid":
         c = np.load(FLAGS.c_path)['x_test_miss']
-        # c = np.load(FLAGS.c_path)['feature_batches']
         c = np.transpose(c, (0, 2, 1))
         c = c.astype(int)
         z = np.load(z_path)
@@ -110,15 +97,17 @@ def main(argv, model_dir=None):
 
     c_train, c_test, z_train, z_test = train_test_split(c_reshape, z_reshape, test_size=0.2, shuffle=FLAGS.shuffle, random_state=FLAGS.dci_seed)
 
-    # scores = dci._compute_dci(z_train[:8000,:].transpose(), c_train[:8000,:].transpose(), z_test[:2000,:].transpose(), c_test[:2000,:].transpose())
-    #
-    # print('D: {}'.format(scores['disentanglement']))
-    # print('C: {}'.format(scores['completeness']))
-    # print('I: {}'.format(scores['informativeness_test']))
+    if FLAGS.data_type_dci == "hirid":
+        n_train = 20000
+        n_test = 5000
+    else:
+        n_train = 8000
+        n_test = 2000
+
     importance_matrix, i_train, i_test = dci.compute_importance_gbt(
-        z_train[:8000, :].transpose(),
-        c_train[:8000, :].transpose().astype(int),
-        z_test[:2000, :].transpose(), c_test[:2000, :].transpose().astype(int))
+        z_train[:n_train, :].transpose(),
+        c_train[:n_train, :].transpose().astype(int),
+        z_test[:n_test, :].transpose(), c_test[:n_test, :].transpose().astype(int))
     # Calculate scores
     d = dci.disentanglement(importance_matrix)
     c = dci.completeness(importance_matrix)
@@ -150,67 +139,28 @@ def main(argv, model_dir=None):
             np.savez(F'{out_dir}/dci_{FLAGS.dci_seed}', informativeness_train=i_train, informativeness_test=i_test,
                      disentanglement=d, completeness=c)
 
-    # if FLAGS.save_score:
-    #     np.savez('{}/dci_{}_{}_{}'.format(out_dir, z_shape[1], c_shape[1], z_shape[0]),
-    #              informativeness_train=scores['informativeness_train'],
-    #              informativeness_test=scores['informativeness_test'],
-    #              disentanglement=scores['disentanglement'],
-    #              completeness=scores['completeness'])
-    #     print("Score saved")
-
     # Visualization
     if FLAGS.visualize_score:
-        # importance_matrix, _, _ = dci.compute_importance_gbt(
-        #     z_train[:20000,:].transpose(), c_train[:20000,:].transpose().astype(int),
-        #     z_test[:5000,:].transpose(), c_test[:5000,:].transpose().astype(int))
-
-        if FLAGS.data_type_dci == 'physionet':
-            importance_matrix = np.insert(importance_matrix,
-                                               np.nonzero(np.invert(mask))[0],
-                                               0, axis=1)
-            assign_mat = np.load(FLAGS.assign_mat_path)
-            importance_matrix_physio = np.matmul(importance_matrix, assign_mat)
-            visualize_scores.heat_square(importance_matrix, out_dir,
-                                         F"dci_matrix_{FLAGS.dci_seed}",
-                                         "x_axis", "y_axis")
-            visualize_scores.heat_square(importance_matrix_physio, out_dir,
-                                         "dci_matrix_physio",
-                                         "x_axis", "y_axis")
-            np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
-            np.save(F"{out_dir}/impt_matrix_phys_{FLAGS.dci_seed}", importance_matrix_physio)
-        elif FLAGS.data_type_dci == 'hirid':
-            # miss_idxs = np.nonzero(np.invert(mask))[0]
-            # for idx in miss_idxs:
-            #     importance_matrix = np.insert(importance_matrix,
-            #                                   idx,
-            #                                   0, axis=1)
-            # assign_mat = np.load(FLAGS.assign_mat_path)
-            # impt_mat_assign = np.matmul(importance_matrix, assign_mat)
-            # impt_mat_assign_norm = np.nan_to_num(impt_mat_assign/np.sum(impt_mat_assign, axis=0))
-            #
-            # # Calculate scores
-            # d = dci.disentanglement(importance_matrix)
-            # c = dci.completeness(importance_matrix)
-            # d_assign = dci.disentanglement(impt_mat_assign_norm)
-            # c_assign = dci.completeness(impt_mat_assign_norm)
-
+        if FLAGS.data_type_dci == 'hirid':
             # Visualize
             visualize_scores.heat_square(np.transpose(importance_matrix), out_dir,
                                          F"dci_matrix_{FLAGS.dci_seed}",
                                          "feature", "latent dim")
             visualize_scores.heat_square(np.transpose(impt_mat_assign_norm), out_dir,
-                                         F"dci_matrix_assign_2_{FLAGS.dci_seed}",
+                                         F"dci_matrix_assign_{FLAGS.dci_seed}",
                                          "feature", "latent_dim")
 
             # Save importance matrices
             if FLAGS.save_score:
                 np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
-                np.save(F"{out_dir}/impt_matrix_assign_2_{FLAGS.dci_seed}", impt_mat_assign_norm)
+                np.save(F"{out_dir}/impt_matrix_assign_{FLAGS.dci_seed}", impt_mat_assign_norm)
 
         else:
+            # Visualize
             visualize_scores.heat_square(importance_matrix, out_dir,
                                          F"dci_matrix_{FLAGS.dci_seed}",
                                          "x_axis", "y_axis")
+            # Save importance matrices
             np.save(F"{out_dir}/impt_matrix_{FLAGS.dci_seed}", importance_matrix)
 
     print("Evaluation finished")

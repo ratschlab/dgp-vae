@@ -3,7 +3,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=(FutureWarning, DeprecationWarning, RuntimeWarning))
 
 import train
-import dsprites_dci as dci
+import eval_dci as dci
 
 def run_experiment(argv):
     # del argv
