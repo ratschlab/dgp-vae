@@ -113,6 +113,8 @@ venv.bak/
 .mypy_cache/
 
 data/*
+!/data/create_dataset.py
+
 models/*
 cluster_logs/*
 lsf.*
