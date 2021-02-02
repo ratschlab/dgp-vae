@@ -71,6 +71,7 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 dataset_check.ipynb
+eval_model.ipynb
 *.ipynb
 
 # pyenv
