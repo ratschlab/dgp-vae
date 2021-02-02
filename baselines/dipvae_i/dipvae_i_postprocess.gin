@@ -1,4 +1,0 @@
-
-postprocess.postprocess_fn = @mean_representation
-dataset.name="auto"
-postprocess.random_seed = 0
