@@ -74,6 +74,10 @@ dataset_check.ipynb
 eval_model.ipynb
 *.ipynb
 
+# Helper scripts
+hirid_labels.py
+hirid_utils.py
+
 # pyenv
 .python-version
 
