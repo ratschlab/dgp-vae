@@ -14,7 +14,7 @@ from absl import flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('hirid_merged_dir', '/hirid/partitions', 'Base directory of hirid (merged) pq partitions.')
-flags.DEFINE_string('out_dir', '/hirid', 'Where to save data.')
+flags.DEFINE_string('out_dir', 'hirid', 'Where to save data.')
 flags.DEFINE_integer('seed', 42, 'Random seed.')
 
 def filter_and_reshape(data, idxs, counts, time_len):
