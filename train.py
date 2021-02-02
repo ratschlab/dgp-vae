@@ -40,7 +40,7 @@ FLAGS = flags.FLAGS
 # flags.DEFINE_float('beta', 1.0, 'Factor to weigh the KL term (similar to beta-VAE)')
 # flags.DEFINE_integer('num_epochs', 1, 'Number of training epochs')
 
-# Physionet config
+# HiRID config
 flags.DEFINE_integer('latent_dim', 8, 'Dimensionality of the latent space')
 flags.DEFINE_list('encoder_sizes', [128, 128], 'Layer sizes of the encoder')
 flags.DEFINE_list('decoder_sizes', [256, 256], 'Layer sizes of the decoder')
@@ -66,7 +66,7 @@ flags.DEFINE_integer('cnn_kernel_size', 3, 'Kernel size for the CNN preprocessor
 flags.DEFINE_list('cnn_sizes', [256], 'Number of filters for the layers of the CNN preprocessor')
 flags.DEFINE_boolean('testing', False, 'Use the actual test set for testing')
 flags.DEFINE_boolean('banded_covar', False, 'Use a banded covariance matrix instead of a diagonal one for the output of the inference network: Ignored if model_type is not gp-vae')
-flags.DEFINE_integer('batch_size', 64, 'Batch size for training')
+flags.DEFINE_integer('batch_size', 32, 'Batch size for training')
 
 flags.DEFINE_integer('M', 1, 'Number of samples for ELBO estimation')
 flags.DEFINE_integer('K', 1, 'Number of importance sampling weights')
