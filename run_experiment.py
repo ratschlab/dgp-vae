@@ -2,7 +2,7 @@ from absl import app
 import warnings
 warnings.simplefilter(action='ignore', category=(FutureWarning, DeprecationWarning, RuntimeWarning))
 
-import train_exp as train
+import train
 import dsprites_dci as dci
 
 def run_experiment(argv):
