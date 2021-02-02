@@ -40,10 +40,6 @@ def create_data(factors):
 
     N_train = factors_train.shape[0]
     N_test = factors_test.shape[0]
-    ### LOCAL DEBUG
-    N_train = 10
-    N_test = 5
-    ### LOCAL DEBUG
     time_len = factors_train.shape[1]
 
     if FLAGS.data_type in ["dsprites", "smallnorb"]:
