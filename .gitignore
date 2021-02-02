@@ -127,6 +127,8 @@ lsf.*
 *.index
 .DS_Store
 
+scripts/*
+
 # Baselines
 baselines/
 #baselines/betatcvae

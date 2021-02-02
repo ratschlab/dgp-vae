@@ -38,7 +38,7 @@ with the state-of-the-art model for disentanglement that can exploit the structu
     and save the Parquet partitons of the `merged` stage of the pre-processed data in a directory.
     To create the training data from the partitions, run `python create_hirid.py --hirid_merged_dir /path/to/hirid/partitions`.
     Finally, to download the assignment matrix required for the DCI score calculation, run 
-    `data/load_hirid_assign.sh`
+    `data/load_hirid_assign.sh`.
 6. Run the command `python run_experiment.py --model_type dgp-vae --data_type {dsprites, smallnorb, cars3d, shapes3d, hirid} 
 --exp_name <your_name> ...`
 
