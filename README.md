@@ -1,18 +1,23 @@
 # DGP-VAE: Disentangled GP-VAE
-Model to learn disentangled representations from time series. 
+Tensorflow implementation of the DGP-VAE model. 
+Accompanying code for our paper.
 
 ## Overview
-Our model is an extension of the GP-VAE model used for time series imputation ([code](https://github.com/ratschlab/GP-VAE), [paper](http://arxiv.org/abs/1907.04155)).
+We investigate the performance of a [GP-VAE](http://arxiv.org/abs/1907.04155) type model to learning
+disentangled representations from time series by providing a slightly modified model: the DGP-VAE.
 
-The base GP-VAE model uses Variational Autoencoders in conjunction with a Gaussian Process prior to encode a latent time series from the time series in the feature space. 
-We test a number of extensions to this model with the goal of further improving disentanglement.
+Our model learns disentangled representations from sequential data 
+by modeling each independent latent channel with a Gaussian Process and employing
+a structured variational distribution that can capture long-term dependencies in time.
 
-* Weak Supervision: As the change over time of the underlying factors of variation is sparse in all
-time series, we argue that most of the latent factors of paired time series will be shared. We explicitly enforce the sharing of some factors to exploit this assumption.
+We show the efficacy of our approach in two experiments:
 
-* Learnable Length Scales: The length scales of the GP kernel can now be learned to increase the expressive power of the model.
+1) A benchmark experiment comparing against state-of-the-art disentanglement models on synthetic data.
 
-More extensions and improvements tbd. This is still a work in progress.
+2) An experiment on real medical time series data, where we provide a detailed comparison 
+with the state-of-the-art model for disentanglement that can exploit the structure of sequential data.
+
+![A test image](figures/overview.png)
 
 ## Dependencies
 
