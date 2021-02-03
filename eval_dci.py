@@ -17,7 +17,7 @@ import os
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('c_path', '', 'File path for underlying factors c')
-flags.DEFINE_string('assign_mat_path', '/data/hirid/assign_mats/hirid_assign_mat.npy', 'Path for assignment matrix')
+flags.DEFINE_string('assign_mat_path', 'data/hirid/assign_mats/hirid_assign_mat.npy', 'Path for assignment matrix')
 flags.DEFINE_string('model_name', '', 'Name of model directory to get learned latent code')
 flags.DEFINE_enum('data_type_dci', 'dsprites', ['hmnist', 'physionet', 'hirid', 'sprites', 'dsprites', 'smallnorb', 'cars3d', 'shapes3d'], 'Type of data and how to evaluate')
 flags.DEFINE_list('score_factors', [], 'Underlying factors to consider in DCI score calculation')
