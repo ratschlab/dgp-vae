@@ -1,5 +1,5 @@
 """
-Script to train the proposed DGP-VAE model.
+Script to train the DGP-VAE model.
 """
 
 import sys

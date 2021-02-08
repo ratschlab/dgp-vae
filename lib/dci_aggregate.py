@@ -1,8 +1,5 @@
 """
 Aggregate and plot dci scores of models.
-
-Simon Bing,
-ETHZ 2020
 """
 
 import numpy as np
